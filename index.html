@@ -3,730 +3,381 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Name | Interactive Portfolio</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for icons -->
+  <title>Your Name | Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #ec4899;
-      --accent: #06d6a0;
-      --bg: #0f172a;
-      --bg-light: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --card-bg: rgba(30, 41, 59, 0.8);
-      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --bg: #0a0a0f;
+      --card: rgba(30, 30, 45, 0.8);
+      --text: #ffffff;
+      --muted: #9ca3af;
     }
-
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
-
-    body { 
-      font-family: "Poppins", sans-serif; 
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: "Poppins", sans-serif;
       background: var(--bg);
-      color: var(--text); 
-      line-height: 1.6; 
+      color: var(--text);
       overflow-x: hidden;
-      scroll-behavior: smooth;
     }
-
+    
     /* Animated background */
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
       z-index: -1;
-      animation: backgroundShift 20s ease-in-out infinite;
+      animation: float 20s ease-in-out infinite;
     }
-
-    @keyframes backgroundShift {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; transform: scale(1.1); }
+    
+    @keyframes float {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(180deg); }
     }
-
-    /* Custom cursor */
-    .cursor {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--primary);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transition: transform 0.1s ease;
-      mix-blend-mode: difference;
-    }
-
-    /* Header styles */
+    
     header {
-      position: relative;
-      text-align: center;
-      padding: 4rem 1rem;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
     }
-
-    .hero-content {
-      animation: fadeInUp 1s ease-out;
-    }
-
-    .typing-animation {
-      border-right: 3px solid var(--primary);
-      animation: blink 1s infinite;
-      min-height: 1.2em;
-      display: inline-block;
-    }
-
-    @keyframes blink {
-      0%, 50% { border-color: var(--primary); }
-      51%, 100% { border-color: transparent; }
-    }
-
-    header h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
+    
+    h1 {
+      font-size: 3.5rem;
       margin-bottom: 1rem;
-      background: var(--gradient);
+      background: linear-gradient(45deg, #6366f1, #ec4899);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 700;
-      animation: slideInFromTop 1s ease-out 0.2s both;
+      animation: slideDown 1s ease;
     }
-
-    header p {
-      color: var(--text-muted);
+    
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.3rem;
       margin-bottom: 2rem;
-      font-size: 1.2rem;
-      animation: slideInFromTop 1s ease-out 0.4s both;
+      animation: slideUp 1s ease 0.3s both;
     }
-
+    
     nav {
-      animation: slideInFromTop 1s ease-out 0.6s both;
+      animation: fadeIn 1s ease 0.6s both;
     }
-
+    
     nav a {
       margin: 0 1rem;
-      text-decoration: none;
       color: var(--text);
-      font-weight: 600;
-      position: relative;
-      padding: 0.5rem 1rem;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 25px;
       transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-block;
     }
-
+    
     nav a:hover {
       background: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
     }
-
-    .scroll-indicator {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: bounce 2s infinite;
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-      40% { transform: translateX(-50%) translateY(-10px); }
-      60% { transform: translateX(-50%) translateY(-5px); }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    /* Animation keyframes */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    @keyframes slideInFromTop {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideInFromLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    /* Container and sections */
+    
     .container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: auto;
       padding: 4rem 1rem;
     }
-
+    
     section {
-      margin-bottom: 6rem;
+      margin-bottom: 4rem;
       opacity: 0;
-      transform: translateY(50px);
-      transition: all 0.8s ease;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
     }
-
-    section.animate {
+    
+    section.show {
       opacity: 1;
       transform: translateY(0);
     }
-
+    
     h2 {
-      margin-bottom: 2rem;
       font-size: 2.5rem;
-      background: var(--gradient);
+      text-align: center;
+      margin-bottom: 3rem;
+      background: linear-gradient(45deg, var(--primary), #ec4899);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 700;
-      text-align: center;
       position: relative;
     }
-
+    
     h2::after {
       content: '';
       position: absolute;
-      bottom: -10px;
-      left: 50%;
+      bottom: -10px; left: 50%;
       transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
+      width: 50px; height: 3px;
       background: var(--primary);
       border-radius: 2px;
     }
-
-    /* Projects grid */
+    
     .projects {
       display: grid;
       gap: 2rem;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      margin-top: 3rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
-
+    
     .card {
-      background: var(--card-bg);
+      background: var(--card);
       backdrop-filter: blur(20px);
-      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 15px;
       padding: 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s ease;
+      cursor: pointer;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
     }
-
+    
     .card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
       transition: left 0.6s ease;
     }
-
-    .card:hover::before {
-      left: 100%;
-    }
-
+    
+    .card:hover::before { left: 100%; }
+    
     .card:hover {
-      transform: translateY(-10px) rotateX(5deg);
+      transform: translateY(-10px);
       box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
-      border-color: var(--primary);
     }
-
-    .card-icon {
-      font-size: 3rem;
+    
+    .card i {
+      font-size: 2.5rem;
       color: var(--primary);
       margin-bottom: 1rem;
-      transition: all 0.3s ease;
+      display: block;
+      transition: transform 0.3s ease;
     }
-
-    .card:hover .card-icon {
-      transform: scale(1.1) rotate(10deg);
-      color: var(--accent);
+    
+    .card:hover i {
+      transform: scale(1.1) rotate(5deg);
     }
-
+    
     .card h3 {
+      font-size: 1.4rem;
       margin-bottom: 1rem;
-      font-size: 1.5rem;
-      color: var(--text);
     }
-
+    
     .card p {
-      font-size: 1rem;
-      color: var(--text-muted);
+      color: var(--muted);
       margin-bottom: 1.5rem;
+      line-height: 1.6;
     }
-
-    .card-links a {
-      margin-right: 1rem;
+    
+    .card a {
       color: var(--primary);
       text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      position: relative;
+      margin-right: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
     }
-
-    .card-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--primary);
-      transition: width 0.3s ease;
-    }
-
-    .card-links a:hover::after {
-      width: 100%;
-    }
-
-    .card-links a:hover {
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    /* Skills section */
-    .skills-container {
-      display: grid;
-      gap: 2rem;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      margin-top: 3rem;
-    }
-
-    .skill-item {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border-radius: 15px;
-      padding: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .skill-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
-    }
-
-    .skill-name {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .skill-bar {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .skill-progress {
-      height: 100%;
-      background: var(--gradient);
-      border-radius: 4px;
-      transition: width 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      position: relative;
-    }
-
-    .skill-progress::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    /* About section */
+    
+    .card a:hover { color: #ec4899; }
+    
     .about {
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .about p {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .stat-item {
-      text-align: center;
-      padding: 2rem;
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border-radius: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .stat-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
-    }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Contact section */
-    .contact {
       text-align: center;
       max-width: 600px;
       margin: 0 auto;
     }
-
-    .contact p {
+    
+    .about p {
       font-size: 1.2rem;
-      color: var(--text-muted);
+      color: var(--muted);
+      line-height: 1.8;
       margin-bottom: 2rem;
     }
-
+    
+    .skills {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      margin-top: 2rem;
+    }
+    
+    .skill {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .skill:hover { transform: translateY(-5px); }
+    
+    .skill-name {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .skill-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .skill-progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #ec4899);
+      border-radius: 3px;
+      transition: width 1.5s ease;
+      width: 0;
+    }
+    
+    .contact {
+      text-align: center;
+    }
+    
+    .contact p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
     .socials {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin-top: 2rem;
     }
-
+    
     .socials a {
-      width: 60px;
-      height: 60px;
+      width: 50px; height: 50px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 50%;
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
       color: var(--text);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 1.2rem;
       text-decoration: none;
+      transition: all 0.3s ease;
     }
-
+    
     .socials a:hover {
-      transform: translateY(-10px) scale(1.1);
       background: var(--primary);
-      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
-    }
-
-    /* Contact form */
-    .contact-form {
-      margin-top: 3rem;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 1rem;
-      background: var(--card-bg);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: inherit;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(20px);
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    .submit-btn {
-      background: var(--gradient);
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 25px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
+      transform: translateY(-5px);
       box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
     }
-
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .submit-btn:hover::before {
-      left: 100%;
-    }
-
-    /* Footer */
+    
     footer {
       text-align: center;
       padding: 2rem;
-      margin-top: 4rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 2rem;
     }
-
-    /* Progress bar */
-    .progress-bar {
+    
+    .scroll-top {
       position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: var(--gradient);
-      z-index: 1000;
-      transition: width 0.3s ease;
-    }
-
-    /* Floating action button */
-    .fab {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient);
+      bottom: 20px; right: 20px;
+      width: 45px; height: 45px;
+      background: var(--primary);
       border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-      z-index: 1000;
-    }
-
-    .fab:hover {
-      transform: scale(1.1);
-      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .projects {
-        grid-template-columns: 1fr;
-      }
-      
-      header h1 {
-        font-size: 2.5rem;
-      }
-      
-      .socials {
-        flex-wrap: wrap;
-      }
-      
-      nav a {
-        margin: 0.5rem;
-        display: inline-block;
-      }
-    }
-
-    /* Loading animation */
-    .loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      transition: opacity 0.5s ease;
-    }
-
-    .loading.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(99, 102, 241, 0.3);
-      border-top: 3px solid var(--primary);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      color: white;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
     }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    
+    .scroll-top.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .scroll-top:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .projects { grid-template-columns: 1fr; }
+      nav a { margin: 0.5rem; display: block; }
     }
   </style>
 </head>
 <body>
-  <!-- Loading screen -->
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-  </div>
-
-  <!-- Progress bar -->
-  <div class="progress-bar" id="progressBar"></div>
-
-  <!-- Custom cursor -->
-  <div class="cursor" id="cursor"></div>
-
-  <!-- Floating action button -->
-  <button class="fab" id="backToTop" onclick="scrollToTop()">
-    <i class="fas fa-arrow-up"></i>
-  </button>
-
   <header>
-    <div class="hero-content">
-      <h1>Your Name</h1>
-      <p class="typing-animation" id="typingText"></p>
-      <nav>
-        <a href="#projects" onclick="smoothScroll('#projects')">Projects</a>
-        <a href="#skills" onclick="smoothScroll('#skills')">Skills</a>
-        <a href="#about" onclick="smoothScroll('#about')">About</a>
-        <a href="#contact" onclick="smoothScroll('#contact')">Contact</a>
-      </nav>
-    </div>
-    <div class="scroll-indicator">
-      <i class="fas fa-chevron-down" style="color: var(--primary); font-size: 1.5rem;"></i>
-    </div>
+    <h1>Your Name</h1>
+    <p class="subtitle">Frontend Developer • Designer • Problem Solver</p>
+    <nav>
+      <a href="#projects" onclick="scrollTo('projects')">Projects</a>
+      <a href="#about" onclick="scrollTo('about')">About</a>
+      <a href="#contact" onclick="scrollTo('contact')">Contact</a>
+    </nav>
   </header>
 
   <div class="container">
-    <!-- Projects -->
     <section id="projects">
-      <h2><i class="fa-solid fa-laptop-code"></i> Projects</h2>
+      <h2><i class="fas fa-code"></i> Projects</h2>
       <div class="projects">
         <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-globe"></i>
-          </div>
+          <i class="fas fa-globe"></i>
           <h3>Portfolio Website</h3>
-          <p>A responsive personal portfolio built with HTML, CSS & JavaScript featuring modern animations and interactive elements.</p>
-          <div class="card-links">
-            <a href="#" onclick="showDemo('portfolio')">Live Demo</a>
-            <a href="#" onclick="showCode('portfolio')">Source Code</a>
-          </div>
+          <p>A responsive personal portfolio built with HTML, CSS & JavaScript.</p>
+          <a href="#">Live Demo</a>
+          <a href="#">Source Code</a>
         </div>
         <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-chart-bar"></i>
-          </div>
+          <i class="fas fa-chart-bar"></i>
           <h3>Data Dashboard</h3>
-          <p>Interactive charts & analytics dashboard using Python, Flask, and modern data visualization libraries.</p>
-          <div class="card-links">
-            <a href="#" onclick="showDemo('dashboard')">Live Demo</a>
-            <a href="#" onclick="showCode('dashboard')">Source Code</a>
-          </div>
+          <p>Interactive charts & analytics using Python & Flask.</p>
+          <a href="#">Live Demo</a>
+          <a href="#">Source Code</a>
         </div>
         <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-mobile-alt"></i>
-          </div>
+          <i class="fas fa-mobile-alt"></i>
           <h3>Mobile App UI</h3>
-          <p>Designed a clean and modern mobile app interface with focus on user experience and accessibility.</p>
-          <div class="card-links">
-            <a href="#" onclick="showDemo('mobile')">Case Study</a>
-          </div>
+          <p>Designed a clean and modern mobile app interface.</p>
+          <a href="#">Case Study</a>
         </div>
       </div>
     </section>
 
-    <!-- Skills -->
-    <section id="skills">
-      <h2><i class="fa-solid fa-code"></i> Skills</h2>
-      <div class="skills-container">
-        <div class="skill-item">
+    <section id="about" class="about">
+      <h2><i class="fas fa-user"></i> About</h2>
+      <p>Hello! I'm a passionate developer who loves creating modern, user-friendly web experiences. Skilled in HTML, CSS, JavaScript, and exploring frameworks like React. Always eager to learn and take on new challenges.</p>
+      
+      <div class="skills">
+        <div class="skill">
           <div class="skill-name">
             <span>JavaScript</span>
             <span>90%</span>
@@ -735,7 +386,7 @@
             <div class="skill-progress" data-width="90"></div>
           </div>
         </div>
-        <div class="skill-item">
+        <div class="skill">
           <div class="skill-name">
             <span>React</span>
             <span>85%</span>
@@ -744,7 +395,7 @@
             <div class="skill-progress" data-width="85"></div>
           </div>
         </div>
-        <div class="skill-item">
+        <div class="skill">
           <div class="skill-name">
             <span>Python</span>
             <span>80%</span>
@@ -753,91 +404,18 @@
             <div class="skill-progress" data-width="80"></div>
           </div>
         </div>
-        <div class="skill-item">
-          <div class="skill-name">
-            <span>UI/UX Design</span>
-            <span>75%</span>
-          </div>
-          <div class="skill-bar">
-            <div class="skill-progress" data-width="75"></div>
-          </div>
-        </div>
-        <div class="skill-item">
-          <div class="skill-name">
-            <span>Node.js</span>
-            <span>70%</span>
-          </div>
-          <div class="skill-bar">
-            <div class="skill-progress" data-width="70"></div>
-          </div>
-        </div>
-        <div class="skill-item">
-          <div class="skill-name">
-            <span>Database</span>
-            <span>65%</span>
-          </div>
-          <div class="skill-bar">
-            <div class="skill-progress" data-width="65"></div>
-          </div>
-        </div>
       </div>
     </section>
 
-    <!-- About -->
-    <section id="about" class="about">
-      <h2><i class="fa-solid fa-user"></i> About</h2>
-      <p>Hello! I'm a passionate developer who loves creating modern, user-friendly web experiences. Skilled in HTML, CSS, JavaScript, and exploring frameworks like React. Always eager to learn and take on new challenges in the ever-evolving world of technology.</p>
-      
-      <div class="stats">
-        <div class="stat-item">
-          <span class="stat-number" data-count="50">0</span>
-          <span>Projects Completed</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number" data-count="25">0</span>
-          <span>Happy Clients</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number" data-count="3">0</span>
-          <span>Years Experience</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number" data-count="100">0</span>
-          <span>Cups of Coffee</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact -->
     <section id="contact" class="contact">
-      <h2><i class="fa-solid fa-envelope"></i> Contact</h2>
+      <h2><i class="fas fa-envelope"></i> Contact</h2>
       <p>If you'd like to collaborate or just say hi, feel free to connect with me:</p>
-      
       <div class="socials">
-        <a href="mailto:you@example.com"><i class="fa-solid fa-envelope"></i></a>
+        <a href="mailto:you@example.com"><i class="fas fa-envelope"></i></a>
         <a href="#"><i class="fab fa-linkedin"></i></a>
         <a href="#"><i class="fab fa-github"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
       </div>
-
-      <form class="contact-form" onsubmit="handleFormSubmit(event)">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" required></textarea>
-        </div>
-        <button type="submit" class="submit-btn">
-          Send Message
-        </button>
-      </form>
     </section>
   </div>
 
@@ -845,93 +423,64 @@
     © <span id="year"></span> Your Name. All rights reserved.
   </footer>
 
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
   <script>
-    // Loading screen
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('loading').classList.add('hidden');
-      }, 1500);
-    });
-
-    // Custom cursor
-    const cursor = document.getElementById('cursor');
-    let mouseX = 0, mouseY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    function updateCursor() {
-      cursor.style.left = mouseX - 10 + 'px';
-      cursor.style.top = mouseY - 10 + 'px';
-      requestAnimationFrame(updateCursor);
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Smooth scroll function
+    function scrollTo(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
-    updateCursor();
-
-    // Typing animation
-    const texts = [
-      'Frontend Developer',
-      'UI/UX Designer', 
-      'Problem Solver',
-      'Creative Thinker'
-    ];
-    let textIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    const typingElement = document.getElementById('typingText');
-
-    function typeEffect() {
-      const currentText = texts[textIndex];
-      
-      if (isDeleting) {
-        typingElement.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-      } else {
-        typingElement.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
-      }
-
-      let speed = isDeleting ? 100 : 150;
-
-      if (!isDeleting && charIndex === currentText.length) {
-        speed = 2000;
-        isDeleting = true;
-      } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        textIndex = (textIndex + 1) % texts.length;
-        speed = 500;
-      }
-
-      setTimeout(typeEffect, speed);
-    }
-
-    // Start typing animation after a delay
-    setTimeout(typeEffect, 2000);
-
-    // Scroll progress bar
-    function updateProgressBar() {
-      const scrollTop = document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrollTop / scrollHeight) * 100;
-      document.getElementById('progressBar').style.width = progress + '%';
-    }
-
-    window.addEventListener('scroll', updateProgressBar);
-
-    // Smooth scrolling
-    function smoothScroll(target) {
-      document.querySelector(target).scrollIntoView({
-        behavior: 'smooth'
-      });
-    }
-
-    // Scroll to top
+    
     function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    // Show/hide
+    
+    // Show sections on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          
+          // Animate skill bars
+          if (entry.target.id === 'about') {
+            setTimeout(() => {
+              document.querySelectorAll('.skill-progress').forEach(bar => {
+                bar.style.width = bar.dataset.width + '%';
+              });
+            }, 500);
+          }
+        }
+      });
+    });
+    
+    document.querySelectorAll('section').forEach(section => {
+      observer.observe(section);
+    });
+    
+    // Show scroll to top button
+    window.addEventListener('scroll', () => {
+      const scrollTop = document.getElementById('scrollTop');
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add('show');
+      } else {
+        scrollTop.classList.remove('show');
+      }
+    });
+    
+    // Add click effect to cards
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+  </script>
+</body>
+</html>
