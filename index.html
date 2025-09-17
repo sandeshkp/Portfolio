@@ -200,7 +200,6 @@
     }
 
     .card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 25px;
       padding: 2.5rem;
       color: white;
@@ -213,26 +212,32 @@
       flex-direction: column;
       justify-content: space-between;
     }
-
-    .card:nth-child(2) {
+    
+    /* Card Backgrounds */
+    .card.analytical {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .card.power-bi {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     }
-
-    .card:nth-child(3) {
+    .card.machine-learning {
       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     }
 
-    .card:nth-child(4) {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    /* Styles for Tool Logos */
+    .tool-logos {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        position: relative;
+        z-index: 2;
     }
-
-    .card:nth-child(5) {
-      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
-
-    .card:nth-child(6) {
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-      color: #333;
+    .tool-logos img {
+        height: 30px;
+        width: auto;
+        opacity: 0.9;
     }
 
     .card::before {
@@ -284,6 +289,7 @@
       opacity: 0.9;
       position: relative;
       z-index: 2;
+      flex-grow: 1; /* Allow p to take up space before logos */
     }
 
     .card-number {
@@ -616,7 +622,7 @@
     <div class="container">
       <div class="content">
         <div class="stats">
-         
+          
         </div>
 
         <h1>Hello</h1>
@@ -631,7 +637,6 @@
     </div>
   </div>
 
-  <!-- Cards Section -->
   <div class="cards-section" id="cards-section">
     <div class="section-title">
       <h2>My Expertise</h2>
@@ -639,46 +644,46 @@
     </div>
 
     <div class="cards-grid">
-      <div class="card">
-        <div class="card-number">01</div>
-        <div class="card-icon">🎨</div>
-        <h3>UI/UX Design</h3>
-        <p>Creating intuitive and beautiful user interfaces that enhance user experience and drive engagement through thoughtful design principles.</p>
+      <div class="card analytical">
+        <div>
+            <div class="card-number">01</div>
+            <div class="card-icon">⚙️</div>
+            <h3>Analytical Software</h3>
+            <p>Developing custom analytical applications using a robust tech stack for data processing and visualization.</p>
+        </div>
+        <div class="tool-logos">
+            <img src="https://cdn.simpleicons.org/flask/white" alt="Flask Logo" title="Flask">
+            <img src="https://cdn.simpleicons.org/django/white" alt="Django Logo" title="Django">
+            <img src="https://cdn.simpleicons.org/mysql/white" alt="MySQL Logo" title="MySQL">
+            <img src="https://cdn.simpleicons.org/docker/white" alt="Docker Logo" title="Docker">
+            <img src="https://cdn.simpleicons.org/sap/white" alt="SAP HANA Logo" title="SAP HANA">
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-number">02</div>
-        <div class="card-icon">💻</div>
-        <h3>Web Development</h3>
-        <p>Building responsive, fast, and scalable websites using modern technologies and best practices to ensure optimal performance.</p>
+      <div class="card power-bi">
+        <div>
+            <div class="card-number">02</div>
+            <div class="card-icon">📊</div>
+            <h3>Power BI</h3>
+            <p>Creating interactive dashboards and reports to turn complex data into actionable insights with Power BI.</p>
+        </div>
+        <div class="tool-logos">
+            <img src="https://cdn.simpleicons.org/powerbi/white" alt="Power BI Logo" title="Power BI">
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-number">03</div>
-        <div class="card-icon">📱</div>
-        <h3>Mobile Apps</h3>
-        <p>Developing native and cross-platform mobile applications that provide seamless user experiences across all devices.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-number">04</div>
-        <div class="card-icon">🚀</div>
-        <h3>Brand Strategy</h3>
-        <p>Crafting comprehensive brand strategies that resonate with your target audience and differentiate you from competitors.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-number">05</div>
-        <div class="card-icon">⚡</div>
-        <h3>Performance</h3>
-        <p>Optimizing applications and websites for maximum speed, efficiency, and user satisfaction through advanced techniques.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-number">06</div>
-        <div class="card-icon">🔧</div>
-        <h3>Maintenance</h3>
-        <p>Providing ongoing support and maintenance to keep your digital assets running smoothly and up-to-date.</p>
+      <div class="card machine-learning">
+        <div>
+            <div class="card-number">03</div>
+            <div class="card-icon">🧠</div>
+            <h3>Machine Learning</h3>
+            <p>Building and deploying machine learning models to solve real-world problems and drive business value.</p>
+        </div>
+        <div class="tool-logos">
+            <img src="https://cdn.simpleicons.org/tensorflow/white" alt="TensorFlow Logo" title="TensorFlow">
+            <img src="https://cdn.simpleicons.org/pytorch/white" alt="PyTorch Logo" title="PyTorch">
+            <img src="https://cdn.simpleicons.org/scikitlearn/white" alt="Scikit-learn Logo" title="Scikit-learn">
+        </div>
       </div>
     </div>
 
