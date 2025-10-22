@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -983,4 +982,32 @@
       if (container && leftBtn && rightBtn) {
         if (window.innerWidth <= 768) {
             leftBtn.style.display = 'none';
-            rightBtn.
+            rightBtn.style.display = 'none';
+            return;
+        } else {
+            leftBtn.style.display = 'flex';
+            rightBtn.style.display = 'flex';
+        }
+          
+        const isAtStart = container.scrollLeft <= 0;
+        const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 1;
+        
+        leftBtn.style.opacity = isAtStart ? '0.3' : '0.8';
+        rightBtn.style.opacity = isAtEnd ? '0.3' : '0.8';
+        leftBtn.style.cursor = isAtStart ? 'not-allowed' : 'pointer';
+        rightBtn.style.cursor = isAtEnd ? 'not-allowed' : 'pointer';
+      }
+    }
+
+    function openProject() {
+      window.location.href = 'project.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('projectsGrid');
+      if (container) {
+        container.addEventListener('scroll', updateScrollButtons);
+        window.addEventListener('resize', updateScrollButtons);
+        updateScrollButtons();
+      }
+    });
