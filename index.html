@@ -579,7 +579,7 @@
       }
 
       .experience-container {
-        padding: 2rem 0; /* Changed padding to remove side spacing for full-width feel */
+        padding: 2rem 0;
         margin-bottom: 3rem;
       }
       
@@ -587,7 +587,7 @@
         flex-direction: column;
         text-align: center;
         gap: 1.5rem;
-        padding: 0 1rem; /* Add padding here so text doesn't touch the edges */
+        padding: 0 1rem;
       }
 
       .company-name {
@@ -598,35 +598,32 @@
         font-size: 1.1rem;
       }
       
-      /* === CHANGES ARE HERE === */
       .projects-grid {
-        padding: 0.5rem 1rem 1rem 1rem; /* Add padding to the sides */
+        padding: 0.5rem 1rem 1rem 1rem;
         display: flex;
-        flex-direction: row; /* Ensure it's a row */
-        overflow-x: auto; /* Allow horizontal scrolling */
+        flex-direction: row;
+        overflow-x: auto;
         gap: 1rem;
       }
 
-      /* Hide scrollbar for a cleaner mobile experience */
       .projects-grid::-webkit-scrollbar {
         display: none;
       }
       .projects-grid {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
       .project-card {
         padding: 1.5rem;
         min-height: 160px;
-        min-width: 240px; /* Make card smaller than the screen */
+        min-width: 240px;
         max-width: 260px;
-        flex-shrink: 0; /* Prevent cards from shrinking */
+        flex-shrink: 0;
       }
-      /* === END OF CHANGES === */
 
       .scroll-controls {
-        display: none; /* Hide arrow buttons on mobile */
+        display: none;
       }
 
       .featured-cards {
@@ -767,7 +764,6 @@
       }
     }
 
-    /* Smooth scroll behavior */
     html {
       scroll-behavior: smooth;
     }
@@ -825,14 +821,12 @@
     </div>
   </div>
 
-
-
       <div class="projects-container">
         <button class="scroll-controls scroll-left" onclick="scrollProjects('left')" aria-label="Scroll left">
           ←
         </button>
         <div class="projects-grid" id="projectsGrid">
-          <div class="project-card analytical">
+          <div class="project-card analytical" onclick="openProject()">
             <div>
               <div class="project-icon">⚙️</div>
               <h4>Sales Analytics Platform</h4>
@@ -846,7 +840,7 @@
             </div>
           </div>
 
-          <div class="project-card power-bi">
+          <div class="project-card power-bi" onclick="openProject()">
             <div>
               <div class="project-icon">📊</div>
               <h4>Sales Dashboards</h4>
@@ -857,7 +851,7 @@
             </div>
           </div>
 
-          <div class="project-card machine-learning">
+          <div class="project-card machine-learning" onclick="openProject()">
             <div>
               <div class="project-icon">🧠</div>
               <h4>Predictive Sales Models</h4>
@@ -870,7 +864,7 @@
             </div>
           </div>
 
-          <div class="project-card analytical">
+          <div class="project-card analytical" onclick="openProject()">
             <div>
               <div class="project-icon">📈</div>
               <h4>Revenue Analytics</h4>
@@ -882,7 +876,7 @@
             </div>
           </div>
 
-          <div class="project-card power-bi">
+          <div class="project-card power-bi" onclick="openProject()">
             <div>
               <div class="project-icon">🎯</div>
               <h4>Market Analysis</h4>
@@ -894,7 +888,7 @@
             </div>
           </div>
 
-          <div class="project-card machine-learning">
+          <div class="project-card machine-learning" onclick="openProject()">
             <div>
               <div class="project-icon">👥</div>
               <h4>Customer Segmentation</h4>
@@ -980,14 +974,12 @@
       }
     }
 
-    // Update scroll button visibility based on scroll position
     function updateScrollButtons() {
       const container = document.getElementById('projectsGrid');
       const leftBtn = document.querySelector('.scroll-left');
       const rightBtn = document.querySelector('.scroll-right');
       
-      if (container && leftBtn && rightBtn) { // Check if buttons exist
-        // Hide buttons on small screens where they are set to display: none
+      if (container && leftBtn && rightBtn) {
         if (window.innerWidth <= 768) {
             leftBtn.style.display = 'none';
             rightBtn.style.display = 'none';
@@ -1007,18 +999,22 @@
       }
     }
 
-    // Add event listeners
+    function openProject() {
+      window.location.href = 'project.html';
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const container = document.getElementById('projectsGrid');
       if (container) {
         container.addEventListener('scroll', updateScrollButtons);
-        window.addEventListener('resize', updateScrollButtons); // Also update on window resize
-        updateScrollButtons(); // Initial call
+        window.addEventListener('resize', updateScrollButtons);
+        updateScrollButtons();
       }
     });
   </script>
 
 </body>
 </html>
+
 
 
