@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <title>Portfolio</title>
   <style>
     body {
       background-color: #121212;
@@ -13,11 +13,16 @@
       padding: 0;
     }
 
+    h2 {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
     .projects-grid {
       display: flex;
       overflow-x: auto;
       gap: 1rem;
-      padding: 1rem;
+      padding: 2rem;
     }
 
     .project-card {
@@ -46,7 +51,9 @@
 
     .project-link {
       text-decoration: none;
+      color: inherit;
     }
+
     .project-link:hover {
       text-decoration: none;
     }
@@ -54,50 +61,50 @@
 </head>
 <body>
 
-  <h2 style="text-align:center; padding-top:1rem;">Projects</h2>
+  <h2>My Projects</h2>
 
-  <div class="projects-grid" id="projectsGrid">
+  <div class="projects-grid">
 
     <a href="project.html" class="project-link">
-      <div class="project-card analytical">
+      <div class="project-card">
         <div>
           <div class="project-icon">⚙️</div>
           <h4>Sales Analytics Platform</h4>
-          <p>Developing comprehensive analytical solutions for sales performance tracking and customer segmentation.</p>
+          <p>Developing analytical solutions for tracking sales performance and customer segmentation.</p>
         </div>
         <div class="project-tools">
-          <img src="https://cdn.simpleicons.org/flask/white" alt="Flask Logo" title="Flask">
-          <img src="https://cdn.simpleicons.org/django/white" alt="Django Logo" title="Django">
-          <img src="https://cdn.simpleicons.org/mysql/white" alt="MySQL Logo" title="MySQL">
-          <img src="https://cdn.simpleicons.org/docker/white" alt="Docker Logo" title="Docker">
+          <img src="https://cdn.simpleicons.org/flask/white" title="Flask">
+          <img src="https://cdn.simpleicons.org/django/white" title="Django">
+          <img src="https://cdn.simpleicons.org/mysql/white" title="MySQL">
+          <img src="https://cdn.simpleicons.org/docker/white" title="Docker">
         </div>
       </div>
     </a>
 
     <a href="project.html" class="project-link">
-      <div class="project-card power-bi">
+      <div class="project-card">
         <div>
           <div class="project-icon">📊</div>
           <h4>Sales Dashboards</h4>
-          <p>Creating interactive Power BI dashboards for real-time sales monitoring and executive reporting.</p>
+          <p>Creating interactive Power BI dashboards for real-time monitoring and reporting.</p>
         </div>
         <div class="project-tools">
-          <img src="https://cdn.simpleicons.org/powerbi/white" alt="Power BI Logo" title="Power BI">
+          <img src="https://cdn.simpleicons.org/powerbi/white" title="Power BI">
         </div>
       </div>
     </a>
 
     <a href="project.html" class="project-link">
-      <div class="project-card machine-learning">
+      <div class="project-card">
         <div>
           <div class="project-icon">🧠</div>
           <h4>Predictive Sales Models</h4>
-          <p>Building ML models for sales forecasting and customer lifetime value prediction.</p>
+          <p>Building machine learning models for forecasting and customer lifetime value prediction.</p>
         </div>
         <div class="project-tools">
-          <img src="https://cdn.simpleicons.org/tensorflow/white" alt="TensorFlow Logo" title="TensorFlow">
-          <img src="https://cdn.simpleicons.org/pytorch/white" alt="PyTorch Logo" title="PyTorch">
-          <img src="https://cdn.simpleicons.org/scikitlearn/white" alt="Scikit-learn Logo" title="Scikit-learn">
+          <img src="https://cdn.simpleicons.org/tensorflow/white" title="TensorFlow">
+          <img src="https://cdn.simpleicons.org/pytorch/white" title="PyTorch">
+          <img src="https://cdn.simpleicons.org/scikitlearn/white" title="Scikit-learn">
         </div>
       </div>
     </a>
