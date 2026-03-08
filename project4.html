@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealer Allotment Script — DMS | Sandesh K P</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #111;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.55;
+            font-size: 0.68rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.45rem 0.9rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.65rem;
+            z-index: 1000;
+            transition: color 0.2s;
+        }
+
+        .back-button:hover {
+            color: #0077ff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 4rem auto 2rem auto;
+            background: #fff;
+            padding: 1.6rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0077ff;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
+            color: #0077ff;
+        }
+
+        h3 {
+            font-size: 0.7rem;
+            margin-bottom: 0.3rem;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 18px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding-bottom: 6px;
+            font-size: 0.7rem;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #0077ff;
+            border-bottom: 2px solid #0077ff;
+            font-weight: 500;
+        }
+
+        .tab:hover:not(.active) {
+            color: #0077ff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Note box */
+        .note-box {
+            background: #fafafa;
+            border-left: 3px solid #0077ff;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 0.6rem 0 0.8rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        .timeline p {
+            margin-bottom: 0.45rem;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.56rem;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #444;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge.blue   { background: #e0f0ff; color: #0055cc; }
+        .badge.orange { background: #fff3e0; color: #cc5500; }
+        .badge.green  { background: #e0ffe0; color: #006600; }
+        .badge.grey   { background: #f0f0f0; color: #444; }
+
+        /* Metrics row */
+        .metrics-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+
+        .metric-chip {
+            background: #f0f7ff;
+            border: 1px solid #c0d9ff;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            text-align: center;
+        }
+
+        .metric-chip .val {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0077ff;
+            display: block;
+        }
+
+        .metric-chip .lbl {
+            font-size: 0.55rem;
+            color: #666;
+        }
+
+        /* Two column */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 0.6rem 0;
+        }
+
+        .col-box {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 0.7rem;
+            border: 1px solid #eee;
+        }
+
+        /* Pipeline */
+        .pipeline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin: 0.7rem 0;
+            align-items: center;
+        }
+
+        .pipe-step {
+            background: #0077ff;
+            color: white;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.6rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .pipe-arrow {
+            font-size: 0.7rem;
+            color: #aaa;
+            padding: 0 0.3rem;
+        }
+
+        /* Traffic light allotment status */
+        .traffic-grid {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 0.7rem 0;
+        }
+
+        .traffic-card {
+            flex: 1;
+            min-width: 160px;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            color: white;
+        }
+
+        .traffic-card.green  { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .traffic-card.red    { background: linear-gradient(135deg, #f5576c, #f093fb); }
+        .traffic-card.black  { background: linear-gradient(135deg, #2c3e50, #4a5568); }
+
+        .traffic-card .tc-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+
+        .traffic-card .tc-desc {
+            font-size: 0.6rem;
+            opacity: 0.9;
+            line-height: 1.45;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            font-family: "Courier New", monospace;
+            font-size: 0.62rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 0.6rem 0;
+        }
+
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str { color: #a6e3a1; }
+        .code-block .cm  { color: #6c7086; font-style: italic; }
+        .code-block .num { color: #fab387; }
+
+        /* Tools logo row */
+        .tools-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.8rem 0;
+            padding: 0.8rem;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .tools-row img {
+            height: 28px;
+            width: auto;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .tools-row img:hover {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .two-col { grid-template-columns: 1fr; }
+
+            .pipeline {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+
+            .traffic-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-button">← Back to Home</a>
+
+    <div class="container">
+
+        <h1>Dealer Allotment Script — DMS Department</h1>
+
+        <div class="tabs">
+            <div class="tab active"  onclick="openTab('overview',   this)">Overview</div>
+            <div class="tab"         onclick="openTab('problem',    this)">Problem</div>
+            <div class="tab"         onclick="openTab('logic',      this)">Allotment Logic</div>
+            <div class="tab"         onclick="openTab('pipeline',   this)">Script Pipeline</div>
+            <div class="tab"         onclick="openTab('criteria',   this)">Criteria Engine</div>
+            <div class="tab"         onclick="openTab('output',     this)">Output & Impact</div>
+        </div>
+
+
+        <!-- ══════════════════════ OVERVIEW ══════════════════════ -->
+        <div id="overview" class="tab-content active">
+
+            <div class="note-box">
+                <b>Note:</b> Data and outputs shown are reconstructed examples.
+                Original dealer records and allotment datasets are protected
+                under company data confidentiality policy.
+            </div>
+
+            <p>
+                The Dealer Allotment Script is a production-grade Python automation
+                built entirely in <b>Pandas, NumPy</b> and <b>Jupyter Notebook</b>,
+                deployed within the Distribution Management System (DMS) department
+                to govern the daily allocation of footwear products to dealers
+                across all distribution zones.
+            </p>
+
+            <p>
+                Each morning, dealers submit their product requirements for the day
+                through the DMS portal. The script ingests these requirements,
+                cross-references them against real-time stock availability, applies
+                a multi-layered rationalisation engine, and produces a finalised
+                allotment output — which is then directly consumed by the production
+                planning and warehouse dispatch teams to initiate the day's operations.
+            </p>
+
+            <h2>What Makes This Non-Trivial</h2>
+
+            <p>
+                On the surface this reads as a distribution problem. In practice, it is a
+                constrained optimisation exercise: hundreds of dealers competing for limited
+                stock across dozens of SKUs, each with different priorities, inventory
+                classifications, market standing and outstanding dues — all resolved in
+                a single automated script run before 9 AM every working day.
+            </p>
+
+            <div class="metrics-row">
+                <div class="metric-chip">
+                    <span class="val">Daily</span>
+                    <span class="lbl">Execution Frequency</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">3</span>
+                    <span class="lbl">Allotment Tiers</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">Multi-factor</span>
+                    <span class="lbl">Rationalisation Engine</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">Zero</span>
+                    <span class="lbl">Manual Interventions Required</span>
+                </div>
+            </div>
+
+            <h2>Core Technology Stack</h2>
+
+            <div class="tools-row">
+                <img src="https://cdn.simpleicons.org/python/3776ab"     alt="Python"  title="Python">
+                <img src="https://cdn.simpleicons.org/pandas/150458"     alt="Pandas"  title="Pandas">
+                <img src="https://cdn.simpleicons.org/numpy/013243"      alt="NumPy"   title="NumPy">
+                <img src="https://cdn.simpleicons.org/jupyter/f37626"    alt="Jupyter" title="Jupyter Notebook">
+                <img src="https://cdn.simpleicons.org/mysql/4479a1"      alt="MySQL"   title="MySQL">
+                <img src="https://cdn.simpleicons.org/microsoftexcel/217346" alt="Excel" title="Excel / openpyxl">
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════ PROBLEM ══════════════════════ -->
+        <div id="problem" class="tab-content">
+
+            <h2>Business Problem</h2>
+
+            <p>
+                Prior to this script, allotment was performed manually by the DMS team
+                using Excel sheets and telephonic coordination with warehouse and
+                production planners. The process was:
+            </p>
+
+            <div class="timeline">
+                <p>• <b>Time-intensive</b> — consuming 3–4 hours of DMS team time each morning</p>
+                <p>• <b>Inconsistent</b> — allotment decisions varied by individual judgment, not standardised criteria</p>
+                <p>• <b>Opaque</b> — no audit trail for why a specific dealer received or was denied a product</p>
+                <p>• <b>Reactive</b> — stock priorities were not weighted by market performance or inventory class</p>
+                <p>• <b>Error-prone</b> — manual data entry mismatches between DMS portal and dispatch sheets</p>
+            </div>
+
+            <h2>Objective</h2>
+
+            <p>
+                Design and deploy a fully automated allotment engine that:
+            </p>
+
+            <div class="timeline">
+                <p>• Ingests the previous day's dealer requirements from DMS portal export</p>
+                <p>• Reads live stock availability from the warehouse inventory table</p>
+                <p>• Applies multi-criteria rationalisation to resolve demand-supply gaps</p>
+                <p>• Classifies every allotment line into a Red / Green / Black tier</p>
+                <p>• Produces a finalised, production-ready allotment sheet by 9 AM</p>
+                <p>• Maintains a full audit log of every decision made by the script</p>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════ ALLOTMENT LOGIC ══════════════════════ -->
+        <div id="logic" class="tab-content">
+
+            <h2>Three-Tier Rationalisation System</h2>
+
+            <p>
+                The core innovation of this script is its traffic-light classification system.
+                Every dealer–SKU allotment line is assigned one of three statuses based on a
+                weighted multi-criteria scoring engine before a single unit is dispatched.
+            </p>
+
+            <div class="traffic-grid">
+
+                <div class="traffic-card green">
+                    <div class="tc-label">🟢 GREEN — Full Allotment</div>
+                    <div class="tc-desc">
+                        Stock is available. Dealer priority score is high.
+                        Inventory class supports dispatch. Market trend is
+                        positive for this SKU–zone combination.
+                        Full requirement quantity is allotted and flagged
+                        for immediate dispatch.
+                    </div>
+                </div>
+
+                <div class="traffic-card red">
+                    <div class="tc-label">🔴 RED — Partial / Deferred</div>
+                    <div class="tc-desc">
+                        Demand exceeds available stock OR dealer priority
+                        score falls below threshold. Requirement is
+                        rationalised — partial quantity allotted based on
+                        fair-share logic. Remaining demand is queued for
+                        the next production cycle.
+                    </div>
+                </div>
+
+                <div class="traffic-card black">
+                    <div class="tc-label">⚫ BLACK — Blocked</div>
+                    <div class="tc-desc">
+                        Allotment is blocked due to outstanding dues,
+                        credit limit breach, zero stock with no replenishment
+                        in pipeline, or market inactivity flag. Dealer is
+                        notified via DMS portal. No dispatch initiated.
+                    </div>
+                </div>
+
+            </div>
+
+            <h2>Criteria Weights (Multi-Factor Scoring)</h2>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h3>Dealer-Level Factors</h3>
+                    <div class="timeline">
+                        <p>• <b>Priority class</b> — A / B / C dealer tier from CRM</p>
+                        <p>• <b>Outstanding dues</b> — overdue invoice ageing bucket</p>
+                        <p>• <b>Credit utilisation</b> — % of credit limit consumed</p>
+                        <p>• <b>Historical offtake</b> — trailing 30-day sales velocity</p>
+                        <p>• <b>Market activity</b> — last order recency flag</p>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <h3>SKU / Stock Factors</h3>
+                    <div class="timeline">
+                        <p>• <b>Stock availability</b> — warehouse live count vs. requirement</p>
+                        <p>• <b>Inventory class</b> — fast / slow / non-moving classification</p>
+                        <p>• <b>Market trend</b> — regional sell-through rate for the SKU</p>
+                        <p>• <b>Replenishment pipeline</b> — production schedule visibility</p>
+                        <p>• <b>Minimum dispatch qty</b> — carton/pair floor enforced</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════ SCRIPT PIPELINE ══════════════════════ -->
+        <div id="pipeline" class="tab-content">
+
+            <h2>End-to-End Script Execution Flow</h2>
+
+            <div class="pipeline">
+                <div class="pipe-step">DMS Export Ingest</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Data Validation</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Stock Merge</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Dealer Scoring</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Rationalisation Engine</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Traffic Light Classifier</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Allotment Sheet Export</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">Audit Log Write</div>
+            </div>
+
+            <h2>Step-by-Step Breakdown</h2>
+
+            <div class="timeline">
+                <p>
+                    <b>Step 1 — Ingest:</b> Previous day's dealer requirements loaded from
+                    DMS portal CSV export into a Pandas DataFrame. Schema validation
+                    checks for missing SKUs, null quantities, and unknown dealer codes.
+                </p>
+                <p>
+                    <b>Step 2 — Stock Merge:</b> Live warehouse stock table (MySQL) queried
+                    via SQLAlchemy and merged on SKU key. Available stock quantity
+                    computed after reserving safety stock buffer.
+                </p>
+                <p>
+                    <b>Step 3 — Dealer Master Join:</b> Dealer priority class, credit
+                    utilisation, outstanding dues and market activity flags joined
+                    from the dealer master table.
+                </p>
+                <p>
+                    <b>Step 4 — Composite Scoring:</b> Each dealer–SKU row scored using
+                    a weighted NumPy dot product across all criteria columns.
+                    Rows sorted descending by composite score before allotment begins.
+                </p>
+                <p>
+                    <b>Step 5 — Iterative Allotment Loop:</b> Script iterates over
+                    sorted rows. For each row, available stock is decremented by
+                    allotted quantity. Once stock reaches zero for a SKU,
+                    all remaining rows for that SKU are flagged RED or BLACK.
+                </p>
+                <p>
+                    <b>Step 6 — Classification:</b> Traffic-light status assigned per
+                    row based on allotment outcome and blocking conditions.
+                </p>
+                <p>
+                    <b>Step 7 — Output Export:</b> Final allotment DataFrame written
+                    to a formatted Excel file via openpyxl with conditional cell
+                    colouring (green / red / black rows) for DMS team readability.
+                </p>
+                <p>
+                    <b>Step 8 — Audit Log:</b> Every decision appended to a persistent
+                    MySQL audit table with timestamp, dealer code, SKU, requested qty,
+                    allotted qty, status, and blocking reason code.
+                </p>
+            </div>
+
+            <h2>Representative Script Logic (Pseudocode)</h2>
+
+            <div class="code-block">
+<span class="cm"># Step 4 — Composite Dealer-SKU Scoring</span>
+weights = np.array([<span class="num">0.30</span>, <span class="num">0.25</span>, <span class="num">0.20</span>, <span class="num">0.15</span>, <span class="num">0.10</span>])
+<span class="cm"># [priority_class, stock_ratio, offtake_velocity, dues_flag, trend_score]</span>
+
+df[<span class="str">'composite_score'</span>] = df[criteria_cols].<span class="fn">values</span> @ weights
+df = df.<span class="fn">sort_values</span>(<span class="str">'composite_score'</span>, ascending=<span class="kw">False</span>).<span class="fn">reset_index</span>(drop=<span class="kw">True</span>)
+
+<span class="cm"># Step 5 — Iterative Allotment with Stock Decrement</span>
+stock_pool = stock_df.<span class="fn">set_index</span>(<span class="str">'sku_code'</span>)[<span class="str">'available_qty'</span>].<span class="fn">to_dict</span>()
+
+<span class="kw">for</span> idx, row <span class="kw">in</span> df.<span class="fn">iterrows</span>():
+    sku   = row[<span class="str">'sku_code'</span>]
+    req   = row[<span class="str">'requested_qty'</span>]
+    avail = stock_pool.<span class="fn">get</span>(sku, <span class="num">0</span>)
+
+    <span class="kw">if</span> row[<span class="str">'blocked_flag'</span>] == <span class="num">1</span>:
+        df.<span class="fn">at</span>[idx, <span class="str">'allotted_qty'</span>]  = <span class="num">0</span>
+        df.<span class="fn">at</span>[idx, <span class="str">'status'</span>]         = <span class="str">'BLACK'</span>
+
+    <span class="kw">elif</span> avail >= req:
+        df.<span class="fn">at</span>[idx, <span class="str">'allotted_qty'</span>]  = req
+        df.<span class="fn">at</span>[idx, <span class="str">'status'</span>]         = <span class="str">'GREEN'</span>
+        stock_pool[sku]              -= req
+
+    <span class="kw">elif</span> avail > <span class="num">0</span>:
+        df.<span class="fn">at</span>[idx, <span class="str">'allotted_qty'</span>]  = avail
+        df.<span class="fn">at</span>[idx, <span class="str">'status'</span>]         = <span class="str">'RED'</span>
+        stock_pool[sku]               = <span class="num">0</span>
+
+    <span class="kw">else</span>:
+        df.<span class="fn">at</span>[idx, <span class="str">'allotted_qty'</span>]  = <span class="num">0</span>
+        df.<span class="fn">at</span>[idx, <span class="str">'status'</span>]         = <span class="str">'RED'</span>
+
+<span class="cm"># Step 7 — Export with conditional formatting</span>
+writer = pd.<span class="fn">ExcelWriter</span>(<span class="str">'allotment_output.xlsx'</span>, engine=<span class="str">'openpyxl'</span>)
+df.<span class="fn">to_excel</span>(writer, index=<span class="kw">False</span>, sheet_name=<span class="str">'Allotment'</span>)
+<span class="fn">apply_traffic_light_formatting</span>(writer, df)
+writer.<span class="fn">save</span>()
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════════ CRITERIA ENGINE ══════════════════════ -->
+        <div id="criteria" class="tab-content">
+
+            <h2>Rationalisation Criteria — Full Detail</h2>
+
+            <h3>1. Dealer Priority Class (Weight: 30%)</h3>
+            <p>
+                Each dealer is pre-classified into Tier A, B or C based on
+                their historical annual offtake, geographic market size and
+                relationship tenure. Tier A dealers receive first-priority
+                access during stock scarcity. This classification is pulled
+                live from the dealer master and encoded numerically
+                (A = 3, B = 2, C = 1) before scoring.
+            </p>
+
+            <h3>2. Stock Availability Ratio (Weight: 25%)</h3>
+            <p>
+                Computed as <code>available_stock / total_requested_across_all_dealers</code>
+                for each SKU. When this ratio falls below 1.0 (oversubscription),
+                the rationalisation engine activates fair-share distribution logic —
+                each dealer receives a proportionate allocation weighted by their
+                composite score rank.
+            </p>
+
+            <h3>3. Offtake Velocity (Weight: 20%)</h3>
+            <p>
+                Trailing 30-day sell-through rate for the dealer–SKU pair,
+                computed from historical DMS sales data. High-velocity
+                dealer–SKU combinations are prioritised to prevent stockouts
+                at active market points and maintain fill rates where demand
+                is proven and recurring.
+            </p>
+
+            <h3>4. Outstanding Dues Flag (Weight: 15%)</h3>
+            <p>
+                Dealers with overdue invoices beyond the credit policy threshold
+                (typically 45 days past due) receive a hard block flag.
+                Dealers within the 15–45 day bucket receive a partial score
+                penalty, reducing their allotment rank without full blockage.
+                This criterion directly enforces financial discipline across
+                the distribution network.
+            </p>
+
+            <h3>5. Market Trend Score (Weight: 10%)</h3>
+            <p>
+                Regional sell-through trend for the SKU over the past 60 days,
+                normalised between 0 and 1. SKUs with declining regional
+                sell-through are deprioritised in allotment — preventing
+                inventory pile-up at dealers in saturated micro-markets.
+                This signal is derived from the broader sales analytics pipeline.
+            </p>
+
+            <h2>Inventory Classification Overlay</h2>
+            <div class="timeline">
+                <p>• <b>Fast Moving</b> — High sell-through, replenished frequently. Allotted first.</p>
+                <p>• <b>Slow Moving</b> — Below-average velocity. Allotted only to high-priority dealers with recent order history.</p>
+                <p>• <b>Non-Moving</b> — Zero sell-through in 90 days. Blocked from fresh allotment. Flagged for scheme or liquidation review.</p>
+            </div>
+
+            <span class="badge blue">Pandas</span>
+            <span class="badge blue">NumPy</span>
+            <span class="badge orange">Jupyter Notebook</span>
+            <span class="badge green">openpyxl</span>
+            <span class="badge green">SQLAlchemy</span>
+            <span class="badge grey">MySQL</span>
+
+        </div>
+
+
+        <!-- ══════════════════════ OUTPUT & IMPACT ══════════════════════ -->
+        <div id="output" class="tab-content">
+
+            <h2>Script Output — Allotment Sheet</h2>
+
+            <p>
+                The final output is a colour-coded Excel workbook consumed by
+                three downstream teams simultaneously:
+            </p>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h3>DMS Team</h3>
+                    <div class="timeline">
+                        <p>• Dealer-wise allotment with GREEN / RED / BLACK status per SKU line</p>
+                        <p>• Blocking reason codes for BLACK rows (dues, credit, zero stock)</p>
+                        <p>• Partial allotment quantities for RED rows with shortfall detail</p>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <h3>Production &amp; Warehouse</h3>
+                    <div class="timeline">
+                        <p>• Consolidated GREEN allotment list fed into Production Planning Software (PPS)</p>
+                        <p>• SKU-wise total allotted quantity triggers production batch sizing</p>
+                        <p>• Warehouse dispatch queue generated directly from allotment output</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Operational Impact</h2>
+
+            <div class="metrics-row">
+                <div class="metric-chip">
+                    <span class="val">~3.5 hrs</span>
+                    <span class="lbl">Daily Time Saved</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">100%</span>
+                    <span class="lbl">Decision Auditability</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">Zero</span>
+                    <span class="lbl">Manual Entry Errors</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">&lt; 90 sec</span>
+                    <span class="lbl">Full Script Runtime</span>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <p>• Eliminated daily 3–4 hour manual allotment coordination process entirely</p>
+                <p>• Standardised allotment decisions across all zones — no more individual judgment variance</p>
+                <p>• Full audit trail maintained in MySQL — every allotment decision is traceable and reviewable</p>
+                <p>• Credit discipline enforced automatically — dues-linked blocking reduced overdue outstanding</p>
+                <p>• Allotment output directly feeds Production Planning Software, closing the demand-to-production loop</p>
+                <p>• Non-moving inventory identified systematically and surfaced for scheme / liquidation decisions</p>
+            </div>
+
+        </div>
+
+    </div><!-- /container -->
+
+
+    <script>
+        function openTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

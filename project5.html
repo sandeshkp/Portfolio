@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Automation Engine — Sandesh K P</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #111;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.55;
+            font-size: 0.68rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.45rem 0.9rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.65rem;
+            z-index: 1000;
+            transition: color 0.2s;
+        }
+
+        .back-button:hover { color: #0077ff; }
+
+        .container {
+            max-width: 1000px;
+            margin: 4rem auto 2rem auto;
+            background: #fff;
+            padding: 1.6rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 { color: #0077ff; font-size: 1.05rem; margin-bottom: 1rem; }
+        h2 { font-size: 0.75rem; margin-bottom: 0.4rem; color: #0077ff; }
+        h3 { font-size: 0.7rem; margin-bottom: 0.3rem; color: #333; }
+        p  { margin-bottom: 0.6rem; text-align: justify; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 18px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding-bottom: 6px;
+            font-size: 0.7rem;
+            color: #555;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #0077ff;
+            border-bottom: 2px solid #0077ff;
+            font-weight: 500;
+        }
+
+        .tab:hover:not(.active) { color: #0077ff; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Note box */
+        .note-box {
+            background: #fafafa;
+            border-left: 3px solid #0077ff;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 0.6rem 0 0.8rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+        }
+        .timeline p { margin-bottom: 0.45rem; }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.56rem;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #444;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge.blue   { background: #e0f0ff; color: #0055cc; }
+        .badge.orange { background: #fff3e0; color: #cc5500; }
+        .badge.green  { background: #e0ffe0; color: #006600; }
+        .badge.red    { background: #ffe0e0; color: #cc0000; }
+        .badge.purple { background: #f0e0ff; color: #6600cc; }
+        .badge.grey   { background: #f0f0f0; color: #444; }
+
+        /* Metrics */
+        .metrics-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+
+        .metric-chip {
+            background: #f0f7ff;
+            border: 1px solid #c0d9ff;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .metric-chip .val {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0077ff;
+            display: block;
+        }
+
+        .metric-chip .lbl {
+            font-size: 0.55rem;
+            color: #666;
+        }
+
+        /* Two col */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 0.6rem 0;
+        }
+
+        .col-box {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 0.7rem;
+            border: 1px solid #eee;
+        }
+
+        /* Three col */
+        .three-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.8rem;
+            margin: 0.6rem 0;
+        }
+
+        /* Pipeline */
+        .pipeline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin: 0.7rem 0;
+            align-items: center;
+        }
+
+        .pipe-step {
+            background: #0077ff;
+            color: white;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.6rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .pipe-step.sap    { background: #1a5276; }
+        .pipe-step.ftp    { background: #6c3483; }
+        .pipe-step.python { background: #2874a6; }
+        .pipe-step.mysql  { background: #117a65; }
+        .pipe-step.report { background: #b7950b; color: #fff; }
+        .pipe-step.mail   { background: #c0392b; }
+
+        .pipe-arrow { font-size: 0.7rem; color: #aaa; padding: 0 0.3rem; }
+
+        /* Code block */
+        .code-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            font-family: "Courier New", monospace;
+            font-size: 0.62rem;
+            line-height: 1.65;
+            overflow-x: auto;
+            margin: 0.6rem 0;
+        }
+
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str { color: #a6e3a1; }
+        .code-block .cm  { color: #6c7086; font-style: italic; }
+        .code-block .num { color: #fab387; }
+        .code-block .cls { color: #f9e2af; }
+
+        /* Tools row */
+        .tools-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.8rem 0;
+            padding: 0.8rem;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .tools-row img {
+            height: 28px;
+            width: auto;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .tools-row img:hover { opacity: 1; }
+
+        /* Report category cards */
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.6rem;
+            margin: 0.7rem 0;
+        }
+
+        .report-card {
+            background: #f8faff;
+            border: 1px solid #dde8ff;
+            border-radius: 7px;
+            padding: 0.65rem 0.8rem;
+        }
+
+        .report-card .rc-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #0077ff;
+            margin-bottom: 0.35rem;
+        }
+
+        .report-card .rc-list {
+            font-size: 0.6rem;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* Before / After comparison */
+        .compare-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 0.7rem 0;
+        }
+
+        .compare-box {
+            border-radius: 7px;
+            padding: 0.8rem;
+        }
+
+        .compare-box.before {
+            background: #fff5f5;
+            border: 1px solid #ffcccc;
+        }
+
+        .compare-box.after {
+            background: #f0fff4;
+            border: 1px solid #b2f0c8;
+        }
+
+        .compare-box .cb-head {
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .compare-box.before .cb-head { color: #cc0000; }
+        .compare-box.after  .cb-head { color: #006600; }
+
+        /* Timeline step with number */
+        .numbered-step {
+            display: flex;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            background: #0077ff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+
+        .step-body { flex: 1; }
+        .step-body b { color: #111; }
+
+        @media (max-width: 640px) {
+            .two-col, .compare-row, .three-col { grid-template-columns: 1fr; }
+            .pipeline { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-button">← Back to Home</a>
+
+    <div class="container">
+
+        <h1>End-to-End Sales Report Automation Engine</h1>
+
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('overview',   this)">Overview</div>
+            <div class="tab"        onclick="openTab('problem',    this)">Problem</div>
+            <div class="tab"        onclick="openTab('architecture',this)">Architecture</div>
+            <div class="tab"        onclick="openTab('pipeline',   this)">ETL Pipeline</div>
+            <div class="tab"        onclick="openTab('reports',    this)">100+ Reports</div>
+            <div class="tab"        onclick="openTab('delivery',   this)">Delivery Engine</div>
+            <div class="tab"        onclick="openTab('impact',     this)">Impact</div>
+        </div>
+
+
+        <!-- ══════════════════ OVERVIEW ══════════════════ -->
+        <div id="overview" class="tab-content active">
+
+            <div class="note-box">
+                <b>Note:</b> Data, report samples and screenshots shown here are
+                reconstructed examples. Original operational reports and internal
+                datasets are protected under company confidentiality policy.
+            </div>
+
+            <p>
+                What was once a half-day manual grind — a single analyst downloading
+                raw data from SAP HANA, manually slicing it across states, categories
+                and sub-categories, building Excel reports one by one, and emailing
+                them individually to 22 different state teams — is now a fully
+                automated, production-grade pipeline that wakes up before the business
+                does, pulls fresh data, constructs over <b>100 distinct reports</b>
+                across every organisational dimension, and dispatches them to the
+                right recipients through three mail servers — all within a single hour,
+                every single working day, without a single human touch.
+            </p>
+
+            <p>
+                This is not a reporting tool. This is an intelligence distribution
+                system built on a robust ETL backbone — SAP HANA OData services,
+                Python batch automation, a scheduler-driven .py script execution layer,
+                MySQL as the operational data store, WinSCP/FTP for early-morning data
+                delivery, and SMTP integration across Zoho, Outlook and Google Workspace
+                mail infrastructure used across the organisation.
+            </p>
+
+            <div class="metrics-row">
+                <div class="metric-chip">
+                    <span class="val">100+</span>
+                    <span class="lbl">Reports Automated</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">22</span>
+                    <span class="lbl">State Teams Served</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">&lt; 1 hr</span>
+                    <span class="lbl">Full Cycle Runtime</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">~4 hrs</span>
+                    <span class="lbl">Daily Time Saved</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">Zero</span>
+                    <span class="lbl">Manual Interventions</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">3</span>
+                    <span class="lbl">Mail Servers Integrated</span>
+                </div>
+            </div>
+
+            <h2>Technology Stack</h2>
+
+            <div class="tools-row">
+                <img src="https://cdn.simpleicons.org/python/3776ab"          alt="Python"   title="Python">
+                <img src="https://cdn.simpleicons.org/pandas/150458"          alt="Pandas"   title="Pandas">
+                <img src="https://cdn.simpleicons.org/numpy/013243"           alt="NumPy"    title="NumPy">
+                <img src="https://cdn.simpleicons.org/mysql/4479a1"           alt="MySQL"    title="MySQL">
+                <img src="https://cdn.simpleicons.org/microsoftexcel/217346"  alt="Excel"    title="Excel / openpyxl">
+                <img src="https://cdn.simpleicons.org/microsoftoutlook/0078d4"alt="Outlook"  title="Outlook SMTP">
+                <img src="https://cdn.simpleicons.org/zoho/e42527"            alt="Zoho"     title="Zoho Mail">
+                <img src="https://cdn.simpleicons.org/gmail/ea4335"           alt="Gmail"    title="Google Workspace">
+                <img src="https://cdn.simpleicons.org/sap/0faaff"             alt="SAP"      title="SAP HANA OData">
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════ PROBLEM ══════════════════ -->
+        <div id="problem" class="tab-content">
+
+            <h2>The Problem — A Half-Day Consumed Before Noon</h2>
+
+            <p>
+                Every working morning, before any decision-maker could look at
+                a number, a member of the sales analytics team had to execute
+                the following sequence manually:
+            </p>
+
+            <div class="compare-row">
+                <div class="compare-box before">
+                    <div class="cb-head">❌ Before Automation</div>
+                    <div class="timeline">
+                        <p>• Login to SAP HANA, navigate to report transaction, set date filters manually</p>
+                        <p>• Download raw Excel dump — often 50,000+ rows across all states and SKUs</p>
+                        <p>• Open Excel, apply pivot tables, slice by state, category, sub-category</p>
+                        <p>• Build each state's report individually — 22 states × multiple tabs</p>
+                        <p>• Add YTD, MTD, target vs. achievement, growth columns manually</p>
+                        <p>• Name, format, and save each file separately</p>
+                        <p>• Open Outlook, compose 22 individual emails, attach correct file to each</p>
+                        <p>• Repeat the same for director-level consolidated PPT summary</p>
+                        <p>• Entire process: <b>3.5 to 4.5 hours every single morning</b></p>
+                    </div>
+                </div>
+                <div class="compare-box after">
+                    <div class="cb-head">✅ After Automation</div>
+                    <div class="timeline">
+                        <p>• SAP HANA backend script pushes fresh data to FTP server at 6:00 AM</p>
+                        <p>• Windows Task Scheduler triggers Python script at 6:30 AM</p>
+                        <p>• Script validates data presence, cleans and loads into MySQL</p>
+                        <p>• 100+ report files generated across all dimensions automatically</p>
+                        <p>• State-specific reports routed to correct recipients via SMTP</p>
+                        <p>• Director-level consolidated reports and PPT summaries dispatched</p>
+                        <p>• Full audit log written — every report, every recipient, every timestamp</p>
+                        <p>• Entire process: <b>under 60 minutes, zero human involvement</b></p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Root Cause of the Old Problem</h2>
+            <div class="timeline">
+                <p>• No structured data pipeline — SAP was used as a glorified download portal</p>
+                <p>• No single source of truth — each analyst's Excel had different filters and logic</p>
+                <p>• No report versioning — recipients had no way to verify if they had the latest file</p>
+                <p>• No scalability — adding a new state or report type required weeks of manual rework</p>
+                <p>• No audit trail — zero traceability on who received what, when, and with what data</p>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════ ARCHITECTURE ══════════════════ -->
+        <div id="architecture" class="tab-content">
+
+            <h2>System Architecture — Two Phases</h2>
+
+            <h3>Phase 1 — FTP-Based Architecture (Initial Deployment)</h3>
+
+            <p>
+                In the first phase, a custom extraction script was written directly
+                inside the SAP HANA backend in collaboration with the IT team.
+                This script was scheduled to execute at 6:00 AM every working day,
+                extracting the prior day's complete sales transaction data and pushing
+                the output file to a designated FTP server managed via WinSCP.
+            </p>
+
+            <div class="pipeline">
+                <div class="pipe-step sap">SAP HANA Backend Script</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step ftp">FTP Push (WinSCP)</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step python">File Presence Check (.py)</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step mysql">Clean + Load → MySQL</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step report">100+ Report Generation</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step mail">SMTP Dispatch</div>
+            </div>
+
+            <h3>Phase 2 — OData ETL Architecture (Production Upgrade)</h3>
+
+            <p>
+                The FTP-based push was later replaced with a proper production-grade
+                ETL pipeline using SAP HANA OData services. This eliminated dependency
+                on the IT team's backend script and gave direct, authenticated API-level
+                access to SAP HANA data — making the pipeline self-sufficient,
+                more reliable, and significantly faster.
+            </p>
+
+            <div class="pipeline">
+                <div class="pipe-step sap">SAP HANA OData API</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step python">Python ETL Script (Requests + OAuth)</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step python">Schema Validation + Incremental Load</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step mysql">MySQL (Partitioned by Date + State)</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step report">Report Engine</div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step mail">Multi-Server SMTP Dispatch</div>
+            </div>
+
+            <h2>Scheduler Layer</h2>
+            <p>
+                Windows Task Scheduler executes the master <code>.py</code> script
+                at a fixed trigger time each morning. The script is self-healing —
+                it checks for data file presence before proceeding, retries on
+                connection timeout, and writes all failures to a structured error log
+                with alert mail dispatch to the admin.
+            </p>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h3>Scheduler Config</h3>
+                    <div class="timeline">
+                        <p>• Trigger: Daily 06:30 AM on working days</p>
+                        <p>• Script: <code>master_report_runner.py</code></p>
+                        <p>• On failure: Error log + admin alert mail</p>
+                        <p>• Retry logic: 3 attempts with 5-min interval</p>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <h3>Data Validation Gates</h3>
+                    <div class="timeline">
+                        <p>• File/API response presence check</p>
+                        <p>• Row count threshold validation</p>
+                        <p>• Date freshness check (yesterday's data)</p>
+                        <p>• Null rate check on critical columns</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════ ETL PIPELINE ══════════════════ -->
+        <div id="pipeline" class="tab-content">
+
+            <h2>ETL Pipeline — Step by Step</h2>
+
+            <div class="numbered-step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <b>Extract — OData API Pull from SAP HANA</b><br>
+                    Authenticated GET requests to SAP HANA OData endpoints
+                    using session-based tokens. Data fetched in paginated
+                    chunks (1,000 rows per request) and assembled into a
+                    single raw Pandas DataFrame. Fields extracted include
+                    invoice date, dealer code, state, category, sub-category,
+                    SKU, pairs sold, MRP, net realisation, and target figures.
+                </div>
+            </div>
+
+            <div class="numbered-step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <b>Validate — Schema and Freshness Checks</b><br>
+                    Automated checks confirm expected columns are present,
+                    null rates on critical fields are below threshold,
+                    and the maximum invoice date in the pull equals
+                    the previous working day. Any gate failure halts
+                    execution and dispatches an alert.
+                </div>
+            </div>
+
+            <div class="numbered-step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <b>Transform — Clean, Enrich and Compute</b><br>
+                    State name standardisation (SAP codes → readable names),
+                    category hierarchy mapping, MRP normalisation,
+                    YTD / MTD / Prior Year aggregation columns computed
+                    using Pandas groupby and rolling window operations.
+                    Growth % and target achievement % derived and appended
+                    as computed columns.
+                </div>
+            </div>
+
+            <div class="numbered-step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <b>Load — MySQL Upsert with Partitioning</b><br>
+                    Cleaned DataFrame upserted into MySQL using
+                    INSERT … ON DUPLICATE KEY UPDATE logic via SQLAlchemy.
+                    Table is partitioned by transaction date and state code
+                    to ensure query performance stays constant as historical
+                    data grows. A copy of the raw file is also archived
+                    in a dated folder for audit traceability.
+                </div>
+            </div>
+
+            <div class="numbered-step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <b>Report Generation — 100+ Files in Parallel</b><br>
+                    Report engine queries MySQL views per report type,
+                    applies openpyxl formatting templates, generates
+                    Excel files with conditional formatting, summary rows,
+                    and chart sheets. Director-level consolidated reports
+                    and PowerPoint presentation decks generated using
+                    python-pptx with auto-populated data tables and charts.
+                </div>
+            </div>
+
+            <div class="numbered-step">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <b>Dispatch — SMTP Multi-Server Mail Engine</b><br>
+                    Report-to-recipient mapping loaded from a configuration
+                    table in MySQL. Each recipient's state-specific reports
+                    are bundled and dispatched through the appropriate
+                    mail server (Zoho for sales team, Outlook for management,
+                    Google Workspace for field force). Mail body includes
+                    summary statistics inline. Full dispatch log written
+                    per run.
+                </div>
+            </div>
+
+            <h2>Core Script Structure (Pseudocode)</h2>
+
+            <div class="code-block">
+<span class="cm"># master_report_runner.py  —  Scheduled 06:30 AM daily</span>
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sqlalchemy <span class="kw">import</span> create_engine
+<span class="kw">from</span> report_engine <span class="kw">import</span> <span class="cls">ReportFactory</span>
+<span class="kw">from</span> mail_engine   <span class="kw">import</span> <span class="cls">SMTPDispatcher</span>
+<span class="kw">from</span> etl           <span class="kw">import</span> <span class="cls">ODataExtractor</span>, <span class="cls">DataValidator</span>, <span class="cls">MySQLLoader</span>
+
+<span class="cm"># ── Step 1: Extract ──────────────────────────────────</span>
+extractor = <span class="cls">ODataExtractor</span>(base_url=SAP_ODATA_URL, auth=ODATA_CREDS)
+raw_df    = extractor.<span class="fn">fetch_incremental</span>(since=<span class="fn">yesterday</span>())
+
+<span class="cm"># ── Step 2: Validate ─────────────────────────────────</span>
+validator = <span class="cls">DataValidator</span>(raw_df)
+<span class="kw">if not</span> validator.<span class="fn">run_all_gates</span>():
+    <span class="cls">SMTPDispatcher</span>.<span class="fn">send_alert</span>(<span class="str">"DATA VALIDATION FAILED"</span>, validator.errors)
+    <span class="fn">exit</span>(<span class="num">1</span>)
+
+<span class="cm"># ── Step 3: Transform ────────────────────────────────</span>
+clean_df = (
+    raw_df
+    .<span class="fn">pipe</span>(normalise_state_codes)
+    .<span class="fn">pipe</span>(map_category_hierarchy)
+    .<span class="fn">pipe</span>(compute_ytd_mtd_columns)
+    .<span class="fn">pipe</span>(compute_growth_and_achievement)
+)
+
+<span class="cm"># ── Step 4: Load ─────────────────────────────────────</span>
+loader = <span class="cls">MySQLLoader</span>(engine=create_engine(MYSQL_CONN))
+loader.<span class="fn">upsert</span>(clean_df, table=<span class="str">'sales_daily_fact'</span>)
+loader.<span class="fn">archive_raw</span>(raw_df)
+
+<span class="cm"># ── Step 5: Generate 100+ Reports ────────────────────</span>
+factory = <span class="cls">ReportFactory</span>(engine=create_engine(MYSQL_CONN))
+
+<span class="kw">for</span> report_config <span class="kw">in</span> REPORT_MANIFEST:
+    factory.<span class="fn">build</span>(report_config)    <span class="cm"># Excel + PPT where applicable</span>
+
+<span class="cm"># ── Step 6: Dispatch ─────────────────────────────────</span>
+dispatcher = <span class="cls">SMTPDispatcher</span>(config=MAIL_SERVER_CONFIG)
+dispatcher.<span class="fn">dispatch_all</span>(
+    report_dir   = OUTPUT_DIR,
+    mapping_table= <span class="str">'report_recipient_map'</span>,
+    run_date     = <span class="fn">today</span>()
+)
+
+<span class="fn">write_run_log</span>(status=<span class="str">'SUCCESS'</span>, reports_sent=factory.count, recipients=dispatcher.count)
+            </div>
+
+            <span class="badge blue">Python</span>
+            <span class="badge blue">Pandas</span>
+            <span class="badge blue">NumPy</span>
+            <span class="badge orange">SAP HANA OData</span>
+            <span class="badge purple">SQLAlchemy</span>
+            <span class="badge green">MySQL</span>
+            <span class="badge green">openpyxl</span>
+            <span class="badge green">python-pptx</span>
+            <span class="badge red">smtplib / MIME</span>
+            <span class="badge grey">WinSCP / FTP</span>
+            <span class="badge grey">Windows Task Scheduler</span>
+
+        </div>
+
+
+        <!-- ══════════════════ 100+ REPORTS ══════════════════ -->
+        <div id="reports" class="tab-content">
+
+            <h2>Report Universe — 100+ Automated Outputs</h2>
+
+            <p>
+                Every report is generated fresh from MySQL on each run,
+                formatted via openpyxl templates, and routed to the
+                correct recipient tier. Reports span four organisational
+                dimensions: geographic hierarchy, product hierarchy,
+                time dimension, and performance dimension.
+            </p>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <div class="rc-title">📍 State-Level Reports (×22)</div>
+                    <div class="rc-list">
+                        Daily sales summary<br>
+                        MTD vs. target<br>
+                        YTD growth vs. LY<br>
+                        State achievement %<br>
+                        Top 10 dealers by state<br>
+                        State category mix
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">🏪 Dealer-Wise Reports</div>
+                    <div class="rc-list">
+                        Individual dealer daily sale<br>
+                        Dealer MTD performance<br>
+                        Dealer YTD ranking<br>
+                        Dealer target achievement<br>
+                        Dealer growth vs. LY<br>
+                        Dealer category penetration
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">📦 Category-Level Reports</div>
+                    <div class="rc-list">
+                        Category daily sale<br>
+                        Category MTD / YTD<br>
+                        Category growth trend<br>
+                        Category share by state<br>
+                        New launch category tracking<br>
+                        Category target vs. actual
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">🔖 Sub-Category Reports</div>
+                    <div class="rc-list">
+                        Sub-category daily breakup<br>
+                        Sub-category MTD analysis<br>
+                        Sub-category YTD trend<br>
+                        Sub-cat vs. prior year<br>
+                        Sub-cat mix by region<br>
+                        Sub-cat contribution %
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">📈 Performance Reports</div>
+                    <div class="rc-list">
+                        Daily live sales tracker<br>
+                        National target dashboard<br>
+                        Zone-wise achievement<br>
+                        YOY growth by zone<br>
+                        Top / bottom performer lists<br>
+                        Achievement heat-map
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">🗓️ Time-Series Reports</div>
+                    <div class="rc-list">
+                        Day-on-day trend (30 days)<br>
+                        Week-over-week comparison<br>
+                        Month-on-month growth<br>
+                        Quarter-to-date summary<br>
+                        Seasonal trend analysis<br>
+                        Festival peak vs. baseline
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">🎯 Target Analytics</div>
+                    <div class="rc-list">
+                        Target vs. actual (daily)<br>
+                        Cumulative target gap<br>
+                        State-wise target pacing<br>
+                        Dealer target utilisation<br>
+                        Shortfall projection<br>
+                        Recovery required analysis
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">👔 Director-Level Reports</div>
+                    <div class="rc-list">
+                        National consolidated summary<br>
+                        Cross-zone comparison<br>
+                        Board-ready KPI snapshot<br>
+                        Executive achievement card<br>
+                        Strategic gap analysis<br>
+                        Automated PPT for meetings
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">📊 Automated PPT Decks</div>
+                    <div class="rc-list">
+                        Morning review slide deck<br>
+                        Weekly MRM presentation<br>
+                        Monthly business review<br>
+                        Director daily briefing<br>
+                        Sales hierarchy summary<br>
+                        Auto-chart with live data
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="rc-title">🏗️ New Launch Tracking</div>
+                    <div class="rc-list">
+                        New product daily offtake<br>
+                        Launch penetration by state<br>
+                        Dealer adoption rate<br>
+                        Category cannibalisation check<br>
+                        Week 1–4 ramp curve<br>
+                        SKU contribution to growth
+                    </div>
+                </div>
+
+            </div>
+
+            <h2>Report Splitting Logic</h2>
+            <p>
+                Each base query result is split across three axes simultaneously
+                using a single Pandas GroupBy operation — state, category and
+                sub-category — producing a separate, correctly named output file
+                per combination. File naming follows a standardised convention
+                that encodes date, report type, state code and dimension level
+                to enable downstream automation by recipients.
+            </p>
+
+            <div class="code-block">
+<span class="cm"># State × Category × Sub-category split in one pass</span>
+<span class="kw">for</span> (state, category, sub_cat), grp <span class="kw">in</span> df.<span class="fn">groupby</span>([
+        <span class="str">'state_name'</span>, <span class="str">'category'</span>, <span class="str">'sub_category'</span>]):
+
+    filename = f<span class="str">"{run_date}_{state}_{category}_{sub_cat}_sales.xlsx"</span>
+    <span class="fn">write_report</span>(grp, OUTPUT_DIR / filename, template=<span class="str">'state_report'</span>)
+    report_registry.<span class="fn">register</span>(filename, recipient=<span class="fn">get_recipient</span>(state))
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════ DELIVERY ENGINE ══════════════════ -->
+        <div id="delivery" class="tab-content">
+
+            <h2>Multi-Server SMTP Delivery Engine</h2>
+
+            <p>
+                The organisation uses three distinct mail ecosystems across
+                different departments and seniority levels. The dispatch engine
+                reads each recipient's assigned mail server from a configuration
+                table and routes accordingly — ensuring delivery through the
+                correct authenticated SMTP connection.
+            </p>
+
+            <div class="three-col">
+                <div class="col-box">
+                    <h3>Zoho Mail</h3>
+                    <div class="timeline">
+                        <p>• Sales field force team</p>
+                        <p>• State-level recipients</p>
+                        <p>• Regional managers</p>
+                        <p>Port: 587 / STARTTLS</p>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <h3>Microsoft Outlook</h3>
+                    <div class="timeline">
+                        <p>• Management layer</p>
+                        <p>• DMS department heads</p>
+                        <p>• Finance and ops teams</p>
+                        <p>Port: 587 / OAuth2</p>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <h3>Google Workspace</h3>
+                    <div class="timeline">
+                        <p>• Director-level recipients</p>
+                        <p>• Senior leadership</p>
+                        <p>• Cross-functional heads</p>
+                        <p>Port: 587 / App Password</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Dispatch Logic</h2>
+
+            <div class="code-block">
+<span class="cm"># Mail dispatch with server routing</span>
+<span class="kw">for</span> recipient <span class="kw">in</span> recipient_list:
+    server_type = recipient[<span class="str">'mail_server'</span>]   <span class="cm"># 'zoho' | 'outlook' | 'google'</span>
+    attachments = <span class="fn">get_reports_for</span>(recipient[<span class="str">'state'</span>], recipient[<span class="str">'level'</span>])
+
+    msg = <span class="cls">MIMEMultipart</span>()
+    msg[<span class="str">'Subject'</span>] = f<span class="str">"{run_date} | Daily Sales Report — {recipient['state']}"</span>
+    msg.<span class="fn">attach</span>(<span class="cls">MIMEText</span>(<span class="fn">build_summary_html</span>(recipient), <span class="str">'html'</span>))
+
+    <span class="kw">for</span> filepath <span class="kw">in</span> attachments:
+        msg.<span class="fn">attach</span>(<span class="fn">build_attachment</span>(filepath))
+
+    smtp = SMTP_POOL[server_type]
+    smtp.<span class="fn">send_message</span>(msg, to_addrs=recipient[<span class="str">'email_list'</span>])
+    <span class="fn">log_dispatch</span>(recipient, attachments, status=<span class="str">'SENT'</span>)
+            </div>
+
+            <h2>Mail Body — Inline Summary</h2>
+            <p>
+                Each automated mail includes an HTML summary table directly
+                in the mail body — key KPIs (previous day sales, MTD achievement %,
+                YTD growth vs. prior year) displayed inline so the recipient gets
+                the headline numbers without opening the attachment. Attachments
+                carry the full drill-down detail.
+            </p>
+
+            <h2>Audit and Error Handling</h2>
+            <div class="timeline">
+                <p>• Every dispatched mail logged to MySQL with timestamp, recipient, report list, server used</p>
+                <p>• SMTP failures caught and retried up to 3 times before being logged as failed</p>
+                <p>• Failed dispatches trigger an admin alert with full error trace</p>
+                <p>• Daily dispatch summary report emailed to pipeline owner at end of run</p>
+            </div>
+
+        </div>
+
+
+        <!-- ══════════════════ IMPACT ══════════════════ -->
+        <div id="impact" class="tab-content">
+
+            <h2>Measured Business Impact</h2>
+
+            <div class="metrics-row">
+                <div class="metric-chip">
+                    <span class="val">~4 hrs</span>
+                    <span class="lbl">Daily Time Recovered</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">100+</span>
+                    <span class="lbl">Reports Automated</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">22</span>
+                    <span class="lbl">States Served Daily</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">6:30 AM</span>
+                    <span class="lbl">Data in Inboxes</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="val">Zero</span>
+                    <span class="lbl">Report Errors Since Go-Live</span>
+                </div>
+            </div>
+
+            <div class="compare-row">
+                <div class="compare-box before">
+                    <div class="cb-head">❌ Old State</div>
+                    <div class="timeline">
+                        <p>• Reports reached teams by 11 AM at the earliest</p>
+                        <p>• Inconsistent formatting across different analysts</p>
+                        <p>• Report errors discovered only after being actioned</p>
+                        <p>• No historical traceability on what was sent</p>
+                        <p>• Scaling = hiring more analysts</p>
+                        <p>• New report type = days of manual Excel rework</p>
+                    </div>
+                </div>
+                <div class="compare-box after">
+                    <div class="cb-head">✅ New State</div>
+                    <div class="timeline">
+                        <p>• Every inbox receives fresh reports by 7:30 AM</p>
+                        <p>• 100% consistent format, logic and naming every day</p>
+                        <p>• Validation gates catch data issues before dispatch</p>
+                        <p>• Full audit trail — every report, recipient, timestamp logged</p>
+                        <p>• Scaling = add one row to the report manifest config</p>
+                        <p>• New report type = one new function in ReportFactory</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Strategic Value</h2>
+            <div class="timeline">
+                <p>• Sales teams receive actionable data <b>before their morning review calls</b> — decisions made on fresh numbers, not yesterday's memory</p>
+                <p>• Director-level PPT decks arrive pre-built — zero slide preparation time before weekly and monthly review meetings</p>
+                <p>• State managers hold accountability through personalised, state-specific report delivery — no shared spreadsheet confusion</p>
+                <p>• Pipeline is fully version-controlled and documented — any new team member can extend it without understanding the legacy Excel process</p>
+                <p>• ETL architecture upgrade to OData made the pipeline IT-independent — no more dependency on SAP backend team for daily operation</p>
+            </div>
+
+        </div>
+
+    </div><!-- /container -->
+
+    <script>
+        function openTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
