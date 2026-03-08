@@ -3,81 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Details</title>
+<title>Production Planning Software</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
-body {
-  background-color: #f5f5f5;
-  color: #111;
-  min-height: 100vh;
-  padding: 2rem;
-  line-height: 1.6;
-  font-size: 0.8rem; /* reduced overall font size */
+body{
+background:#f5f5f5;
+color:#111;
+min-height:100vh;
+padding:2rem;
+line-height:1.6;
+font-size:0.8rem;
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  text-decoration: none;
-  color: #222;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(10px);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  font-size: 0.75rem; /* reduced */
-  z-index: 1000;
+/* BACK BUTTON */
+
+.back-button{
+position:fixed;
+top:20px;
+left:20px;
+text-decoration:none;
+color:#222;
+font-weight:500;
+background:rgba(255,255,255,0.9);
+padding:0.5rem 1rem;
+border-radius:20px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+border:1px solid rgba(255,255,255,0.2);
+font-size:0.75rem;
+z-index:1000;
 }
 
-.back-button:hover {
-  color: #0077ff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+.back-button:hover{
+color:#0077ff;
 }
 
-.container {
-  max-width: 900px;
-  margin: 4rem auto 2rem auto;
-  background: #fff;
-  padding: 1.6rem;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+/* MAIN CONTAINER */
+
+.container{
+max-width:900px;
+margin:4rem auto 2rem auto;
+background:#fff;
+padding:1.6rem;
+border-radius:10px;
+box-shadow:0 6px 20px rgba(0,0,0,0.1);
 }
 
-h1 {
-  color: #0077ff;
-  margin-bottom: 0.8rem;
-  font-size: 1.2rem; /* reduced */
+/* HEADINGS */
+
+h1{
+color:#0077ff;
+margin-bottom:1rem;
+font-size:1.2rem;
 }
 
-h2 {
-  color: #0077ff;
-  margin-bottom: 0.6rem;
-  font-size: 0.95rem; /* reduced */
+h2{
+color:#0077ff;
+margin-bottom:0.4rem;
+font-size:0.9rem;
 }
 
-p {
-  margin-bottom: 0.8rem;
-  text-align: justify;
-  font-size: 0.8rem; /* reduced */
+p{
+margin-bottom:0.7rem;
+text-align:justify;
 }
 
-hr {
-  margin: 1.5rem 0;
-  border: none;
-  border-top: 1px solid #ddd;
+/* TABS */
+
+.tabs{
+display:flex;
+gap:16px;
+border-bottom:1px solid #e5e7eb;
+margin-bottom:1rem;
+flex-wrap:wrap;
 }
+
+.tab{
+cursor:pointer;
+padding-bottom:6px;
+font-size:0.8rem;
+color:#555;
+}
+
+.tab.active{
+color:#0077ff;
+border-bottom:2px solid #0077ff;
+font-weight:500;
+}
+
+/* TAB CONTENT */
+
+.tab-content{
+display:none;
+}
+
+.tab-content.active{
+display:block;
+}
+
+/* BULLET SECTION */
+
+.timeline{
+margin:0.8rem 0;
+padding-left:1rem;
+border-left:2px solid #e5e7eb;
+}
+
+.timeline p{
+margin-bottom:0.5rem;
+}
+
+/* IMAGE GRID */
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:12px;
+margin-top:10px;
+}
+
+.image-grid img{
+width:100%;
+height:auto;
+border-radius:6px;
+border:1px solid #e5e7eb;
+object-fit:contain;
+}
+
 </style>
 </head>
 
@@ -89,81 +148,175 @@ hr {
 
 <h1>Production Planning Software (PPS)</h1>
 
-<h2>1. Project Overview</h2>
+<div class="tabs">
+
+<div class="tab active" onclick="openTab('overview',this)">Project Overview</div>
+<div class="tab" onclick="openTab('problem',this)">Problem</div>
+<div class="tab" onclick="openTab('solution',this)">Solution</div>
+<div class="tab" onclick="openTab('system',this)">System Design</div>
+<div class="tab" onclick="openTab('impact',this)">Business Impact</div>
+
+</div>
+
+<!-- OVERVIEW -->
+
+<div id="overview" class="tab-content active">
+
 <p>
-The Production Planning Software (PPS) is an internal, Flask-based web application
-designed to support daily production and mould planning operations across
-manufacturing units. The application is optimized for controlled internal usage,
-with peak access occurring during scheduled planning windows.
-</p>
-<p>
-The system converts dealer requirements and historical sales data into structured
-production plans, enabling planners to determine the appropriate mould, machine,
-and production sequence for each day. By automating this workflow, the application
-ensures consistency, accuracy, and faster decision-making in production setup.
+The Production Planning Software (PPS) is an internal Flask-based application
+developed to support daily mould and machine planning across manufacturing units.
+The system converts dealer requirements and historical sales patterns into
+structured production schedules.
 </p>
 
-<hr>
-
-<h2>2. Business Motivation</h2>
 <p>
-Prior to this system, production planning was performed manually by a small number
-of personnel at each manufacturing unit. Demand inputs were received from multiple
-states in the form of Excel sheets, followed by extensive coordination through
-phone calls and manual adjustments.
-</p>
-<p>
-Frequent intervention from regional sales teams to prioritize high-demand products
-often resulted in abrupt production changes. This led to machine stoppages,
-inefficient mould changes, and operational confusion during peak hours.
-</p>
-<p>
-A critical operational requirement was to ensure that machines operate continuously,
-as unplanned mould changes or idle time directly impacted productivity. Machines
-also vary by compatibility (PU, Non-PU, etc.), and plants operate under different
-layouts such as linear and circular configurations, which required systematic
-handling.
-</p>
-<p>
-The overarching objective was to ensure the daily production of market-relevant
-products while minimizing stockouts, excess inventory, and non-moving or defective
-stock accumulation.
+The platform enables planners to determine which moulds and machines should be
+used for each product and how production should be sequenced throughout the day.
+By automating this process, the software reduces manual coordination and ensures
+more consistent production planning.
 </p>
 
-<hr>
+<div class="image-grid">
 
-<h2>3. Impact & Outcomes</h2>
+<img src="images/mould.png">
+<img src="images/machine.png">
+
+</div>
+
+</div>
+
+
+<!-- PROBLEM -->
+
+<div id="problem" class="tab-content">
+
 <p>
-The most significant outcome of the Production Planning Software is a substantial
-improvement in operational efficiency and planning accuracy.
-</p>
-<p>
-Earlier, production plans were typically finalized with a one-day delay due to
-manual consolidation and coordination efforts, consuming nearly half a working day.
-</p>
-<p>
-With the introduction of PPS, production planning is now live, standardized, and
-data-driven, resulting in an estimated reduction of planning time by approximately
-90%. The system enables uninterrupted machine utilization and provides clear
-visibility into upcoming production sequences.
-</p>
-<p>
-Operators and planners can easily identify the next product to be produced, the
-appropriate mould, required production cycles, and machine availability. Overall,
-the system has contributed to improved reliability, cost efficiency, and alignment
-between production output and market demand.
+Before the introduction of PPS, production planning was handled manually by
+plant level teams.
 </p>
 
-<hr>
-
-<h2>4. UI / UX Snapshots (Dummy Screens)</h2>
 <p>
-Representative mockups and non-sensitive sample screens are used to demonstrate
-application workflows and user interaction patterns, without exposing proprietary
-data or internal system details.
+Demand requirements from different states were received through Excel sheets and
+production plans were prepared through manual discussions between sales and
+production teams.
+</p>
+
+<div class="timeline">
+
+<p>• Production demand received from multiple regions</p>
+<p>• Planning performed manually using Excel</p>
+<p>• Frequent phone coordination between departments</p>
+<p>• Sudden production changes caused machine downtime</p>
+<p>• Inefficient mould changes during peak production</p>
+
+</div>
+
+<p>
+These challenges created delays in production planning and increased operational
+complexity within manufacturing units.
 </p>
 
 </div>
+
+
+<!-- SOLUTION -->
+
+<div id="solution" class="tab-content">
+
+<p>
+The Production Planning Software was developed to automate and standardize the
+planning process.
+</p>
+
+<div class="timeline">
+
+<p>• Dealer demand integrated into centralized planning system</p>
+<p>• Historical sales data used to guide production decisions</p>
+<p>• Automated generation of daily mould and machine schedules</p>
+<p>• Clear production sequencing for operators and planners</p>
+
+</div>
+
+<p>
+The system ensures that the correct moulds and machines are allocated for each
+product while maintaining continuous machine utilization.
+</p>
+
+</div>
+
+
+<!-- SYSTEM DESIGN -->
+
+<div id="system" class="tab-content">
+
+<p>
+The application is built using a lightweight Flask architecture designed for
+controlled internal usage.
+</p>
+
+<div class="timeline">
+
+<p>• Demand inputs collected from dealer order requirements</p>
+<p>• Historical sales patterns used for demand validation</p>
+<p>• Production schedules generated for mould and machine usage</p>
+<p>• Interface used by planners during daily planning windows</p>
+
+</div>
+
+<p>
+The system supports different machine types and plant configurations such as
+linear and circular layouts.
+</p>
+
+</div>
+
+
+<!-- IMPACT -->
+
+<div id="impact" class="tab-content">
+
+<p>
+The implementation of PPS significantly improved operational efficiency
+within production planning teams.
+</p>
+
+<div class="timeline">
+
+<p>• Planning time reduced by nearly 90%</p>
+<p>• Elimination of manual coordination delays</p>
+<p>• Improved machine utilization</p>
+<p>• Clear visibility of production schedules</p>
+<p>• Better alignment between demand and production output</p>
+
+</div>
+
+<p>
+Production plans that previously required half a day to finalize can now be
+generated quickly with structured data inputs.
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+function openTab(tabId,element){
+
+document.querySelectorAll(".tab-content").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.querySelectorAll(".tab").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.getElementById(tabId).classList.add("active");
+element.classList.add("active");
+
+}
+
+</script>
 
 </body>
 </html>
