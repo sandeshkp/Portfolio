@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive ML Models — Sandesh K P</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #111;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.55;
+            font-size: 0.68rem;
+        }
+
+        /* Back button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.45rem 0.9rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.65rem;
+            z-index: 1000;
+            transition: color 0.2s;
+        }
+
+        .back-button:hover {
+            color: #0077ff;
+        }
+
+        /* Page container */
+        .container {
+            max-width: 1000px;
+            margin: 4rem auto 2rem auto;
+            background: #fff;
+            padding: 1.6rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Page header */
+        .page-header {
+            margin-bottom: 1.4rem;
+        }
+
+        .page-header h1 {
+            color: #0077ff;
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-header p {
+            font-size: 0.68rem;
+            color: #555;
+            max-width: 750px;
+        }
+
+        /* Model selector tabs (top level) */
+        .model-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 1.4rem;
+            flex-wrap: wrap;
+        }
+
+        .model-tab {
+            cursor: pointer;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.67rem;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .model-tab.active {
+            color: #0077ff;
+            border-bottom: 2px solid #0077ff;
+            font-weight: 600;
+        }
+
+        .model-tab:hover:not(.active) {
+            color: #0077ff;
+            background: #f0f7ff;
+        }
+
+        /* Model panel */
+        .model-panel {
+            display: none;
+        }
+
+        .model-panel.active {
+            display: block;
+        }
+
+        /* Model intro banner */
+        .model-banner {
+            background: linear-gradient(135deg, #4facfe 0%, #00c6fb 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .model-banner.sentiment {
+            background: linear-gradient(135deg, #1c1c1c 0%, #764ba2 100%);
+        }
+
+        .model-banner.demand {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .model-banner.churn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .model-banner.dealer {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .banner-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .banner-text h2 {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .banner-text p {
+            font-size: 0.63rem;
+            opacity: 0.9;
+        }
+
+        /* Inner tabs (per model) */
+        .inner-tabs {
+            display: flex;
+            gap: 18px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .inner-tab {
+            cursor: pointer;
+            padding-bottom: 6px;
+            font-size: 0.67rem;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .inner-tab.active {
+            color: #0077ff;
+            border-bottom: 2px solid #0077ff;
+            font-weight: 500;
+        }
+
+        .inner-tab:hover:not(.active) {
+            color: #0077ff;
+        }
+
+        /* Inner content */
+        .inner-content {
+            display: none;
+        }
+
+        .inner-content.active {
+            display: block;
+        }
+
+        /* Headings */
+        h2 {
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
+            color: #0077ff;
+        }
+
+        h3 {
+            font-size: 0.7rem;
+            margin-bottom: 0.3rem;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+        }
+
+        /* Note box */
+        .note-box {
+            background: #fafafa;
+            border-left: 3px solid #0077ff;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Timeline / bullet list */
+        .timeline {
+            margin: 0.6rem 0 0.8rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        .timeline p {
+            margin-bottom: 0.45rem;
+        }
+
+        /* Equation block */
+        .equation-block {
+            background: #f8f9ff;
+            border: 1px solid #dde3ff;
+            border-radius: 6px;
+            padding: 0.7rem 1rem;
+            margin: 0.6rem 0;
+            font-family: "Courier New", monospace;
+            font-size: 0.65rem;
+            color: #2a2a6e;
+            overflow-x: auto;
+        }
+
+        .equation-label {
+            font-size: 0.58rem;
+            color: #888;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        /* Metric chips */
+        .metrics-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0;
+        }
+
+        .metric-chip {
+            background: #f0f7ff;
+            border: 1px solid #c0d9ff;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            text-align: center;
+        }
+
+        .metric-chip .val {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0077ff;
+            display: block;
+        }
+
+        .metric-chip .lbl {
+            font-size: 0.55rem;
+            color: #666;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.56rem;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #444;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge.blue { background: #e0f0ff; color: #0055cc; }
+        .badge.purple { background: #f0e0ff; color: #6600cc; }
+        .badge.green { background: #e0ffe0; color: #006600; }
+        .badge.red { background: #ffe0e0; color: #cc0000; }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 0.6rem 0;
+        }
+
+        .col-box {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 0.7rem;
+            border: 1px solid #eee;
+        }
+
+        .col-box h3 {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Pipeline steps */
+        .pipeline {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            margin: 0.7rem 0;
+            align-items: center;
+        }
+
+        .pipe-step {
+            background: #0077ff;
+            color: white;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.6rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .pipe-arrow {
+            font-size: 0.7rem;
+            color: #aaa;
+            padding: 0 0.3rem;
+        }
+
+        /* Confusion matrix */
+        .conf-matrix {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            gap: 1px;
+            width: fit-content;
+            margin: 0.6rem 0;
+            background: #ddd;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            font-size: 0.6rem;
+        }
+
+        .conf-cell {
+            padding: 0.4rem 0.7rem;
+            text-align: center;
+            background: #fff;
+        }
+
+        .conf-cell.header { background: #f0f0f0; font-weight: 600; }
+        .conf-cell.tp { background: #e0ffe0; color: #006600; font-weight: 700; }
+        .conf-cell.tn { background: #e0ffe0; color: #006600; font-weight: 700; }
+        .conf-cell.fp { background: #ffe0e0; color: #cc0000; }
+        .conf-cell.fn { background: #ffe0e0; color: #cc0000; }
+
+        /* Image placeholder */
+        .img-placeholder {
+            width: 100%;
+            background: #f0f4ff;
+            border: 1px dashed #b0c4ff;
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.62rem;
+            color: #6680cc;
+            margin-top: 0.7rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .model-tab {
+                font-size: 0.6rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .pipeline {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+
+            .pipe-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-button">← Back to Home</a>
+
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Predictive Analytics &amp; Machine Learning Models</h1>
+            <p>
+                A suite of production-grade ML systems built on internal sales,
+                customer, and supply chain data to drive strategic decisions across
+                manufacturing, distribution, and marketing functions.
+            </p>
+        </div>
+
+        <!-- Model selector -->
+        <div class="model-tabs">
+            <div class="model-tab active"   onclick="switchModel('sentiment', this)">01 · Sentiment Analysis</div>
+            <div class="model-tab"          onclick="switchModel('demand',    this)">02 · Demand Forecasting</div>
+            <div class="model-tab"          onclick="switchModel('churn',     this)">03 · Customer Churn</div>
+            <div class="model-tab"          onclick="switchModel('dealer',    this)">04 · Dealer Churn</div>
+        </div>
+
+
+        <!-- ════════════════════════════════════════
+             MODEL 01 — SENTIMENT ANALYSIS
+        ═════════════════════════════════════════ -->
+        <div id="model-sentiment" class="model-panel active">
+
+            <div class="model-banner sentiment">
+                <div class="banner-icon">🧠</div>
+                <div class="banner-text">
+                    <h2>Product Sentiment Analysis Engine</h2>
+                    <p>
+                        Multi-source review scraping → custom NLP pipeline → attribute-level
+                        sentiment classification → actionable quality insights for PU &amp; MM teams.
+                    </p>
+                </div>
+            </div>
+
+            <div class="inner-tabs">
+                <div class="inner-tab active" onclick="switchInner('s','s-overview',this)">Overview</div>
+                <div class="inner-tab"        onclick="switchInner('s','s-data',this)">Data Collection</div>
+                <div class="inner-tab"        onclick="switchInner('s','s-model',this)">Model Architecture</div>
+                <div class="inner-tab"        onclick="switchInner('s','s-results',this)">Results</div>
+                <div class="inner-tab"        onclick="switchInner('s','s-impact',this)">Business Impact</div>
+            </div>
+
+            <!-- OVERVIEW -->
+            <div id="s-overview" class="inner-content active">
+
+                <div class="note-box">
+                    <b>Note:</b> Screenshots and data shown are reconstructed examples.
+                    Original internal datasets are protected under company data policy.
+                </div>
+
+                <p>
+                    Customer voice is scattered across e-commerce platforms, brand websites and
+                    internal CRM logs. This project consolidates all review channels, extracts
+                    structured opinion signals and routes quality feedback directly to production
+                    and material management teams — closing the loop between end consumer and
+                    factory floor.
+                </p>
+
+                <h2>Problem Statement</h2>
+                <p>
+                    Returns and quality complaints about footwear products were escalating without
+                    a structured feedback mechanism from the market. Attribute-level issues
+                    (material, MRP perception, comfort, elasticity) were buried inside unstructured
+                    review text and could not be systematically quantified or prioritised.
+                </p>
+
+                <div class="metrics-row">
+                    <div class="metric-chip">
+                        <span class="val">4</span>
+                        <span class="lbl">Sources Scraped</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">~85K</span>
+                        <span class="lbl">Reviews Processed</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">5</span>
+                        <span class="lbl">Attribute Categories</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">91.4%</span>
+                        <span class="lbl">Classification Accuracy</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DATA COLLECTION -->
+            <div id="s-data" class="inner-content">
+
+                <h2>Data Sources &amp; Scraping Stack</h2>
+
+                <p>
+                    Four distinct platforms were scraped using a combination of
+                    Selenium WebDriver (for JavaScript-rendered pages) and
+                    BeautifulSoup4 (for static HTML parsing).
+                </p>
+
+                <div class="timeline">
+                    <p>• <b>Flipkart</b> — product pages, star ratings, verified buyer reviews, images</p>
+                    <p>• <b>Amazon India</b> — reviews, Q&amp;A sections, review helpfulness scores</p>
+                    <p>• <b>Company website</b> — official product pages and review widgets</p>
+                    <p>• <b>Internal cloud CRM portal</b> — dealer complaints and end-customer tickets</p>
+                </div>
+
+                <h2>Scraping Architecture</h2>
+
+                <div class="pipeline">
+                    <div class="pipe-step">Selenium Driver</div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-step">Dynamic Page Render</div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-step">BS4 HTML Parse</div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-step">Raw JSON Store</div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-step">Dedup + Clean</div>
+                    <div class="pipe-arrow">→</div>
+                    <div class="pipe-step">MySQL</div>
+                </div>
+
+                <h2>Raw Fields Extracted</h2>
+                <div class="timeline">
+                    <p>• Review text (title + body), star rating (1–5), review date</p>
+                    <p>• Product SKU, category, price point</p>
+                    <p>• Reviewer metadata (verified purchase flag, helpful votes)</p>
+                    <p>• Product images flagged in reviews (quality-related)</p>
+                </div>
+
+                <h2>Text Preprocessing Pipeline</h2>
+                <div class="timeline">
+                    <p>• Unicode normalisation, transliteration of Hinglish tokens</p>
+                    <p>• Stopword removal (custom domain stoplist + NLTK English corpus)</p>
+                    <p>• Spell correction using SymSpell (edit distance ≤ 2)</p>
+                    <p>• Tokenisation → lowercasing → lemmatisation (spaCy en_core_web_sm)</p>
+                    <p>• Negation handling: "not comfortable" tagged as [comfort:NEG]</p>
+                </div>
+
+            </div>
+
+            <!-- MODEL ARCHITECTURE -->
+            <div id="s-model" class="inner-content">
+
+                <h2>Sentiment Classification Approach</h2>
+
+                <p>
+                    A two-stage pipeline was employed: a coarse polarity classifier followed by
+                    an aspect-based sentiment analysis (ABSA) layer that assigns sentiment
+                    to five product attributes.
+                </p>
+
+                <h3>Stage 1 — Polarity Classifier (TF-IDF + Logistic Regression)</h3>
+
+                <p>
+                    Reviews are first classified as Positive / Neutral / Negative using
+                    TF-IDF vectorisation combined with a regularised Logistic Regression.
+                </p>
+
+                <div class="equation-block">
+                    TF-IDF(t, d) = TF(t, d) × log( N / df(t) )
+
+where:
+  TF(t,d)  = frequency of term t in document d
+  N        = total number of documents
+  df(t)    = number of documents containing term t
+                </div>
+                <div class="equation-label">Term Frequency–Inverse Document Frequency weighting</div>
+
+                <div class="equation-block">
+                    P(y = k | x) = exp(β_k · x) / Σ_j exp(β_j · x)
+
+Loss: L(β) = -Σ log P(y_i | x_i) + λ||β||²
+                </div>
+                <div class="equation-label">Multinomial logistic regression with L2 regularisation</div>
+
+                <h3>Stage 2 — Aspect-Based Sentiment Analysis</h3>
+
+                <p>
+                    Five product attributes were defined as extraction targets.
+                    Aspect terms were matched using a domain lexicon and dependency
+                    parse trees (spaCy), then a fine-tuned BERT-based classifier
+                    (bert-base-multilingual-uncased) was used for aspect-sentiment
+                    assignment.
+                </p>
+
+                <div class="timeline">
+                    <p>• <b>Material</b> — sole quality, stitching, fabric durability</p>
+                    <p>• <b>MRP / Value</b> — price perception, value for money</p>
+                    <p>• <b>Comfort</b> — cushioning, arch support, fit</p>
+                    <p>• <b>Elasticity</b> — stretch, flexibility, resilience</p>
+                    <p>• <b>Aesthetics</b> — design, colour, finish</p>
+                </div>
+
+                <div class="equation-block">
+                    BERT Input: [CLS] review_text [SEP] aspect_term [SEP]
+Output: sentiment ∈ {Positive, Neutral, Negative}
+
+Fine-tune objective:
+  L = CrossEntropy( softmax(W · h_[CLS]), y_true )
+                </div>
+                <div class="equation-label">BERT sentence-pair classification for ABSA</div>
+
+                <h3>Star-Based Category Segmentation</h3>
+                <div class="timeline">
+                    <p>• 4–5 stars → Promoter segment (positive reinforcement signals)</p>
+                    <p>• 3 stars → Neutral segment (latent issues, requires NLP mining)</p>
+                    <p>• 1–2 stars → Detractor segment (priority quality flag)</p>
+                </div>
+
+                <span class="badge blue">BeautifulSoup4</span>
+                <span class="badge blue">Selenium</span>
+                <span class="badge purple">spaCy</span>
+                <span class="badge purple">HuggingFace Transformers</span>
+                <span class="badge green">scikit-learn</span>
+                <span class="badge green">NLTK</span>
+                <span class="badge red">MySQL</span>
+            </div>
+
+            <!-- RESULTS -->
+            <div id="s-results" class="inner-content">
+
+                <h2>Model Performance</h2>
+
+                <div class="metrics-row">
+                    <div class="metric-chip">
+                        <span class="val">91.4%</span>
+                        <span class="lbl">Overall Accuracy</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.89</span>
+                        <span class="lbl">Macro F1-Score</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.93</span>
+                        <span class="lbl">AUC-ROC (Positive)</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.87</span>
+                        <span class="lbl">ABSA Aspect F1</span>
+                    </div>
+                </div>
+
+                <h2>Confusion Matrix (3-class polarity)</h2>
+
+                <div class="conf-matrix">
+                    <div class="conf-cell header"></div>
+                    <div class="conf-cell header">Pred: Pos</div>
+                    <div class="conf-cell header">Pred: Neg</div>
+                    <div class="conf-cell header">Actual: Pos</div>
+                    <div class="conf-cell tp">8,241</div>
+                    <div class="conf-cell fp">412</div>
+                    <div class="conf-cell header">Actual: Neg</div>
+                    <div class="conf-cell fn">389</div>
+                    <div class="conf-cell tn">6,108</div>
+                </div>
+
+                <h2>Top Detected Issue Clusters</h2>
+                <div class="timeline">
+                    <p>• Sole detachment within 30 days — <b>Material</b> attribute (34% of 1-star)</p>
+                    <p>• Strap elasticity loss after washing — <b>Elasticity</b> (21%)</p>
+                    <p>• Price mismatch between online and offline — <b>MRP</b> (18%)</p>
+                    <p>• Size runs small — <b>Comfort / Fit</b> (16%)</p>
+                </div>
+
+                <h2>Image Flagging</h2>
+                <p>
+                    Review images were extracted and filtered using a ResNet-50 based
+                    binary classifier trained on defect vs. non-defect images.
+                    Flagged images were automatically routed to the PU (Production Unit) dashboard.
+                </p>
+
+            </div>
+
+            <!-- BUSINESS IMPACT -->
+            <div id="s-impact" class="inner-content">
+
+                <h2>Stakeholder Outputs</h2>
+
+                <div class="two-col">
+                    <div class="col-box">
+                        <h3>PU — Production Unit</h3>
+                        <div class="timeline">
+                            <p>• Weekly defect heat-maps by SKU and attribute</p>
+                            <p>• Flagged product images from review scraping</p>
+                            <p>• Priority queue of top 10 quality issues</p>
+                        </div>
+                    </div>
+                    <div class="col-box">
+                        <h3>MM — Material Management</h3>
+                        <div class="timeline">
+                            <p>• Material-linked complaint frequency reports</p>
+                            <p>• Supplier-wise issue correlation analysis</p>
+                            <p>• Elasticity and sole quality trend over time</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Measurable Outcomes</h2>
+                <div class="timeline">
+                    <p>• Structured quality intelligence delivered to production team for first time</p>
+                    <p>• Reduced manual complaint review effort by ~60%</p>
+                    <p>• Specific material issues identified and flagged for vendor review</p>
+                    <p>• Positive review trend tracked post corrective action in subsequent quarter</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ════════════════════════════════════════
+             MODEL 02 — DEMAND FORECASTING
+        ═════════════════════════════════════════ -->
+        <div id="model-demand" class="model-panel">
+
+            <div class="model-banner demand">
+                <div class="banner-icon">📈</div>
+                <div class="banner-text">
+                    <h2>Sales Demand Forecasting System</h2>
+                    <p>
+                        SKU-level time-series forecasting using XGBoost + SARIMA ensemble
+                        to optimise production scheduling and inventory positioning.
+                    </p>
+                </div>
+            </div>
+
+            <div class="inner-tabs">
+                <div class="inner-tab active" onclick="switchInner('d','d-overview',this)">Overview</div>
+                <div class="inner-tab"        onclick="switchInner('d','d-data',this)">Feature Engineering</div>
+                <div class="inner-tab"        onclick="switchInner('d','d-model',this)">Model Design</div>
+                <div class="inner-tab"        onclick="switchInner('d','d-results',this)">Results</div>
+                <div class="inner-tab"        onclick="switchInner('d','d-impact',this)">Business Impact</div>
+            </div>
+
+            <div id="d-overview" class="inner-content active">
+
+                <p>
+                    Footwear demand is highly seasonal, geographically heterogeneous and
+                    influenced by festival calendars, monsoon cycles and regional trade
+                    patterns. This model forecasts SKU-level weekly demand 4–8 weeks ahead
+                    across 18 regional zones, enabling proactive production planning and
+                    safety stock computation.
+                </p>
+
+                <h2>Business Problem</h2>
+                <p>
+                    Production batches were planned on static historical averages, leading to
+                    overstock in slow-moving SKUs and stockouts in fast-moving categories during
+                    festival and back-to-school peaks. The objective was to reduce both overstock
+                    waste and lost sales simultaneously.
+                </p>
+
+                <div class="metrics-row">
+                    <div class="metric-chip">
+                        <span class="val">18</span>
+                        <span class="lbl">Regional Zones</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">4–8 wk</span>
+                        <span class="lbl">Forecast Horizon</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">8.3%</span>
+                        <span class="lbl">MAPE (best SKU tier)</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">~22%</span>
+                        <span class="lbl">Overstock Reduction</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="d-data" class="inner-content">
+
+                <h2>Data Sources</h2>
+                <div class="timeline">
+                    <p>• SAP HANA — 36 months of weekly SKU-level sales by zone and dealer</p>
+                    <p>• Production logs — batch sizes, cycle times, mould availability</p>
+                    <p>• Festival &amp; holiday calendar — regional event flags</p>
+                    <p>• Weather API — monsoon onset dates by region (footwear is weather-sensitive)</p>
+                    <p>• Pricing table — MRP changes and promotional discounts history</p>
+                </div>
+
+                <h2>Feature Engineering</h2>
+                <div class="timeline">
+                    <p>• <b>Lag features:</b> sales at t-1, t-2, t-4, t-8 (weekly lags)</p>
+                    <p>• <b>Rolling statistics:</b> 4-week rolling mean, std, min, max</p>
+                    <p>• <b>Calendar encoding:</b> week-of-year, month, quarter, is_festival_week</p>
+                    <p>• <b>Trend decomposition:</b> STL decomposition → trend, seasonal, residual components as features</p>
+                    <p>• <b>Zone-SKU interaction:</b> historical zone preference index per SKU category</p>
+                    <p>• <b>Price elasticity proxy:</b> (MRP_current - MRP_baseline) / MRP_baseline</p>
+                </div>
+
+            </div>
+
+            <div id="d-model" class="inner-content">
+
+                <h2>Model Architecture — Ensemble Approach</h2>
+
+                <p>
+                    Two complementary models are trained per SKU-zone combination
+                    and blended via weighted average, where weights are tuned on a
+                    held-out validation window.
+                </p>
+
+                <h3>Component 1 — SARIMA (Statistical Baseline)</h3>
+
+                <div class="equation-block">
+    SARIMA(p, d, q)(P, D, Q)[S]
+
+    Non-seasonal: AR(p) × I(d) × MA(q)
+    Seasonal:     AR(P) × I(D) × MA(Q) at period S = 52 (weekly)
+
+    ARIMA equation:
+    Φ_P(B^S) φ_p(B) ∇^d_S ∇^d y_t = Θ_Q(B^S) θ_q(B) ε_t
+
+    Parameters selected by minimising AIC:
+    AIC = 2k − 2 ln(L̂)
+                </div>
+                <div class="equation-label">Seasonal ARIMA — captures trend and seasonal structure</div>
+
+                <h3>Component 2 — XGBoost Regressor (Gradient Boosting)</h3>
+
+                <div class="equation-block">
+    Objective: L(θ) = Σ_i l(y_i, ŷ_i) + Σ_k Ω(f_k)
+
+    where  Ω(f) = γT + ½λ||w||²
+           T    = number of leaves
+           w    = leaf weights
+           γ, λ = regularisation hyperparameters
+
+    Gradient boosting update:
+    ŷ_i^(t) = ŷ_i^(t-1) + η · f_t(x_i)
+
+    η = learning rate (tuned: 0.05)
+    max_depth = 6,  n_estimators = 500,  subsample = 0.8
+                </div>
+                <div class="equation-label">XGBoost with L1/L2 regularisation — captures non-linear feature interactions</div>
+
+                <h3>Ensemble Blend</h3>
+                <div class="equation-block">
+    ŷ_final = α · ŷ_SARIMA + (1 − α) · ŷ_XGBoost
+
+    α optimised on validation set using grid search:
+    α* = argmin_α RMSE(y_val, α·ŷ_SARIMA + (1-α)·ŷ_XGB)
+
+    Typical optimal range: α ∈ [0.25, 0.45]
+                </div>
+
+                <span class="badge blue">XGBoost</span>
+                <span class="badge blue">statsmodels SARIMA</span>
+                <span class="badge purple">scikit-learn</span>
+                <span class="badge green">pandas</span>
+                <span class="badge green">NumPy</span>
+                <span class="badge red">SAP HANA OData API</span>
+
+            </div>
+
+            <div id="d-results" class="inner-content">
+
+                <h2>Forecast Accuracy by SKU Tier</h2>
+
+                <div class="metrics-row">
+                    <div class="metric-chip">
+                        <span class="val">8.3%</span>
+                        <span class="lbl">MAPE — High-velocity SKUs</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">14.6%</span>
+                        <span class="lbl">MAPE — Mid-tier SKUs</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.91</span>
+                        <span class="lbl">R² (overall)</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">1,240</span>
+                        <span class="lbl">Avg RMSE (units/week)</span>
+                    </div>
+                </div>
+
+                <div class="equation-block">
+    MAPE = (1/n) Σ |y_t − ŷ_t| / y_t × 100
+    RMSE = √[ (1/n) Σ (y_t − ŷ_t)² ]
+                </div>
+                <div class="equation-label">Evaluation metrics — MAPE preferred for business interpretability</div>
+
+            </div>
+
+            <div id="d-impact" class="inner-content">
+
+                <h2>Operational Outcomes</h2>
+                <div class="timeline">
+                    <p>• Production schedule now aligned to 4-week forward demand signal</p>
+                    <p>• Safety stock levels re-parameterised using forecast confidence intervals</p>
+                    <p>• ~22% reduction in overstock in pilot zones over first 2 quarters</p>
+                    <p>• Stockout incidents reduced by ~18% in festival peak windows</p>
+                    <p>• Model outputs piped directly into Production Planning Software (PPS)</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ════════════════════════════════════════
+             MODEL 03 — CUSTOMER CHURN
+        ═════════════════════════════════════════ -->
+        <div id="model-churn" class="model-panel">
+
+            <div class="model-banner churn">
+                <div class="banner-icon">👤</div>
+                <div class="banner-text">
+                    <h2>Customer Churn Prediction Model</h2>
+                    <p>
+                        Behavioural classification model to identify high-risk customers
+                        before they disengage — enabling targeted retention campaigns.
+                    </p>
+                </div>
+            </div>
+
+            <div class="inner-tabs">
+                <div class="inner-tab active" onclick="switchInner('c','c-overview',this)">Overview</div>
+                <div class="inner-tab"        onclick="switchInner('c','c-features',this)">Feature Design</div>
+                <div class="inner-tab"        onclick="switchInner('c','c-model',this)">Model</div>
+                <div class="inner-tab"        onclick="switchInner('c','c-results',this)">Results</div>
+                <div class="inner-tab"        onclick="switchInner('c','c-impact',this)">Impact</div>
+            </div>
+
+            <div id="c-overview" class="inner-content active">
+
+                <p>
+                    End-consumers who purchase through company-owned digital channels (website,
+                    cloud portal) exhibit measurable behavioural signals before they stop
+                    re-purchasing. This model scores each active customer on a monthly churn
+                    probability, enabling the marketing team to prioritise retention spend.
+                </p>
+
+                <h2>Churn Definition</h2>
+                <p>
+                    A customer is labelled <b>churned</b> if they have made no purchase within
+                    the last 90 days AND had previously purchased at least twice within the
+                    preceding 180-day window. This definition avoids penalising one-time buyers.
+                </p>
+
+                <div class="metrics-row">
+                    <div class="metric-chip">
+                        <span class="val">~41K</span>
+                        <span class="lbl">Customer Records</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">17.3%</span>
+                        <span class="lbl">Churn Rate (baseline)</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.88</span>
+                        <span class="lbl">AUC-ROC</span>
+                    </div>
+                    <div class="metric-chip">
+                        <span class="val">0.82</span>
+                        <span class="lbl">Precision@Top 20%</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="c-features" class="inner-content">
+
+                <h2>RFM + Behavioural Feature Matrix</h2>
+
+                <p>
+                    Features are constructed around the classical RFM (Recency, Frequency,
+                    Monetary) framework, extended with engagement and product affinity signals.
+                </p>
+
+                <div class="two-col">
+                    <div class="col-box">
+                        <h3>RFM Features</h3>
+                        <div class="timeline">
+                            <p>• <b>Recency (R):</b> days since last purchase</p>
+                            <p>• <b>Frequency (F):</b> number of orders in 6 months</p>
+                            <p>• <b>Monetary (M):</b> total spend (INR) in 6 months</p>
+                        </div>
+                    </div>
+                    <div class="col-box">
+                        <h3>Extended Signals</h3>
+                        <div class="timeline">
+                            <p>• Category breadth (# distinct categories bought)</p>
+                            <p>• Average inter-purchase interval (days)</p>
+                            <p>• Return / refund count ratio</p>
+                            <p>• Promotion response flag</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Class Imbalance Handling</h2>
+                <p>
+                    The dataset is imbalanced (~17% churn). SMOTE (Synthetic Minority
+                    Over-sampling Technique) was applied on the training fold only to
+                    avoid data leakage.
+                </p>
+
+                <div class="equation-block">
+    SMOTE interpolation:
+    x_new = x_i + λ · (x̃_i − x_i),  λ ~ Uniform(0, 1)
+
+    where x̃_i is a randomly selected k-nearest neighbour of x_i
+    in the minority class feature space.
+                </div>
+
+            </div>
+
+            <div id="c-model" class="inner-content">
+
+                <h2>Model — Gradient Boosted Trees (XGBoost)</h2>
+
+                <p>
+                    XGBoost was selected after benchmarking against Logistic Regression,
+                    Random Forest and LightGBM. It produced the best precision-recall
+                    trade-off on the validation set.
+                </p>
+
+                <div class="equation-block">
+    Binary classification objective (log-loss):
+    L = -[y log(p) + (1−y) log(1−p)]
+
+    where p = σ(Σ_k f_k(x))  and  σ(z) = 1 / (1 + e^{-z})
+
+    Regularised objective:
+    L(θ) = Σ_i l(y_i, ŷ_i) + Σ_k [γT_k + ½λ||w_k||²]
+
+    Hyperparameters (tuned via Optuna):
+      learning_rate   = 0.04
+      max_depth       = 5
+      subsample       = 0.75
+      colsample_bytree= 0.80
+      scale_pos_weight= 4.8  (handles class imbalance)
+                </div>
+
+                <h2>SHAP Explainability</h2>
+                <p>
+                    SHAP (SHapley Additive exPlanations) values were computed to provide
+                    feature attribution per customer, making the model auditable by the
+                    marketing team.
+                </p>
+
+                <div class="equation-block">
+    SHAP value for feature j:
+    φ_j = Σ_{S ⊆ F\{j}} [ |S|!(|F|−|S|−1)! / |F|! ] · [f(S∪{j}) − f(S)]
+
+    Key interpretation:
+      φ_j > 0  → feature j pushes prediction toward churn
+      φ_j < 0  → feature j pushes prediction toward retention
+                </div>
+
+                <span class="badge blue">XGBoost</span>
+                <span class="badge blue">LightGBM</span>
+                <span class="badge purple">SHAP</span>
+                <span class="badge green">imbalanced-learn (SMOTE)</span>
+                <span class="badge green">Optuna</span>
+                <span class="badge red">MySQL</span>
+
+            </div>
+
+            <div id="c-results" class="inner-content">
+
+                <h2>Model Evaluation</h2>
+
+                <div class="metrics-row">
+                    <div class="metric-chip"><span class="val">0.88</span><span class="lbl">AUC-ROC</span></div>
+                    <div class="metric-chip"><span class="val">0.84</span><span class="lbl">F1 (churned class)</span></div>
+                    <div class="metric-chip"><span class="val">0.82</span><span class="lbl">Precision</span></div>
+                    <div class="metric-chip"><span class="val">0.86</span><span class="lbl">Recall</span></div>
+                </div>
+
+                <div class="equation-block">
+    Precision = TP / (TP + FP)
+    Recall    = TP / (TP + FN)
+    F1-Score  = 2 · (Precision · Recall) / (Precision + Recall)
+    AUC-ROC   = P(score(churn) > score(non-churn))
+                </div>
+
+                <h2>Top Churn Drivers (SHAP importance)</h2>
+                <div class="timeline">
+                    <p>1. Recency — days since last purchase (highest impact)</p>
+                    <p>2. Inter-purchase interval trend (increasing gap = high risk)</p>
+                    <p>3. Return/refund ratio (high returns precede churn)</p>
+                    <p>4. Frequency decline (3-month vs 6-month frequency ratio)</p>
+                    <p>5. Category breadth (single-category buyers churn faster)</p>
+                </div>
+
+            </div>
+
+            <div id="c-impact" class="inner-content">
+
+                <h2>Marketing Activation</h2>
+                <div class="timeline">
+                    <p>• Monthly scored list delivered to CRM for targeted re-engagement</p>
+                    <p>• Top 20% high-risk segment enrolled in personalised coupon campaign</p>
+                    <p>• Model explanation (SHAP summary) used in campaign messaging strategy</p>
+                    <p>• Pilot re-engagement campaign achieved 23% recovery rate on high-risk cohort</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ════════════════════════════════════════
+             MODEL 04 — DEALER CHURN
+        ═════════════════════════════════════════ -->
+        <div id="model-dealer" class="model-panel">
+
+            <div class="model-banner dealer">
+                <div class="banner-icon">🏪</div>
+                <div class="banner-text">
+                    <h2>Dealer Churn &amp; Disengagement Prediction</h2>
+                    <p>
+                        Binary classification model to identify at-risk dealers before
+                        order volume drops — protecting the B2B distribution network.
+                    </p>
+                </div>
+            </div>
+
+            <div class="inner-tabs">
+                <div class="inner-tab active" onclick="switchInner('dl','dl-overview',this)">Overview</div>
+                <div class="inner-tab"        onclick="switchInner('dl','dl-features',this)">Features</div>
+                <div class="inner-tab"        onclick="switchInner('dl','dl-model',this)">Model</div>
+                <div class="inner-tab"        onclick="switchInner('dl','dl-results',this)">Results</div>
+                <div class="inner-tab"        onclick="switchInner('dl','dl-impact',this)">Impact</div>
+            </div>
+
+            <div id="dl-overview" class="inner-content active">
+
+                <p>
+                    Dealer relationships are the backbone of Walkaroo's distribution network.
+                    A dealer who progressively reduces order frequency or stops reordering
+                    represents a significant revenue risk and potential market share loss
+                    in their territory. This model identifies early disengagement signals
+                    at the dealer level, enabling the sales team to intervene before attrition occurs.
+                </p>
+
+                <h2>Dealer Churn Definition</h2>
+                <p>
+                    A dealer is flagged as <b>at-risk</b> if their 3-month order volume
+                    has declined by more than 30% relative to their 12-month baseline,
+                    OR if they have had zero orders in the past 45 days despite being
+                    active (≥ 4 orders) in the prior 6 months.
+                </p>
+
+                <div class="metrics-row">
+                    <div class="metric-chip"><span class="val">~3,200</span><span class="lbl">Active Dealers</span></div>
+                    <div class="metric-chip"><span class="val">11.8%</span><span class="lbl">Churn Rate (annual)</span></div>
+                    <div class="metric-chip"><span class="val">0.91</span><span class="lbl">AUC-ROC</span></div>
+                    <div class="metric-chip"><span class="val">6 wks</span><span class="lbl">Avg Early Warning Lead</span></div>
+                </div>
+
+            </div>
+
+            <div id="dl-features" class="inner-content">
+
+                <h2>Dealer Behaviour Features</h2>
+
+                <div class="timeline">
+                    <p>• <b>Order cadence:</b> avg days between consecutive orders (rolling 90-day)</p>
+                    <p>• <b>Volume trend:</b> linear slope of monthly order quantity over 6 months</p>
+                    <p>• <b>SKU diversity:</b> number of distinct product lines ordered</p>
+                    <p>• <b>Payment behaviour:</b> average days-past-due (DPD) on invoices</p>
+                    <p>• <b>Return rate:</b> returned units / total ordered units</p>
+                    <p>• <b>Complaint frequency:</b> support tickets per 100 units</p>
+                    <p>• <b>Competitor activity proxy:</b> territory-level sales drop vs. region average</p>
+                    <p>• <b>Sales rep visit frequency:</b> logged field visits per quarter</p>
+                </div>
+
+                <h2>Volume Trend Feature (Linear Regression Slope)</h2>
+
+                <div class="equation-block">
+    For dealer d, monthly order volume {v_1, v_2, ..., v_6}:
+
+    Fit OLS:  v_t = β_0 + β_1·t + ε_t
+
+    Trend feature = β̂_1 (slope coefficient)
+
+    β̂_1 = [Σ(t - t̄)(v_t - v̄)] / [Σ(t - t̄)²]
+
+    Interpretation:
+      β̂_1 < -threshold  →  declining engagement signal
+      β̂_1 > 0           →  growing dealer
+                </div>
+                <div class="equation-label">OLS trend slope as a structured churn signal</div>
+
+            </div>
+
+            <div id="dl-model" class="inner-content">
+
+                <h2>Model — Random Forest + Logistic Regression Stacking</h2>
+
+                <p>
+                    A stacked ensemble combines a Random Forest (base model) with a
+                    Logistic Regression meta-learner. The meta-learner is trained on
+                    out-of-fold predictions from the base model.
+                </p>
+
+                <div class="equation-block">
+    Level-0 (Base Model — Random Forest):
+      ŷ_RF = (1/T) Σ_{t=1}^{T} f_t(x)
+
+      Each tree f_t trained on bootstrap sample.
+      Gini impurity split criterion:
+      G(t) = 1 − Σ_k p_k²
+
+    Level-1 (Meta-learner — Logistic Regression):
+      ŷ_final = σ(w · ŷ_RF + b)
+
+      Trained on out-of-fold (OOF) predictions to prevent
+      overfitting to training distribution.
+                </div>
+
+                <div class="equation-block">
+    Cross-validated stacking (5-fold):
+      For each fold k:
+        Train RF on folds ≠ k
+        Predict on fold k → OOF_k
+      Meta-features = [OOF_1, OOF_2, ..., OOF_5]
+      Train LR on full meta-feature matrix
+                </div>
+
+                <span class="badge blue">scikit-learn RandomForest</span>
+                <span class="badge blue">Logistic Regression</span>
+                <span class="badge purple">SHAP</span>
+                <span class="badge green">pandas</span>
+                <span class="badge green">Optuna</span>
+                <span class="badge red">SAP HANA</span>
+
+            </div>
+
+            <div id="dl-results" class="inner-content">
+
+                <h2>Model Performance</h2>
+
+                <div class="metrics-row">
+                    <div class="metric-chip"><span class="val">0.91</span><span class="lbl">AUC-ROC</span></div>
+                    <div class="metric-chip"><span class="val">0.86</span><span class="lbl">F1 (at-risk class)</span></div>
+                    <div class="metric-chip"><span class="val">0.84</span><span class="lbl">Precision</span></div>
+                    <div class="metric-chip"><span class="val">0.88</span><span class="lbl">Recall</span></div>
+                </div>
+
+                <h2>Confusion Matrix (At-Risk vs. Active)</h2>
+
+                <div class="conf-matrix">
+                    <div class="conf-cell header"></div>
+                    <div class="conf-cell header">Pred: Active</div>
+                    <div class="conf-cell header">Pred: At-Risk</div>
+                    <div class="conf-cell header">Actual: Active</div>
+                    <div class="conf-cell tn">2,748</div>
+                    <div class="conf-cell fp">87</div>
+                    <div class="conf-cell header">Actual: At-Risk</div>
+                    <div class="conf-cell fn">52</div>
+                    <div class="conf-cell tp">313</div>
+                </div>
+
+                <h2>Top Churn Drivers</h2>
+                <div class="timeline">
+                    <p>1. Volume trend slope (β̂_1 strongly negative)</p>
+                    <p>2. Days since last order exceeding median cadence</p>
+                    <p>3. High DPD on invoices (cash flow stress signal)</p>
+                    <p>4. Declining SKU diversity (narrowing to single category)</p>
+                    <p>5. Below-average visits by sales rep in last quarter</p>
+                </div>
+
+            </div>
+
+            <div id="dl-impact" class="inner-content">
+
+                <h2>Sales Team Activation</h2>
+                <div class="timeline">
+                    <p>• Weekly at-risk dealer list delivered to regional sales managers</p>
+                    <p>• Reason codes (top 3 SHAP drivers) attached to each flagged dealer</p>
+                    <p>• Field visit priority queue automatically generated per zone</p>
+                    <p>• ~6-week average early-warning lead time before actual churn event</p>
+                    <p>• Pilot intervention on top 50 at-risk dealers recovered 31 within 60 days</p>
+                </div>
+
+                <h2>Revenue Protection Estimate</h2>
+                <p>
+                    Based on average dealer order value and recovery rate observed in pilot,
+                    the model is estimated to protect approximately ₹ 3–4 Cr in annual
+                    distribution revenue if deployed at full network scale.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div><!-- /container -->
+
+
+    <script>
+        /* Switch top-level model */
+        function switchModel(modelId, el) {
+            document.querySelectorAll('.model-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('model-' + modelId).classList.add('active');
+            el.classList.add('active');
+        }
+
+        /* Switch inner tab within a model */
+        function switchInner(prefix, contentId, el) {
+            // deactivate all inner tabs inside the same model panel
+            const panel = el.closest('.model-panel');
+            panel.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+            panel.querySelectorAll('.inner-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(contentId).classList.add('active');
+            el.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
