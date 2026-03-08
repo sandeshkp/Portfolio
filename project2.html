@@ -3,118 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Details</title>
+<title>Power BI Embedded Flask Software</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
-/* -------- GLOBAL FONT REDUCTION -------- */
-body {
-  background-color: #f5f5f5;
-  color: #111;
-  min-height: 100vh;
-  padding: 2rem;
-  line-height: 1.55;
-  font-size: 0.68rem;   /* ~50% reduction */
+body{
+background:#f5f5f5;
+color:#111;
+min-height:100vh;
+padding:2rem;
+line-height:1.55;
+font-size:0.68rem;
 }
 
-/* -------- BACK BUTTON -------- */
-.back-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  text-decoration: none;
-  color: #222;
-  font-weight: 500;
-  background: rgba(255,255,255,0.95);
-  padding: 0.45rem 0.9rem;
-  border-radius: 18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  font-size: 0.65rem;
-  z-index: 1000;
+/* back button */
+
+.back-button{
+position:fixed;
+top:20px;
+left:20px;
+text-decoration:none;
+color:#222;
+font-weight:500;
+background:rgba(255,255,255,0.95);
+padding:0.45rem 0.9rem;
+border-radius:18px;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+font-size:0.65rem;
+z-index:1000;
 }
 
-.back-button:hover {
-  color: #0077ff;
+.back-button:hover{
+color:#0077ff;
 }
 
-/* -------- MAIN CONTAINER -------- */
-.container {
-  max-width: 900px;
-  margin: 4rem auto 2rem auto;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+/* container */
+
+.container{
+max-width:1000px;
+margin:4rem auto 2rem auto;
+background:#fff;
+padding:1.6rem;
+border-radius:10px;
+box-shadow:0 6px 18px rgba(0,0,0,0.1);
 }
 
-/* -------- HEADINGS -------- */
-h1 {
-  color: #0077ff;
-  font-size: 1.05rem;
-  margin-bottom: 0.6rem;
+/* headings */
+
+h1{
+color:#0077ff;
+font-size:1.05rem;
+margin-bottom:1rem;
 }
 
-h2 {
-  color: #0077ff;
-  font-size: 0.78rem;
-  margin-bottom: 0.4rem;
+h2{
+font-size:0.75rem;
+margin-bottom:0.4rem;
+color:#0077ff;
 }
 
-h3 {
-  font-size: 0.7rem;
-  margin-bottom: 0.3rem;
-  color: #333;
+/* tabs */
+
+.tabs{
+display:flex;
+gap:18px;
+border-bottom:1px solid #e5e7eb;
+margin-bottom:1rem;
+flex-wrap:wrap;
 }
 
-/* -------- TEXT -------- */
-p {
-  margin-bottom: 0.6rem;
-  text-align: justify;
-  font-size: 0.68rem;
+.tab{
+cursor:pointer;
+padding-bottom:6px;
+font-size:0.7rem;
+color:#555;
 }
 
-/* -------- DIVIDER -------- */
-hr {
-  margin: 1.2rem 0;
-  border: none;
-  border-top: 1px solid #ddd;
+.tab.active{
+color:#0077ff;
+border-bottom:2px solid #0077ff;
+font-weight:500;
 }
 
-/* -------- CREATIVE BUT PROFESSIONAL BLOCKS -------- */
-.highlight-box {
-  background: #fafafa;
-  border-left: 3px solid #0077ff;
-  padding: 0.6rem 0.8rem;
-  margin: 0.8rem 0;
-  font-size: 0.65rem;
+/* tab content */
+
+.tab-content{
+display:none;
 }
 
-.timeline {
-  margin: 0.8rem 0;
-  padding-left: 1rem;
-  border-left: 2px solid #e5e7eb;
+.tab-content.active{
+display:block;
 }
 
-.timeline p {
-  margin-bottom: 0.5rem;
-  font-size: 0.65rem;
+/* text */
+
+p{
+margin-bottom:0.6rem;
+text-align:justify;
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.4rem;
-  font-size: 0.55rem;
-  border-radius: 4px;
-  background: #f0f0f0;
-  margin-right: 0.3rem;
-  margin-bottom: 0.3rem;
+/* info box */
+
+.note-box{
+background:#fafafa;
+border-left:3px solid #0077ff;
+padding:0.6rem;
+margin-bottom:0.8rem;
 }
+
+/* bullet timeline */
+
+.timeline{
+margin:0.8rem 0;
+padding-left:1rem;
+border-left:2px solid #e5e7eb;
+}
+
+.timeline p{
+margin-bottom:0.5rem;
+}
+
+/* tags */
+
+.badge{
+display:inline-block;
+padding:0.15rem 0.4rem;
+font-size:0.55rem;
+border-radius:4px;
+background:#f0f0f0;
+margin-right:0.3rem;
+margin-bottom:0.3rem;
+}
+
+/* SINGLE IMAGE (overview section) */
+
+.page-image{
+width:100%;
+max-width:100%;
+height:auto;
+border-radius:6px;
+border:1px solid #e5e7eb;
+margin-top:10px;
+}
+
+/* DASHBOARD GRID */
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:10px;
+margin-top:10px;
+}
+
+.image-grid img{
+width:100%;
+height:auto;
+border-radius:6px;
+border:1px solid #e5e7eb;
+object-fit:contain;
+}
+
 </style>
 </head>
 
@@ -124,105 +179,217 @@ hr {
 
 <div class="container">
 
-<h1>Sales Performance Dashboard & Analytics Platform</h1>
+<h1>Power BI Embedded Flask Software (iFrame Integration)</h1>
 
-<div class="highlight-box">
-A centralized analytics system built to replace fragmented, email-driven reporting
-with real-time, hierarchy-based business insights across India.
+<div class="tabs">
+
+<div class="tab active" onclick="openTab('overview',this)">Project Overview</div>
+<div class="tab" onclick="openTab('problem',this)">Problem</div>
+<div class="tab" onclick="openTab('architecture',this)">Architecture</div>
+<div class="tab" onclick="openTab('pipeline',this)">Data Pipeline</div>
+<div class="tab" onclick="openTab('dashboards',this)">Key Dashboards</div>
+<div class="tab" onclick="openTab('flask',this)">Flask Interface</div>
+<div class="tab" onclick="openTab('impact',this)">Business Impact</div>
+
 </div>
 
-<hr>
+<!-- OVERVIEW -->
 
-<h2>1. Project Context</h2>
-<p>
-The organization operates with a complex, nationwide sales hierarchy consisting of
-Dealers reporting to Area Sales Managers (ASMs), ASMs reporting to Regional Sales
-Managers (RSMs), and regional leadership overseeing performance across multiple
-states. The product portfolio spans a wide range of categories and subcategories,
-making data consolidation and reporting inherently complex.
-</p>
+<div id="overview" class="tab-content active">
 
-<hr>
-
-<h2>2. Challenges Identified</h2>
-<div class="timeline">
-  <p>• Sales, stock, and production data existed in multiple disconnected formats</p>
-  <p>• Depot-wise stock, cut cases, and launch-pending reports were emailed individually</p>
-  <p>• Large image-based reports caused mail server load and storage issues</p>
-  <p>• Month-end PPTs were manually prepared by sales teams, impacting daily operations</p>
+<div class="note-box">
+<b>Note:</b> The screenshots displayed here are not the original internal
+datasets or interfaces. Due to company policies and data privacy
+guidelines, the actual operational dashboards cannot be shared publicly.
+These images are recreated examples for demonstration purposes.
 </div>
 
-<hr>
-
-<h2>3. Solution Approach</h2>
 <p>
-A lightweight Flask-based analytical application was developed, supported by a
-heavy-duty backend ETL pipeline. The frontend focuses purely on data consumption
-and visualization, while all computationally intensive processing is handled
-upstream.
+This project is an internal analytics platform developed to centralize
+reporting across Sales, Production and Supply Chain operations.
 </p>
 
-<div class="highlight-box">
-<b>Automation-first design:</b> zero manual intervention after daily data arrival.
-</div>
-
-<hr>
-
-<h2>4. Data Pipeline & Architecture</h2>
 <p>
-Every morning, previous-day sales, stock, supply chain, and production data is
-received via FTP from SAP HANA systems. This data undergoes validation,
-transformation, aggregation, and enrichment as part of an automated ETL workflow.
+The system consolidates operational datasets including dealer sales,
+stock availability and production metrics and converts them into
+analytical dashboards accessible across the sales hierarchy.
 </p>
+
+<h2>Key Objective</h2>
 
 <div class="timeline">
-  <p>• SAP HANA → FTP ingestion</p>
-  <p>• Automated transformation & validation</p>
-  <p>• Generation of 100+ analytical reports (including image mapping)</p>
-  <p>• Storage in MySQL and shared servers</p>
+<p>• Centralize operational reports into one analytics platform</p>
+<p>• Provide sales hierarchy visibility from national level to dealer level</p>
+<p>• Automate manual Excel based reporting</p>
+<p>• Deliver secure role based dashboard access</p>
 </div>
 
-<hr>
+<h2>Solution Approach</h2>
 
-<h2>5. Platform Capabilities</h2>
-<p>
-<span class="badge">Sales Analytics</span>
-<span class="badge">Stock Visibility</span>
-<span class="badge">Supply Chain Tracking</span>
-<span class="badge">Production Insights</span>
-<span class="badge">FY-wise History</span>
-</p>
-
-<p>
-Users access the finalized analytical outputs through the Flask application,
-eliminating dependency on emails and static presentations. Over time, selective
-operational windows such as stock updates and allotment views were introduced to
-enhance usability without compromising analytical performance.
-</p>
-
-<hr>
-
-<h2>6. Business Impact</h2>
-<p>
-The platform significantly reduced reporting time, infrastructure overhead, and
-manual effort. Stakeholders now access near real-time insights instead of waiting
-for month-end summaries, enabling proactive decision-making at all levels of the
-sales hierarchy.
-</p>
-
-<div class="highlight-box">
-Result: Faster decisions · Lower operational load · Consistent metrics · Scalable analytics
+<div class="timeline">
+<p>• Python ETL pipelines for SAP HANA data extraction</p>
+<p>• Multi-year historical data processing</p>
+<p>• Power BI analytical dashboards</p>
+<p>• Embedded dashboards inside Flask application</p>
 </div>
 
-<hr>
+<h2>Operational Result</h2>
 
-<h2>7. UI / UX Representation</h2>
+<div class="timeline">
+<p>• Removed manual reporting workflows</p>
+<p>• Reduced reporting delays</p>
+<p>• Centralized analytics access</p>
+<p>• Improved decision making</p>
+</div>
+
+<img src="images/dashboard1.png" class="page-image">
+
+</div>
+
+
+<!-- PROBLEM -->
+
+<div id="problem" class="tab-content">
+
 <p>
-Only representative, non-sensitive mock screens are used to demonstrate navigation,
-filters, and report structure. No proprietary data, metrics, or visuals are exposed.
+The sales department uses multiple reports such as dealer wise sales,
+new product launch tracking and daily live sales dashboards.
+</p>
+
+<div class="timeline">
+<p>• Previous day sales</p>
+<p>• Month to date sales</p>
+<p>• Year to date sales</p>
+<p>• Target achievement percentage</p>
+<p>• Year over year growth</p>
+</div>
+
+<p>
+Earlier these reports were generated in Excel and distributed by email,
+which created operational delays and data management issues.
 </p>
 
 </div>
+
+
+<!-- ARCHITECTURE -->
+
+<div id="architecture" class="tab-content">
+
+<p>
+SAP HANA → Python ETL → MySQL / PostgreSQL → Power BI → Flask Application
+</p>
+
+<p>
+This architecture separates heavy data processing from the reporting
+layer to ensure scalability and performance.
+</p>
+
+</div>
+
+
+<!-- PIPELINE -->
+
+<div id="pipeline" class="tab-content">
+
+<p>
+Data is extracted from SAP HANA through OData APIs and processed
+through automated Python ETL pipelines.
+</p>
+
+<div class="timeline">
+<p>• Data extraction</p>
+<p>• Cleaning and transformation</p>
+<p>• Chunk processing for large datasets</p>
+<p>• Storage in relational databases and cloud storage</p>
+</div>
+
+</div>
+
+
+<!-- DASHBOARDS -->
+
+<div id="dashboards" class="tab-content">
+
+<p>
+The system provides multiple operational dashboards for sales monitoring.
+</p>
+
+<p>
+<span class="badge">Dealer Sales</span>
+<span class="badge">New Launch Tracking</span>
+<span class="badge">Daily Live Sales</span>
+<span class="badge">MTD Analysis</span>
+<span class="badge">YTD Growth</span>
+</p>
+
+<div class="image-grid">
+
+<img src="images/dashboard1.png">
+<img src="images/dashboard2.png">
+<img src="images/dashboard3.png">
+
+</div>
+
+</div>
+
+
+<!-- FLASK -->
+
+<div id="flask" class="tab-content">
+
+<p>
+A Flask web application acts as the delivery interface for dashboards.
+Power BI dashboards are embedded using iframe integration.
+</p>
+
+<div class="timeline">
+<p>• Row Level Security implemented</p>
+<p>• Region specific dashboard access</p>
+<p>• Department level visibility</p>
+</div>
+
+</div>
+
+
+<!-- IMPACT -->
+
+<div id="impact" class="tab-content">
+
+<p>
+The platform replaced manual Excel reporting with a centralized
+analytics system.
+</p>
+
+<div class="timeline">
+<p>• Faster reporting</p>
+<p>• Reduced operational workload</p>
+<p>• Improved reporting consistency</p>
+<p>• Secure access control</p>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function openTab(tabId,element){
+
+document.querySelectorAll(".tab-content").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.querySelectorAll(".tab").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.getElementById(tabId).classList.add("active");
+element.classList.add("active");
+
+}
+
+</script>
 
 </body>
 </html>
