@@ -1,1 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Planning Software</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+body{
+background:#f5f5f5;
+color:#111;
+min-height:100vh;
+padding:2rem;
+line-height:1.6;
+font-size:0.8rem;
+}
+
+/* BACK BUTTON */
+
+.back-button{
+position:fixed;
+top:20px;
+left:20px;
+text-decoration:none;
+color:#222;
+font-weight:500;
+background:rgba(255,255,255,0.9);
+padding:0.5rem 1rem;
+border-radius:20px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+border:1px solid rgba(255,255,255,0.2);
+font-size:0.75rem;
+z-index:1000;
+}
+
+.back-button:hover{
+color:#0077ff;
+}
+
+/* MAIN CONTAINER */
+
+.container{
+max-width:900px;
+margin:4rem auto 2rem auto;
+background:#fff;
+padding:1.6rem;
+border-radius:10px;
+box-shadow:0 6px 20px rgba(0,0,0,0.1);
+}
+
+/* HEADINGS */
+
+h1{
+color:#0077ff;
+margin-bottom:1rem;
+font-size:1.2rem;
+}
+
+h2{
+color:#0077ff;
+margin-bottom:0.4rem;
+font-size:0.9rem;
+}
+
+p{
+margin-bottom:0.7rem;
+text-align:justify;
+}
+
+/* TABS */
+
+.tabs{
+display:flex;
+gap:16px;
+border-bottom:1px solid #e5e7eb;
+margin-bottom:1rem;
+flex-wrap:wrap;
+}
+
+.tab{
+cursor:pointer;
+padding-bottom:6px;
+font-size:0.8rem;
+color:#555;
+}
+
+.tab.active{
+color:#0077ff;
+border-bottom:2px solid #0077ff;
+font-weight:500;
+}
+
+/* TAB CONTENT */
+
+.tab-content{
+display:none;
+}
+
+.tab-content.active{
+display:block;
+}
+
+/* BULLET SECTION */
+
+.timeline{
+margin:0.8rem 0;
+padding-left:1rem;
+border-left:2px solid #e5e7eb;
+}
+
+.timeline p{
+margin-bottom:0.5rem;
+}
+
+/* IMAGE GRID */
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:12px;
+margin-top:10px;
+}
+
+.image-grid img{
+width:100%;
+height:auto;
+border-radius:6px;
+border:1px solid #e5e7eb;
+object-fit:contain;
+}
+
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="back-button">← Back to Home</a>
+
+<div class="container">
+
+<h1>Production Planning Software (PPS)</h1>
+
+<div class="tabs">
+
+<div class="tab active" onclick="openTab('overview',this)">Project Overview</div>
+<div class="tab" onclick="openTab('problem',this)">Problem</div>
+<div class="tab" onclick="openTab('solution',this)">Solution</div>
+<div class="tab" onclick="openTab('system',this)">System Design</div>
+<div class="tab" onclick="openTab('impact',this)">Business Impact</div>
+
+</div>
+
+<!-- OVERVIEW -->
+
+<div id="overview" class="tab-content active">
+
+<p>
+The Production Planning Software (PPS) is an internal Flask-based application
+developed to support daily mould and machine planning across manufacturing units.
+The system converts dealer requirements and historical sales patterns into
+structured production schedules.
+</p>
+
+<p>
+The platform enables planners to determine which moulds and machines should be
+used for each product and how production should be sequenced throughout the day.
+By automating this process, the software reduces manual coordination and ensures
+more consistent production planning.
+</p>
+
+<div class="image-grid">
+
+
+</div>
+
+</div>
+
+
+<!-- PROBLEM -->
+
+<div id="problem" class="tab-content">
+
+<p>
+Before the introduction of PPS, production planning was handled manually by
+plant level teams.
+</p>
+
+<p>
+Demand requirements from different states were received through Excel sheets and
+production plans were prepared through manual discussions between sales and
+production teams.
+</p>
+
+<div class="timeline">
+
+<p>• Production demand received from multiple regions</p>
+<p>• Planning performed manually using Excel</p>
+<p>• Frequent phone coordination between departments</p>
+<p>• Sudden production changes caused machine downtime</p>
+<p>• Inefficient mould changes during peak production</p>
+
+</div>
+
+<p>
+These challenges created delays in production planning and increased operational
+complexity within manufacturing units.
+</p>
+
+</div>
+
+
+<!-- SOLUTION -->
+
+<div id="solution" class="tab-content">
+
+<p>
+The Production Planning Software was developed to automate and standardize the
+planning process.
+</p>
+
+<div class="timeline">
+
+<p>• Dealer demand integrated into centralized planning system</p>
+<p>• Historical sales data used to guide production decisions</p>
+<p>• Automated generation of daily mould and machine schedules</p>
+<p>• Clear production sequencing for operators and planners</p>
+
+</div>
+
+<p>
+The system ensures that the correct moulds and machines are allocated for each
+product while maintaining continuous machine utilization.
+</p>
+
+</div>
+
+
+<!-- SYSTEM DESIGN -->
+
+<div id="system" class="tab-content">
+
+<p>
+The application is built using a lightweight Flask architecture designed for
+controlled internal usage.
+</p>
+
+<div class="timeline">
+
+<p>• Demand inputs collected from dealer order requirements</p>
+<p>• Historical sales patterns used for demand validation</p>
+<p>• Production schedules generated for mould and machine usage</p>
+<p>• Interface used by planners during daily planning windows</p>
+
+</div>
+
+<p>
+The system supports different machine types and plant configurations such as
+linear and circular layouts.
+</p>
+
+</div>
+
+
+<!-- IMPACT -->
+
+<div id="impact" class="tab-content">
+
+<p>
+The implementation of PPS significantly improved operational efficiency
+within production planning teams.
+</p>
+
+<div class="timeline">
+
+<p>• Planning time reduced by nearly 90%</p>
+<p>• Elimination of manual coordination delays</p>
+<p>• Improved machine utilization</p>
+<p>• Clear visibility of production schedules</p>
+<p>• Better alignment between demand and production output</p>
+
+</div>
+
+<p>
+Production plans that previously required half a day to finalize can now be
+generated quickly with structured data inputs.
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+function openTab(tabId,element){
+
+document.querySelectorAll(".tab-content").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.querySelectorAll(".tab").forEach(tab=>{
+tab.classList.remove("active");
+});
+
+document.getElementById(tabId).classList.add("active");
+element.classList.add("active");
+
+}
+
+</script>
+
+</body>
+</html>
 
