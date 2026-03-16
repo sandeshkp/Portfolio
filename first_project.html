@@ -14,4 +14,852 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+body {
+  background: #f5f5f5;
+  color: #111;
+  min-height: 100vh;
+  padding: 2rem;
+  line-height: 1.55;
+  font-size: 0.68rem;
+}
 
+/* ── Back Button ── */
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.45rem 0.9rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 0.65rem;
+  z-index: 1000;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #0077ff;
+}
+
+/* ── Container ── */
+.container {
+  max-width: 1000px;
+  margin: 4rem auto 2rem auto;
+  background: #fff;
+  padding: 1.6rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Headings ── */
+h1 {
+  color: #0077ff;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 0.75rem;
+  margin-bottom: 0.4rem;
+  color: #0077ff;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  cursor: pointer;
+  padding-bottom: 6px;
+  font-size: 0.7rem;
+  color: #555;
+  transition: color 0.2s ease;
+}
+
+.tab.active {
+  color: #0077ff;
+  border-bottom: 2px solid #0077ff;
+  font-weight: 500;
+}
+
+/* ── Tab Content ── */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ── Text ── */
+p {
+  margin-bottom: 0.6rem;
+  text-align: justify;
+}
+
+/* ── Info / Note Box ── */
+.note-box {
+  background: #fafafa;
+  border-left: 3px solid #0077ff;
+  padding: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ── Timeline / Bullet list ── */
+.timeline {
+  margin: 0.8rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid #e5e7eb;
+}
+
+.timeline p {
+  margin-bottom: 0.5rem;
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.55rem;
+  border-radius: 4px;
+  background: #f0f0f0;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.badge.blue   { background: #e8f0fe; color: #1a56db; }
+.badge.green  { background: #e8fdf2; color: #0e7a4e; }
+.badge.orange { background: #fff3e0; color: #c05500; }
+.badge.purple { background: #f3edff; color: #6d28d9; }
+.badge.red    { background: #fff0f0; color: #c0392b; }
+
+/* ── Single full-width image ── */
+.page-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  margin-top: 10px;
+}
+
+/* ── Image Grid ── */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  object-fit: contain;
+}
+
+/* ── Architecture Flow ── */
+.arch-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+
+.arch-box {
+  background: #f0f4ff;
+  border: 1px solid #c7d7f9;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #1a3a7c;
+  white-space: nowrap;
+}
+
+.arch-arrow {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* ── Status Pills ── */
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.6rem 0;
+}
+
+.status-pill {
+  font-size: 0.58rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.pill-green  { background: #d1fae5; color: #065f46; }
+.pill-blue   { background: #dbeafe; color: #1e3a8a; }
+.pill-orange { background: #ffedd5; color: #9a3412; }
+.pill-purple { background: #ede9fe; color: #4c1d95; }
+
+/* ── Two-column layout for some sections ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.8rem 0;
+}
+
+.col-box {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 0.8rem;
+  border: 1px solid #efefef;
+}
+
+.col-box h3 {
+  font-size: 0.68rem;
+  color: #0077ff;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Metric Cards ── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.8rem;
+  margin: 0.8rem 0;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 0.8rem;
+  color: white;
+  text-align: center;
+}
+
+.metric-card .metric-value {
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.metric-card .metric-label {
+  font-size: 0.55rem;
+  opacity: 0.85;
+}
+
+/* ── Code snippet ── */
+.code-block {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.6rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0.6rem 0;
+}
+
+.code-block .kw  { color: #cba6f7; }
+.code-block .str { color: #a6e3a1; }
+.code-block .cmt { color: #6c7086; font-style: italic; }
+.code-block .fn  { color: #89b4fa; }
+.code-block .num { color: #fab387; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  body { padding: 0.8rem; }
+  .container { margin: 3.5rem auto 1rem auto; padding: 1rem; }
+  .two-col { grid-template-columns: 1fr; }
+  h1 { font-size: 0.9rem; }
+}
+
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="back-button">← Back to Home</a>
+
+<div class="container">
+
+  <h1>Production Planning Software (PPS) — Flask Application</h1>
+
+  <div class="tabs">
+    <div class="tab active"  onclick="openTab('overview',   this)">Project Overview</div>
+    <div class="tab"         onclick="openTab('problem',    this)">Problem</div>
+    <div class="tab"         onclick="openTab('architecture',this)">Architecture</div>
+    <div class="tab"         onclick="openTab('pipeline',   this)">Data Pipeline</div>
+    <div class="tab"         onclick="openTab('features',   this)">Key Features</div>
+    <div class="tab"         onclick="openTab('flask',      this)">Flask Interface</div>
+    <div class="tab"         onclick="openTab('impact',     this)">Business Impact</div>
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 1 — OVERVIEW
+  ══════════════════════════════ -->
+  <div id="overview" class="tab-content active">
+
+    <div class="note-box">
+      <b>Note:</b> Screenshots displayed here are recreated examples for demonstration purposes.
+      Actual internal operational data cannot be shared publicly due to company data privacy policies.
+    </div>
+
+    <p>
+      The Production Planning Software (PPS) is a Flask-based internal web application
+      developed to streamline the daily mould allocation and machine scheduling process
+      at Walkaroo International. The system converts dealer requirements — pulled live
+      from SAP HANA — into structured production schedules, assigning moulds and
+      machines based on historical sales patterns, inventory levels, and production capacity.
+    </p>
+
+    <p>
+      Before PPS, production planners manually processed dealer order sheets in Excel,
+      cross-referenced mould availability registers, and built machine schedules by hand —
+      a process that consumed 3–4 hours each morning and was prone to scheduling conflicts
+      and missed allocations. PPS reduced this to a single-click operation.
+    </p>
+
+    <h2>Key Objectives</h2>
+    <div class="timeline">
+      <p>• Automate daily mould and machine scheduling from live dealer demand data</p>
+      <p>• Integrate directly with SAP HANA OData APIs for real-time stock and order data</p>
+      <p>• Apply historical sales intelligence to prioritise high-velocity SKUs</p>
+      <p>• Provide planners with a visual schedule interface — not raw spreadsheets</p>
+      <p>• Containerise and deploy via Docker for reliable cross-environment operation</p>
+    </div>
+
+    <h2>Technology Stack</h2>
+    <div class="status-row">
+      <span class="status-pill pill-blue">Flask</span>
+      <span class="status-pill pill-blue">Python 3.11</span>
+      <span class="status-pill pill-green">MySQL</span>
+      <span class="status-pill pill-green">SAP HANA OData</span>
+      <span class="status-pill pill-orange">Docker</span>
+      <span class="status-pill pill-purple">Pandas</span>
+      <span class="status-pill pill-purple">NumPy</span>
+      <span class="status-pill pill-blue">Jinja2</span>
+      <span class="status-pill pill-orange">SQLAlchemy</span>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-card">
+        <span class="metric-value">~3 hrs</span>
+        <span class="metric-label">Daily time saved per planner</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">22</span>
+        <span class="metric-label">States covered</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">100%</span>
+        <span class="metric-label">Manual scheduling replaced</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">Live</span>
+        <span class="metric-label">SAP HANA data integration</span>
+      </div>
+    </div>
+
+    <img src="images/pps_overview.png" class="page-image" alt="PPS Overview Screenshot" onerror="this.style.display='none'">
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 2 — PROBLEM
+  ══════════════════════════════ -->
+  <div id="problem" class="tab-content">
+
+    <h2>The Problem Before PPS</h2>
+    <p>
+      Every morning, the production planning team at Walkaroo faced the same challenge:
+      translating hundreds of dealer orders — spread across 22 states — into a coherent
+      machine and mould schedule for the factory floor. This required simultaneously
+      knowing which moulds were available, which machines were running, which SKUs
+      were high priority, and which dealers had pending backlogs.
+    </p>
+
+    <div class="two-col">
+      <div class="col-box">
+        <h3>🔴 Before PPS</h3>
+        <div class="timeline">
+          <p>• Manual Excel order consolidation every morning</p>
+          <p>• Cross-referencing mould availability registers by hand</p>
+          <p>• Machine scheduling done on whiteboards or paper sheets</p>
+          <p>• 3–4 hours consumed before production could begin</p>
+          <p>• No historical pattern weighting — orders treated equally</p>
+          <p>• Scheduling conflicts discovered only at machine-floor level</p>
+          <p>• No visibility into why a dealer's order was deprioritised</p>
+          <p>• Data spread across SAP, Excel files, and email threads</p>
+        </div>
+      </div>
+      <div class="col-box">
+        <h3>🟢 After PPS</h3>
+        <div class="timeline">
+          <p>• Single-click schedule generation from live SAP HANA data</p>
+          <p>• Mould availability checked automatically in real time</p>
+          <p>• Machine schedule generated and downloadable as Excel / PDF</p>
+          <p>• Full morning process completed in under 10 minutes</p>
+          <p>• Historical sales velocity used to weight allocation priority</p>
+          <p>• Conflicts flagged before reaching the factory floor</p>
+          <p>• Full audit trail — every decision logged with reason</p>
+          <p>• Single source of truth via centralised MySQL + SAP integration</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Core Challenge</h2>
+    <p>
+      The scheduling problem is fundamentally a constraint-satisfaction problem:
+      given N dealer requirements, M available moulds, and K available machines —
+      generate an optimal allocation that maximises production output while respecting
+      mould-machine compatibility, shift capacity, and priority rules. The system
+      handles this using a weighted priority queue built in Python, with
+      compatibility matrices maintained in MySQL.
+    </p>
+
+    <div class="timeline">
+      <p>• Mould-to-machine compatibility constraints (not every mould fits every machine)</p>
+      <p>• Shift-based capacity limits per machine per day</p>
+      <p>• Dealer priority tiers (A / B / C classification from SAP)</p>
+      <p>• SKU velocity weighting from 12-month historical sales data</p>
+      <p>• Backlog carry-forward logic for unfulfilled prior-day requirements</p>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 3 — ARCHITECTURE
+  ══════════════════════════════ -->
+  <div id="architecture" class="tab-content">
+
+    <h2>System Architecture</h2>
+
+    <div class="arch-flow">
+      <div class="arch-box">SAP HANA</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">OData API</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Python ETL</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">MySQL</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Scheduling Engine</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Flask App</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Planner UI</div>
+    </div>
+
+    <p>
+      The architecture is split into three distinct layers: data ingestion,
+      scheduling computation, and the Flask delivery interface. This separation
+      ensures that heavy ETL and scheduling logic never blocks the web interface.
+    </p>
+
+    <div class="two-col">
+      <div class="col-box">
+        <h3>Layer 1 — Data Ingestion</h3>
+        <div class="timeline">
+          <p>• SAP HANA queried via OData REST APIs at schedule generation time</p>
+          <p>• Dealer order data, mould master, and machine availability extracted</p>
+          <p>• Python ETL validates, cleans, and normalises incoming records</p>
+          <p>• Historical sales data loaded from MySQL (12-month rolling window)</p>
+          <p>• All raw extracts stored in staging tables before processing</p>
+        </div>
+      </div>
+      <div class="col-box">
+        <h3>Layer 2 — Scheduling Engine</h3>
+        <div class="timeline">
+          <p>• Weighted priority queue built per dealer × SKU × mould combination</p>
+          <p>• Compatibility matrix loaded from MySQL configuration tables</p>
+          <p>• Constraint solver iterates allocation respecting shift capacity limits</p>
+          <p>• Backlog engine carries forward unmet demand from previous day</p>
+          <p>• Output schedule written to MySQL output tables</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-box" style="margin-top: 0.8rem;">
+      <h3>Layer 3 — Flask Delivery Interface</h3>
+      <div class="timeline">
+        <p>• Flask reads final schedule from MySQL output tables</p>
+        <p>• Jinja2 templates render machine-wise and mould-wise schedule views</p>
+        <p>• Excel export generated via openpyxl for factory floor distribution</p>
+        <p>• Role-based access: planners vs. floor supervisors see different views</p>
+        <p>• Docker container ensures consistent deployment across environments</p>
+      </div>
+    </div>
+
+    <h2>Deployment</h2>
+    <p>
+      The application is containerised using Docker with a
+      <code style="background:#f0f0f0; padding:0.1rem 0.3rem; border-radius:3px; font-size:0.6rem;">docker-compose.yml</code>
+      configuration that orchestrates the Flask app container alongside the MySQL container.
+      This enables one-command deployment on any server without dependency conflicts.
+    </p>
+
+    <div class="code-block">
+<span class="cmt"># docker-compose.yml (simplified)</span>
+<span class="kw">version</span>: <span class="str">'3.8'</span>
+<span class="kw">services</span>:
+  <span class="kw">pps_app</span>:
+    <span class="kw">build</span>: .
+    <span class="kw">ports</span>: [<span class="str">"5000:5000"</span>]
+    <span class="kw">depends_on</span>: [db]
+    <span class="kw">environment</span>:
+      - <span class="str">SAP_HANA_HOST</span>=...
+      - <span class="str">MYSQL_HOST</span>=db
+  <span class="kw">db</span>:
+    <span class="kw">image</span>: <span class="str">mysql:8.0</span>
+    <span class="kw">volumes</span>: [<span class="str">pps_data:/var/lib/mysql</span>]
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 4 — DATA PIPELINE
+  ══════════════════════════════ -->
+  <div id="pipeline" class="tab-content">
+
+    <h2>Data Pipeline — End to End</h2>
+
+    <p>
+      The PPS pipeline runs on-demand when a planner triggers schedule generation,
+      and also has a scheduled pre-fetch that runs at 6:00 AM to pull overnight
+      SAP HANA data so the morning schedule can be generated instantly.
+    </p>
+
+    <h2>Step 1 — SAP HANA Extraction</h2>
+    <div class="timeline">
+      <p>• OData API calls made to SAP HANA endpoints for dealer order tables</p>
+      <p>• Mould master data fetched (mould ID, dimensions, compatible article types)</p>
+      <p>• Machine availability status fetched from production module</p>
+      <p>• API responses parsed from JSON into Pandas DataFrames</p>
+      <p>• Extraction handles pagination for large order volumes (batch size 1000)</p>
+    </div>
+
+    <h2>Step 2 — Cleaning and Validation</h2>
+    <div class="timeline">
+      <p>• Null checks on critical fields: dealer code, article code, quantity, mould ID</p>
+      <p>• Duplicate order line detection and de-duplication</p>
+      <p>• Quantity outlier detection — orders above 3σ flagged for planner review</p>
+      <p>• Article code standardisation (SAP codes mapped to internal naming convention)</p>
+      <p>• Invalid mould-article combinations rejected with logged error reason</p>
+    </div>
+
+    <h2>Step 3 — Priority Scoring</h2>
+    <p>
+      Each dealer-SKU requirement is assigned a composite priority score before entering
+      the scheduling engine. The score combines four weighted factors:
+    </p>
+    <div class="timeline">
+      <p>• <b>Dealer tier weight (40%)</b> — A/B/C classification from SAP dealer master</p>
+      <p>• <b>Historical velocity weight (30%)</b> — 12-month average sales for this SKU in this region</p>
+      <p>• <b>Backlog weight (20%)</b> — number of days this requirement has been unmet</p>
+      <p>• <b>Stock urgency weight (10%)</b> — days-of-stock remaining at current sell rate</p>
+    </div>
+
+    <h2>Step 4 — Schedule Generation</h2>
+    <div class="timeline">
+      <p>• Requirements sorted by descending priority score</p>
+      <p>• For each requirement: compatible moulds fetched from compatibility matrix</p>
+      <p>• Available machines identified (not at capacity for current shift)</p>
+      <p>• Optimal mould-machine pair selected; allocation written to output table</p>
+      <p>• Shift capacity counters updated after each allocation</p>
+      <p>• Unallocated requirements written to backlog table for next day carry-forward</p>
+    </div>
+
+    <h2>Step 5 — Output and Distribution</h2>
+    <div class="timeline">
+      <p>• Final schedule written to MySQL output tables (machine-wise view)</p>
+      <p>• Flask reads output tables and renders schedule on web interface</p>
+      <p>• Excel export generated with openpyxl — one sheet per machine</p>
+      <p>• Schedule summary emailed to production manager via SMTP automation</p>
+    </div>
+
+    <div class="code-block">
+<span class="cmt"># Priority scoring — simplified Python logic</span>
+<span class="kw">def</span> <span class="fn">compute_priority_score</span>(row, velocity_df, backlog_df):
+    dealer_weight  = {<span class="str">'A'</span>: <span class="num">1.0</span>, <span class="str">'B'</span>: <span class="num">0.7</span>, <span class="str">'C'</span>: <span class="num">0.4</span>}
+    velocity       = velocity_df.get(row[<span class="str">'article_code'</span>], <span class="num">0</span>)
+    backlog_days   = backlog_df.get(row[<span class="str">'order_id'</span>], <span class="num">0</span>)
+    stock_urgency  = <span class="num">1</span> / (row[<span class="str">'days_of_stock'</span>] + <span class="num">1</span>)
+
+    score = (
+        dealer_weight[row[<span class="str">'tier'</span>]] * <span class="num">0.4</span> +
+        (velocity / velocity_df.max())  * <span class="num">0.3</span> +
+        (backlog_days / <span class="num">30</span>)             * <span class="num">0.2</span> +
+        stock_urgency                   * <span class="num">0.1</span>
+    )
+    <span class="kw">return</span> round(score, <span class="num">4</span>)
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 5 — KEY FEATURES
+  ══════════════════════════════ -->
+  <div id="features" class="tab-content">
+
+    <h2>Core Features</h2>
+
+    <div class="two-col">
+
+      <div class="col-box">
+        <h3>⚙️ Auto Schedule Generation</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          One-click schedule generation that pulls live data from SAP HANA,
+          runs the priority-weighted allocation engine, and produces a complete
+          machine-wise production schedule — in under 60 seconds.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>📦 Mould Compatibility Matrix</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          A configurable mould-to-article and mould-to-machine compatibility matrix
+          maintained in MySQL. Planners can update compatibility rules via the
+          admin panel without touching code.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>🔁 Backlog Carry-Forward</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          Unmet requirements automatically carry forward to the next day with
+          an escalating backlog weight — ensuring high-backlog orders surface
+          to the top of the next day's priority queue.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>📤 Excel Schedule Export</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          Final schedules exportable as formatted Excel files with one sheet
+          per machine, ready for floor supervisors. Generated via openpyxl
+          with conditional formatting for priority indicators.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>📊 Historical Velocity Weighting</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          12-month rolling average sales velocity per article per region
+          is used to weight allocation priority — ensuring fast-moving SKUs
+          are always scheduled ahead of slow movers when capacity is constrained.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>🔐 Role-Based Access</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          Planners see the full schedule generation interface. Floor supervisors
+          see a read-only machine-view. Admins can update compatibility matrices
+          and capacity configurations. Flask session-based authentication.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>⚠️ Conflict & Outlier Flagging</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          Orders with unusually high quantities, invalid mould-article combinations,
+          or machine capacity overloads are flagged before the schedule is finalised —
+          giving planners a review queue rather than a failed run.
+        </p>
+      </div>
+
+      <div class="col-box">
+        <h3>🐳 Docker Deployment</h3>
+        <p style="font-size:0.68rem; color:#555; line-height:1.5; margin-top:0.3rem;">
+          Fully containerised with Docker Compose — Flask app + MySQL in isolated
+          containers. Environment variables manage SAP HANA credentials and
+          database configs. One-command startup: <code style="background:#f0f0f0;padding:0.1rem 0.2rem;border-radius:2px;">docker-compose up</code>.
+        </p>
+      </div>
+
+    </div>
+
+    <h2>Tech Stack Detail</h2>
+    <p>
+      <span class="badge blue">Flask 3.x</span>
+      <span class="badge blue">Python 3.11</span>
+      <span class="badge green">MySQL 8.0</span>
+      <span class="badge green">SQLAlchemy ORM</span>
+      <span class="badge orange">Docker / Docker Compose</span>
+      <span class="badge purple">Pandas</span>
+      <span class="badge purple">NumPy</span>
+      <span class="badge blue">Jinja2</span>
+      <span class="badge orange">openpyxl</span>
+      <span class="badge green">SAP HANA OData API</span>
+      <span class="badge purple">smtplib (schedule email)</span>
+    </p>
+
+    <div class="image-grid">
+      <img src="images/pps_schedule.png"    alt="Schedule View"    onerror="this.style.display='none'">
+      <img src="images/pps_mould.png"       alt="Mould Matrix"     onerror="this.style.display='none'">
+      <img src="images/pps_backlog.png"     alt="Backlog View"     onerror="this.style.display='none'">
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 6 — FLASK INTERFACE
+  ══════════════════════════════ -->
+  <div id="flask" class="tab-content">
+
+    <h2>Flask Application Interface</h2>
+
+    <p>
+      The Flask application serves as the user-facing interface for the entire PPS system.
+      It is designed for production planners who need a fast, no-friction tool —
+      not a complex analytics dashboard. The UI is deliberately simple:
+      one primary action (generate schedule), with secondary views for review and export.
+    </p>
+
+    <h2>Route Structure</h2>
+    <div class="timeline">
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /</code> — Login / session check → redirect to dashboard</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /dashboard</code> — Main planner dashboard; shows today's schedule status</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">POST /generate</code> — Triggers SAP pull → ETL → scheduling engine → writes output</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /schedule</code> — Renders today's generated schedule (machine-wise view)</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /export</code> — Streams Excel file download of today's schedule</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /backlog</code> — View unallocated requirements carried forward</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">GET  /admin</code> — Mould compatibility matrix and capacity configuration (admin only)</p>
+    </div>
+
+    <h2>Session and Authentication</h2>
+    <div class="timeline">
+      <p>• Flask session-based authentication with bcrypt password hashing</p>
+      <p>• Three roles: <b>planner</b>, <b>supervisor</b>, <b>admin</b></p>
+      <p>• Route decorators enforce role-based access on sensitive routes</p>
+      <p>• Sessions expire after 8 hours (one shift duration)</p>
+    </div>
+
+    <h2>Template Structure</h2>
+    <div class="timeline">
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">base.html</code> — Shared layout with nav and session context</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">dashboard.html</code> — Schedule generation trigger + status cards</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">schedule.html</code> — Machine-wise schedule table with priority colour coding</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">backlog.html</code> — Unallocated orders table with backlog age indicators</p>
+      <p>• <code style="background:#f0f0f0;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.6rem;">admin.html</code> — Mould matrix editor and machine capacity configuration</p>
+    </div>
+
+    <div class="code-block">
+<span class="cmt"># Flask route — schedule generation trigger</span>
+<span class="kw">@app</span>.route(<span class="str">'/generate'</span>, methods=[<span class="str">'POST'</span>])
+<span class="kw">@login_required</span>
+<span class="kw">@role_required</span>(<span class="str">'planner'</span>)
+<span class="kw">def</span> <span class="fn">generate_schedule</span>():
+    date_str = request.form.get(<span class="str">'schedule_date'</span>)
+    result   = scheduler.run(date_str)        <span class="cmt"># triggers full pipeline</span>
+    <span class="kw">if</span> result[<span class="str">'status'</span>] == <span class="str">'success'</span>:
+        flash(<span class="str">f"Schedule generated: {result['allocated']} allocations"</span>, <span class="str">'success'</span>)
+    <span class="kw">else</span>:
+        flash(<span class="str">f"Error: {result['message']}"</span>, <span class="str">'error'</span>)
+    <span class="kw">return</span> redirect(url_for(<span class="str">'schedule'</span>))
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════
+       TAB 7 — BUSINESS IMPACT
+  ══════════════════════════════ -->
+  <div id="impact" class="tab-content">
+
+    <h2>Business Impact</h2>
+
+    <p>
+      PPS was built to solve a real, daily operational problem and its impact
+      was measurable from the first week of deployment.
+    </p>
+
+    <div class="metrics-row">
+      <div class="metric-card">
+        <span class="metric-value">3–4 hrs</span>
+        <span class="metric-label">Morning planning time eliminated daily</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">&lt; 10 min</span>
+        <span class="metric-label">Full schedule generation time (post-PPS)</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">0</span>
+        <span class="metric-label">Mould-machine conflicts post-deployment</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">100%</span>
+        <span class="metric-label">Backlog visibility (previously invisible)</span>
+      </div>
+    </div>
+
+    <h2>Operational Improvements</h2>
+    <div class="timeline">
+      <p>• Production floor starts earlier — schedule ready before shift begins</p>
+      <p>• Zero mould-machine compatibility errors since deployment</p>
+      <p>• Backlog carry-forward prevents dealer requirements from being silently missed</p>
+      <p>• Planners freed from Excel work; focus on exception handling instead</p>
+      <p>• Management visibility into daily scheduling decisions via audit log</p>
+      <p>• Consistent priority logic applied across all planners (no individual bias)</p>
+    </div>
+
+    <h2>Technical Learnings</h2>
+    <div class="timeline">
+      <p>• SAP HANA OData API rate limits require careful batch sizing and retry logic</p>
+      <p>• Constraint-satisfaction problems at production scale benefit from greedy
+         weighted sorting over exhaustive solvers — speed matters more than
+         theoretical optimality in an operational morning context</p>
+      <p>• Docker Compose significantly simplified deployment across dev / staging / prod</p>
+      <p>• Building an admin UI for the compatibility matrix was essential —
+         without it, every mould/machine change would have required a code deployment</p>
+    </div>
+
+    <h2>Status</h2>
+    <div class="status-row">
+      <span class="status-pill pill-green">✓ Live in Production</span>
+      <span class="status-pill pill-blue">✓ Daily Active Use</span>
+      <span class="status-pill pill-orange">↻ Iterating — v2 roadmap includes ML-based capacity forecasting</span>
+    </div>
+
+  </div>
+
+</div><!-- /container -->
+
+
+<script>
+function openTab(tabId, element) {
+  document.querySelectorAll(".tab-content").forEach(tab => {
+    tab.classList.remove("active");
+  });
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+  document.getElementById(tabId).classList.add("active");
+  element.classList.add("active");
+}
+</script>
+
+</body>
+</html>
