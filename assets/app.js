@@ -59,14 +59,14 @@
         <div style="display:flex;flex-direction:column;gap:8px">
           <div class="card-top"><span class="tag">${esc(KIND[p.kind])}</span><span class="status ${esc(p.status)}">${esc(STATUS[p.status])}</span></div>
           <h3 style="font-size:1.15rem">${esc(p.title)}</h3><p>${esc(p.tagline)}</p>
-          <ul class="points">${p.points.slice(0, 3).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-          ${chips(p.stack)}<span class="open">Open research →</span>
+          <p>${esc(p.problem)}</p>
+          ${chips(p.stack)}<span class="open">Read the full research →</span>
         </div>
         <div class="mini">${preview(p.preview)}</div></button>`;
     }
     return `<button class="card ${esc(p.kind)}" data-id="${esc(p.id)}" aria-haspopup="dialog">
       <div class="card-top"><span class="tag">${esc(KIND[p.kind])}</span><span class="status ${esc(p.status)}">${esc(STATUS[p.status])}</span></div>
-      <h3>${esc(p.title)}</h3><p>${esc(p.tagline)}</p>${chips(p.stack, 4)}<span class="open">See how it works →</span></button>`;
+      <h3>${esc(p.title)}</h3><p>${esc(p.tagline)}</p>${chips(p.stack, 4)}<span class="open">Read case study →</span></button>`;
   }
 
   function render() {
@@ -85,6 +85,8 @@
     if (!p) return;
     const dlg = $("#dlg");
     dlg.className = p.kind;
+    const list = (arr) => `<ul>${(arr || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    const sec = (title, html) => (html ? `<section class="cs"><h4>${title}</h4>${html}</section>` : "");
     $("#dlgContent").innerHTML = `
       <div class="dlg-head">
         <div class="row"><span class="tag">${esc(KIND[p.kind])}</span><span class="status ${esc(p.status)}">${esc(STATUS[p.status])}</span></div>
@@ -92,14 +94,15 @@
         <button class="dlg-close" aria-label="Close">×</button>
       </div>
       <div class="dlg-body">
-        ${preview(p.preview)}
-        <div class="two">
-          <div><h4>What it does</h4><ul class="points">${p.points.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
-          <div><h4>How it works</h4><div class="steps">${(p.steps || []).map((s) => `<span>${esc(s)}</span>`).join("")}</div></div>
-        </div>
-        <div class="result"><b>Result:</b> ${esc(p.result)}</div>
-        <div><h4>Built with</h4>${chips(p.stack)}</div>
-        ${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}
+        ${sec("1. The problem", `<p>${esc(p.problem)}</p>`)}
+        ${p.before ? sec("2. Before vs after", `<div class="ba"><div class="b"><b>Before</b>${list(p.before)}</div><div class="a"><b>After</b>${list(p.after)}</div></div>`) : ""}
+        ${sec("3. Solution", `<p>${esc(p.solution)}</p>${p.architecture ? `<div class="flow">${p.architecture.map((s) => `<span>${esc(s)}</span>`).join("<em>→</em>")}</div>` : ""}`)}
+        ${p.tech ? sec("4. How it works (technical)", list(p.tech)) : ""}
+        ${p.testing ? sec("5. How it was tested / validated", list(p.testing)) : ""}
+        ${p.outcomes ? sec("6. Outcome", list(p.outcomes)) : ""}
+        ${p.preview ? sec("Preview", preview(p.preview)) : ""}
+        ${sec("Built with", chips(p.stack))}
+        ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
       </div>`;
     dlg.showModal();
     $(".dlg-close").focus();
