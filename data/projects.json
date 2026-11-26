@@ -1,0 +1,224 @@
+{
+  "updated": "2026-11-26",
+  "projects": [
+    {
+      "id": "btc-forecast",
+      "source": "Fable 5 test ml",
+      "title": "Short-Horizon Crypto Volatility & Direction Research",
+      "kind": "ml",
+      "status": "research",
+      "summary": "Forecasting price ranges and direction on 1-second market data, with leakage checks, placebo tests and fee-aware walk-forward backtests.",
+      "problem": "Can short-horizon price ranges and direction be predicted well enough to matter after trading costs? Most retail backtests skip leakage and fee checks, so the goal was to answer this honestly.",
+      "pipeline": ["Public exchange archive (1s spot, 1m futures)", "Feature build", "Ridge volatility model", "Gated logistic direction model", "Walk-forward backtest", "Paper-trading dashboard"],
+      "built": [
+        "Volatility model: ridge regression on multi-window realised variance, activity, jumps and time-of-day features.",
+        "Price ranges from volatility-scaled return quantiles, recalibrated on a rolling window.",
+        "Direction model: heavily regularised logistic regression on order-flow imbalance, recent returns and futures–spot basis, only enabled when it beats the base rate out of sample.",
+        "A small wide-and-deep neural net written in plain NumPy that learns a residual correction, with early stopping.",
+        "Local paper-trading dashboards and auto-generated markdown reports. No real orders."
+      ],
+      "ml": [
+        "Horizon study from 10 seconds to 20 minutes.",
+        "Placebo test with shuffled labels and a synthetic no-signal test to catch leakage.",
+        "Walk-forward evaluation including fees."
+      ],
+      "outcome": [
+        "Range forecasts came out well calibrated.",
+        "Direction signal was weak, close to chance.",
+        "No strategy was profitable after fees, and the reports say so plainly."
+      ],
+      "stack": ["Python", "NumPy", "pandas", "Ridge regression", "Logistic regression", "Neural network (NumPy)", "Backtesting"],
+      "note": "Personal research project. The value is in the evaluation discipline: a negative result reported honestly."
+    },
+    {
+      "id": "po-forecast",
+      "source": "MODERN TRADE",
+      "title": "Retail Purchase-Order Demand Forecasting",
+      "kind": "ml",
+      "status": "prototype",
+      "summary": "Gradient-boosting ensemble that predicts monthly purchase-order quantities per article for retail chain customers, built to support stock planning.",
+      "problem": "Stock for chain-store customers was planned from simple averages, which reacts slowly to trends and seasonality.",
+      "pipeline": ["Monthly sales & PO history", "Lag / rolling features", "XGBoost + LightGBM + GBM ensemble", "Cross-validation", "Hold-out month check"],
+      "built": [
+        "Feature set of 60+ lag and rolling-window statistics (mean, std, min, max) plus encoded category.",
+        "Ensemble of XGBoost, LightGBM and gradient boosting, with random forest as a comparison.",
+        "Evaluated with 5-fold CV on MAE, then MAE, RMSE, R² and MAPE on a held-out month."
+      ],
+      "ml": [
+        "Supervised regression on time-series features.",
+        "Model comparison and ensembling.",
+        "Hold-out evaluation on the most recent month."
+      ],
+      "outcome": [
+        "Runs offline as a notebook and script. It is not yet wired into the planning app.",
+        "Sits next to a rules-based planner (weighted averages, trend and ABC classification) that is in daily use."
+      ],
+      "stack": ["Python", "pandas", "XGBoost", "LightGBM", "scikit-learn", "Jupyter"]
+    },
+    {
+      "id": "modern-trade",
+      "source": "MODERN TRADE",
+      "title": "Modern Trade Sales & Stock Planning Platform",
+      "kind": "app",
+      "status": "production",
+      "summary": "Flask platform that consolidates retail-chain sales and purchase orders, and plans stock with ABC classification, trend detection and stock-cover rules.",
+      "problem": "Sales, purchase-order and stock data for chain-store customers arrived as separate files in different formats, so planning and reporting were manual.",
+      "pipeline": ["Partner files via FTP", "ETL", "MySQL consolidated tables", "Dashboards & planner", "Excel / order files"],
+      "built": [
+        "ETL jobs that load distributor and customer files into consolidated MySQL tables.",
+        "Dashboards by article, store, category and state, plus sales vs. target, exported as heat-mapped Excel.",
+        "Purchase-order mapper and master-data management.",
+        "Demand planner using weighted-average sales, trend classification, ABC classes, stock cover and pipeline, with editable multipliers.",
+        "Generates order files with product thumbnails. Login, registration and email password reset."
+      ],
+      "outcome": [
+        "One place for the team to see sales against target and plan replenishment instead of merging files by hand."
+      ],
+      "stack": ["Flask", "Blueprints", "pandas", "SQLAlchemy", "MySQL", "openpyxl", "XlsxWriter", "pdfplumber"]
+    },
+    {
+      "id": "ims",
+      "source": "IMS(Inventory Management Software)",
+      "title": "Sales & Inventory Reporting System (ETL + Portal)",
+      "kind": "data",
+      "status": "production",
+      "summary": "ETL pipelines that turn ERP extracts into report tables, served through a role-based Flask portal where each user sees only their regions.",
+      "problem": "Daily stock and sales reports were assembled by hand from ERP extracts and spreadsheets, then sent around as files.",
+      "pipeline": ["ERP extracts + Excel masters", "Python ETL", "Report tables", "Status emails", "Region-filtered portal + Excel export"],
+      "built": [
+        "ETL scripts for new launches, depot stock, leftover stock, category mix, sales-plan accuracy and dealer-wise sales.",
+        "Flask portal with filterable admin and user dashboards, and Excel export with embedded product images.",
+        "Region-based access control, roles, session timeouts and logging.",
+        "Admin uploads for finance-related files that feed the reports.",
+        "Experiment: a chat endpoint that asks a hosted open-weights LLM to answer questions over KPI summaries."
+      ],
+      "outcome": [
+        "Reports are generated by scheduled scripts instead of by hand, and users pull their own region's view."
+      ],
+      "stack": ["Python", "pandas", "Flask", "Flask-Caching", "SQLite", "openpyxl", "Google Sheets API", "SMTP", "LLM API"]
+    },
+    {
+      "id": "image-bot",
+      "source": "Walkaroo Bot",
+      "title": "Product Image Search Bot with Nightly Sync ETL",
+      "kind": "app",
+      "status": "production",
+      "summary": "Chat-style product image search with OTP login and admin analytics, kept current by a nightly ETL that syncs only changed images from cloud storage.",
+      "problem": "Sales teams needed current product images quickly, but the image library was large, changed often and was hard to search.",
+      "pipeline": ["Cloud object storage listing", "ETag diff (new / replaced / unchanged)", "Match to product master", "Incremental download", "Search bot + exception reports"],
+      "built": [
+        "Search by article, colour or category with type-ahead, or upload a stock list. Results come back as images, Excel or ZIP.",
+        "Scheduled ETL that compares content hashes to download only new or replaced images, and writes exception reports.",
+        "Rule-based name parsing (regex + colour mapping) to standardise image names into a master file.",
+        "Security: OTP email login, admin-approved registration, HMAC single-sign-on tokens from sibling apps, encrypted secrets, password hashing.",
+        "Admin analytics: searches, trending items, not-found items and daily usage."
+      ],
+      "outcome": [
+        "Incremental sync avoids re-downloading the full library every night.",
+        "Not-found search analytics show which images are missing."
+      ],
+      "stack": ["Flask", "pandas", "boto3", "APScheduler", "SQLite", "cryptography", "HMAC", "XlsxWriter", "Pillow"]
+    },
+    {
+      "id": "stock-image-map",
+      "source": "STOCK_IMAGE_MAP_TEST",
+      "title": "Stock-to-Image Catalogue Generator",
+      "kind": "app",
+      "status": "production",
+      "summary": "Upload a stock list and get back an illustrated PDF catalogue, an Excel file with images or a ZIP, joined with product master and MRP data.",
+      "problem": "Building a picture catalogue for a stock list meant looking up each article's image and price by hand.",
+      "pipeline": ["Stock Excel upload", "Join product master + MRP", "Find & stamp images", "PDF / Excel / ZIP output"],
+      "built": [
+        "Joins uploaded stock with a cached product master and MRP data.",
+        "Finds images, stamps them with the article code, and builds PDF catalogues (ReportLab) and Excel files with embedded images.",
+        "Parallel, resumable image downloader from cloud object storage with retries.",
+        "Missing-image tracking with a scheduled email report, user management and activity logging."
+      ],
+      "outcome": [
+        "A catalogue that took manual lookups is produced from one upload."
+      ],
+      "stack": ["Flask", "pandas", "ReportLab", "Pillow", "XlsxWriter", "boto3", "ThreadPoolExecutor", "SQLite", "schedule"]
+    },
+    {
+      "id": "launch-mail",
+      "source": "Launch Mail",
+      "title": "Product Launch Mailer",
+      "kind": "app",
+      "status": "production",
+      "summary": "Turns a launch spreadsheet into region-wise HTML emails with product images and attachments, and flags articles that are missing images.",
+      "problem": "Launch announcements were assembled and sent region by region by hand, and missing images were often found only after sending.",
+      "pipeline": ["Launch Excel upload", "Join colour map + images", "Missing-image check", "HTML email build", "SMTP send + history log"],
+      "built": [
+        "Reads the launch file and joins it with a colour map and product images.",
+        "Lists articles with missing images for download before anything is sent.",
+        "Region-to-recipient mapping stored in SQLite.",
+        "HTML emails with inlined CSS, embedded images and attachments, sent over SMTP, with a launch history log.",
+        "Single-sign-on hand-off to the image search bot."
+      ],
+      "outcome": [
+        "A repeatable launch mail process with a check for missing images before sending."
+      ],
+      "stack": ["Flask", "pandas", "openpyxl", "Pillow", "premailer", "SMTP", "SQLite", "python-dotenv"]
+    },
+    {
+      "id": "powerbi-portal",
+      "source": "Sales App",
+      "title": "Power BI Embedded Sales Portal",
+      "kind": "app",
+      "status": "production",
+      "summary": "Flask portal that embeds Power BI reports with per-user access, admin-managed report pages and filters, and DAX-driven Excel export.",
+      "problem": "Different users needed different slices of the same Power BI reports without each one needing a Power BI licence or workspace access.",
+      "pipeline": ["Azure AD token (MSAL)", "Power BI REST API", "Embed config per user", "DAX queries for filters", "Excel export"],
+      "built": [
+        "Server-side Azure AD authentication and Power BI REST calls to generate embed settings.",
+        "Admin screens to register reports, pages and filters and to grant access per user.",
+        "DAX queries to discover columns and values for filter menus, and to export data to Excel.",
+        "User and activity tracking with auto-logout."
+      ],
+      "outcome": [
+        "Users see only the reports they are allowed to, inside one portal."
+      ],
+      "stack": ["Flask", "MSAL", "Power BI REST API", "DAX", "SQLite", "pandas", "XlsxWriter", "JavaScript"]
+    },
+    {
+      "id": "pps",
+      "source": "",
+      "title": "Production Planning Software (PPS)",
+      "kind": "app",
+      "status": "production",
+      "summary": "Flask application that converts daily dealer requirements into machine and mould schedules using historical sales and mould–machine compatibility.",
+      "problem": "Daily production plans were built by hand from dealer requirements, mould availability and machine capacity.",
+      "pipeline": ["ERP requirement pull", "ETL", "Scheduling rules", "Machine-wise schedule", "Excel export & backlog"],
+      "built": [
+        "Pulls daily requirements and runs a rules-based scheduler over mould–machine compatibility and capacity.",
+        "Machine-wise schedule view with priorities, a backlog view of unallocated requirements, and Excel export.",
+        "Admin screens for the mould compatibility matrix and machine capacity."
+      ],
+      "outcome": [
+        "Planners generate the day's schedule from the app instead of building it in spreadsheets."
+      ],
+      "stack": ["Flask", "Python", "pandas", "SQL", "Docker"],
+      "note": "Runs on a company server. Described at a high level only."
+    },
+    {
+      "id": "dms-allotment",
+      "source": "",
+      "title": "Dealer Stock Allotment Engine",
+      "kind": "data",
+      "status": "production",
+      "summary": "Script that allocates limited stock against daily dealer requirements using weighted priority, inventory class and recent sales trend.",
+      "problem": "When demand exceeds stock, deciding which dealer gets what was manual and inconsistent.",
+      "pipeline": ["Dealer requirements", "Live stock", "Weighted scoring", "Green / Red / Black classes", "Allotment output"],
+      "built": [
+        "Multi-factor scoring that combines priority, inventory class and recent trend.",
+        "Three-tier classification (green / red / black) to decide full, partial or no allotment.",
+        "Produces an allotment file for the distribution team."
+      ],
+      "outcome": [
+        "The same rules are applied every day instead of case-by-case decisions."
+      ],
+      "stack": ["Python", "pandas", "SQL"],
+      "note": "Runs on a company server. Described at a high level only."
+    }
+  ]
+}
