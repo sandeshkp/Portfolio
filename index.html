@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sandesh K P · Data Analyst & Python Developer</title>
-  <meta name="description" content="Data analyst and Python developer: ETL pipelines, forecasting and ML experiments, and Flask apps that turn ERP data into daily decisions.">
+  <meta name="description" content="Data analyst and Python developer: data pipelines, forecasting research and Flask apps.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -12,134 +12,76 @@
 </head>
 <body>
 
-<nav class="nav">
+<header class="hero">
   <div class="wrap">
-    <a class="brand" href="#top">sandesh<span>.kp</span></a>
-    <div class="nav-links">
-      <a href="#projects">Projects</a>
-      <a href="#skills" class="hide-sm">Skills</a>
-      <a href="#experience" class="hide-sm">Experience</a>
-      <a href="#contact">Contact</a>
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+    <div class="topbar">
+      <span class="brand">sandesh<span>.kp</span></span>
+      <div class="top-links">
+        <a href="#projects">Projects</a>
+        <a href="#skills" class="hide-sm">Skills</a>
+        <a href="#contact">Contact</a>
+        <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+      </div>
     </div>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <div class="wrap">
-    <div class="eyebrow">Data Analyst · Python Developer</div>
-    <h1>Sandesh K P</h1>
-    <p class="role">
-      I turn <strong>raw ERP and sales data</strong> into <strong>automated pipelines</strong>,
-      <strong>forecasting experiments</strong> and <strong>internal web apps</strong> that teams use every day.
-    </p>
-    <div class="hero-actions">
-      <a class="btn primary" href="#projects">View projects</a>
-      <a class="btn" href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn" href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener">Kaggle</a>
-      <a class="btn" href="https://leetcode.com/u/sandesh_kp/" target="_blank" rel="noopener">LeetCode</a>
-      <a class="btn" href="https://github.com/sandeshkp" target="_blank" rel="noopener">GitHub</a>
-    </div>
-
-    <div class="terminal" aria-label="Profile summary">
-      <div class="terminal-bar"><i></i><i></i><i></i></div>
-<pre><span class="c"># profile.py</span>
-<span class="k">role</span>      = <span class="s">"Data Analyst — Sales"</span>
-<span class="k">focus</span>     = [<span class="s">"ETL pipelines"</span>, <span class="s">"forecasting / ML"</span>, <span class="s">"Flask apps"</span>, <span class="s">"Power BI"</span>]
-<span class="k">daily</span>     = <span class="s">"ERP extract → clean → model → report / app"</span>
-<span class="k">stack</span>     = [<span class="s">"Python"</span>, <span class="s">"pandas"</span>, <span class="s">"SQL"</span>, <span class="s">"scikit-learn"</span>, <span class="s">"Flask"</span>]</pre>
-    </div>
-
-    <div class="stats">
-      <div class="stat"><b id="statProjects">–</b><span>projects</span></div>
-      <div class="stat"><b id="statProd">–</b><span>in production</span></div>
-      <div class="stat"><b id="statML">–</b><span>with ML / analytics</span></div>
-      <div class="stat"><b id="statTech">–</b><span>tools used</span></div>
+    <div class="hero-body">
+      <div>
+        <div class="role">Data Analyst · Python Developer</div>
+        <h1>Sandesh K P</h1>
+        <p class="lead">I build data pipelines, forecasting models and internal web apps that sales and planning teams use every day.</p>
+        <div class="btns">
+          <a class="btn solid" href="#projects">See projects</a>
+          <a class="btn" href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn" href="https://github.com/sandeshkp" target="_blank" rel="noopener">GitHub</a>
+          <a class="btn" href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener">Kaggle</a>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statWork">–</b><span>work projects</span></div>
+        <div class="stat"><b id="statUse">–</b><span>in daily use</span></div>
+        <div class="stat"><b id="statML">–</b><span>ML / research</span></div>
+        <div class="stat"><b id="statTech">–</b><span>tools used</span></div>
+      </div>
     </div>
   </div>
 </header>
 
-<section id="what">
+<main class="projects" id="projects">
   <div class="wrap">
-    <div class="eyebrow">What I build</div>
-    <h2>Three kinds of work</h2>
-    <p class="section-sub">Most projects combine all three: get the data right, learn something from it, then put it in front of people.</p>
-    <div class="pillars">
-      <div class="pillar"><span class="dot data"></span><h3>Data engineering</h3><p>Python ETL from ERP extracts and Excel masters into clean tables, scheduled jobs and automated reports.</p></div>
-      <div class="pillar"><span class="dot ml"></span><h3>Data science</h3><p>Forecasting, classification and exploratory analysis in notebooks, with honest evaluation before anything ships.</p></div>
-      <div class="pillar"><span class="dot app"></span><h3>Internal apps</h3><p>Flask apps with login, search and downloads so sales and planning teams can self-serve instead of asking for files.</p></div>
+    <div class="tabs" role="tablist" aria-label="Project type">
+      <button class="tab" role="tab" data-tab="work" aria-selected="true">💼 Work projects<small id="nWork"></small></button>
+      <button class="tab" role="tab" data-tab="personal" aria-selected="false">🔬 Personal research<small id="nPersonal"></small></button>
     </div>
-  </div>
-</section>
-
-<section id="projects">
-  <div class="wrap">
-    <div class="eyebrow">Projects</div>
-    <h2>Case studies</h2>
-    <p class="section-sub">Work projects are described by approach and outcome only. No company data, names or internal systems are shown.</p>
-    <div class="filters" role="toolbar" aria-label="Filter projects">
-      <button class="chip-btn" data-filter="all" aria-pressed="true">All</button>
-      <button class="chip-btn" data-filter="ml" aria-pressed="false">ML / Data Science</button>
-      <button class="chip-btn" data-filter="data" aria-pressed="false">Data Engineering</button>
-      <button class="chip-btn" data-filter="app" aria-pressed="false">Web Apps</button>
-    </div>
+    <p class="tab-hint" id="hint"></p>
     <div class="grid" id="grid"></div>
   </div>
-</section>
+</main>
 
-<section id="skills">
+<section class="band" id="skills">
   <div class="wrap">
-    <div class="eyebrow">Skills</div>
     <h2>Toolbox</h2>
-    <p class="section-sub">What I use day to day, grouped by job.</p>
-    <div class="skills">
-      <div class="skill-group"><h3><span class="dot data"></span>Data & pipelines</h3>
-        <div class="stack"><span>Python</span><span>pandas</span><span>NumPy</span><span>SQL</span><span>MySQL</span><span>SAP HANA extracts</span><span>openpyxl</span><span>Scheduled jobs</span></div></div>
-      <div class="skill-group"><h3><span class="dot ml"></span>Analytics & ML</h3>
-        <div class="stack"><span>scikit-learn</span><span>Time-series forecasting</span><span>Jupyter</span><span>Matplotlib</span><span>Feature engineering</span><span>Model evaluation</span></div></div>
-      <div class="skill-group"><h3><span class="dot app"></span>Apps & delivery</h3>
-        <div class="stack"><span>Flask</span><span>Jinja2</span><span>SQLite</span><span>REST endpoints</span><span>SMTP mail</span><span>Cloud object storage</span></div></div>
-      <div class="skill-group"><h3><span class="dot" style="background:var(--accent)"></span>Reporting</h3>
-        <div class="stack"><span>Power BI</span><span>Excel automation</span><span>KPI design</span><span>Dashboards</span></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="experience">
-  <div class="wrap">
-    <div class="eyebrow">Experience</div>
-    <h2>Where I work</h2>
-    <div class="xp">
-      <div class="xp-head"><h3>Data Analyst, Sales · Footwear manufacturer</h3><span class="mono" style="color:var(--muted)">current</span></div>
-      <ul>
-        <li>Build Python ETL that turns daily ERP extracts into clean sales, stock and target tables.</li>
-        <li>Automate recurring sales reports and mailers that used to be prepared by hand.</li>
-        <li>Develop Flask tools for sales and planning teams: stock/image lookup, product-launch mailers, chat-style product search.</li>
-        <li>Run forecasting and analysis experiments in notebooks to support stock planning.</li>
-      </ul>
+    <div class="skill-rows">
+      <div class="s1"><h3>Data</h3><div class="chips"><span>Python</span><span>pandas</span><span>SQL</span><span>MySQL</span><span>ETL</span><span>Excel automation</span></div></div>
+      <div class="s2"><h3>ML</h3><div class="chips"><span>scikit-learn</span><span>XGBoost</span><span>LightGBM</span><span>Forecasting</span><span>Backtesting</span></div></div>
+      <div class="s3"><h3>Apps</h3><div class="chips"><span>Flask</span><span>SQLite</span><span>REST APIs</span><span>Cloud storage</span><span>Scheduling</span></div></div>
+      <div class="s4"><h3>Reporting</h3><div class="chips"><span>Power BI</span><span>DAX</span><span>KPI dashboards</span></div></div>
     </div>
   </div>
 </section>
 
 <footer id="contact">
   <div class="wrap">
-    <div>
-      <div style="color:var(--text);font-weight:600;margin-bottom:4px">Get in touch</div>
-      <a href="mailto:sandesh007369@gmail.com">sandesh007369@gmail.com</a>
-    </div>
-    <div>
-      <div class="links">
-        <a href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener">Kaggle</a>
-        <a href="https://leetcode.com/u/sandesh_kp/" target="_blank" rel="noopener">LeetCode</a>
-        <a href="https://github.com/sandeshkp" target="_blank" rel="noopener">GitHub</a>
-      </div>
-      <div class="mono" style="font-size:.8rem;margin-top:6px">Last updated: <span id="updated"></span></div>
+    <div>Contact: <a href="mailto:sandesh007369@gmail.com">sandesh007369@gmail.com</a></div>
+    <div class="links">
+      <a href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/sandeshkp" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener">Kaggle</a>
+      <a href="https://leetcode.com/u/sandesh_kp/" target="_blank" rel="noopener">LeetCode</a>
+      <span class="mono">Updated <span id="updated"></span></span>
     </div>
   </div>
 </footer>
 
-<dialog id="dlg" aria-label="Project case study"><div id="dlgContent"></div></dialog>
+<dialog id="dlg" aria-label="Project details"><div id="dlgContent"></div></dialog>
 <script src="assets/app.js"></script>
 </body>
 </html>
