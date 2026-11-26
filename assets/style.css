@@ -48,7 +48,7 @@ a:hover { text-decoration: underline; }
 h1, h2, h3 { line-height: 1.2; letter-spacing: -0.015em; }
 
 /* ── Hero (coloured band, compact) ──────────────────── */
-.hero { background: linear-gradient(120deg, var(--hero-a), #3730a3 45%, var(--hero-b)); color: #fff; }
+.hero { background: linear-gradient(120deg, #7681f7, #3730a3 45%, #b29c4b); color: #fff; }
 .topbar { display: flex; justify-content: space-between; align-items: center; height: 54px; }
 .brand { font-family: var(--mono); font-weight: 600; color: #fff; }
 .brand span { color: #7dd3c0; }
