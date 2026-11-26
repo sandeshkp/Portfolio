@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project · Sandesh K P</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=5">
+</head>
+<body class="project-page">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="index.html">sandesh<span>.kp</span></a>
+      <div class="top-links">
+        <a href="index.html#projects">← All projects</a>
+        <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+      </div>
+    </div>
+    <div class="p-head">
+      <div class="p-meta" id="pMeta"></div>
+      <h1 id="pTitle">Loading…</h1>
+      <p class="lead" id="pTagline"></p>
+    </div>
+  </div>
+</header>
+
+<nav class="ptabs" aria-label="Project sections">
+  <div class="wrap" id="pTabs" role="tablist"></div>
+</nav>
+
+<main class="wrap p-main">
+  <div id="pPanel" role="tabpanel"></div>
+  <div class="p-pager" id="pPager"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="index.html#projects">← Back to all projects</a>
+    <span class="mono">Dummy data only · no company data shown</span>
+  </div>
+</footer>
+
+<script src="assets/project.js?v=5"></script>
+</body>
+</html>
