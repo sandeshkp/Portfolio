@@ -83,6 +83,14 @@
   function openCase(id) {
     const p = projects.find((x) => x.id === id);
     if (!p) return;
+    try { renderCase(p); } catch (err) {
+      console.error(err);
+      $("#dlgContent").innerHTML = `<div class="dlg-head"><h3>${esc(p.title)}</h3><p>${esc(p.tagline)}</p><button class="dlg-close" aria-label="Close">×</button></div>`;
+      $("#dlg").showModal();
+    }
+  }
+
+  function renderCase(p) {
     const dlg = $("#dlg");
     dlg.className = p.kind;
     const list = (arr) => `<ul>${(arr || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
