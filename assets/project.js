@@ -42,8 +42,32 @@
     return `<div class="mock"><div class="mock-bar"><i></i><i></i><i></i><b>${esc(pv.title)}</b><em>dummy data</em></div><div class="mock-body">${body}</div></div>`;
   }
 
+  // ── Doc blocks (used when a project has "sections") ──
+  function table(t) {
+    return `<div class="tbl-wrap"><table class="tbl">${t.caption ? `<caption>${esc(t.caption)}</caption>` : ""}
+      <thead><tr>${t.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${t.rows.map((r) => `<tr>${r.map((c, i) => `<td${i === 0 ? ' class="k"' : ""}>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+  function block(b, p) {
+    if (b.h) return `<h3>${esc(b.h)}</h3>`;
+    if (b.p) return `<p>${esc(b.p)}</p>`;
+    if (b.ul) return `<ul class="plist">${b.ul.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    if (b.ol) return `<ol class="plist">${b.ol.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>`;
+    if (b.table) return table(b.table);
+    if (b.kv) return table({ caption: b.caption, columns: b.columns || ["Item", "Detail"], rows: b.kv });
+    if (b.code) return `<figure class="code">${b.title ? `<figcaption>${esc(b.title)}</figcaption>` : ""}<pre><code>${esc(b.code)}</code></pre></figure>`;
+    if (b.flow) return `<div class="flow">${b.flow.map((s) => `<span>${esc(s)}</span>`).join("<em>→</em>")}</div>`;
+    if (b.callout) return `<div class="callout">${esc(b.callout)}</div>`;
+    if (b.preview) return `${preview(p.preview)}<p class="note" style="margin-top:6px">Recreated example with dummy data. Real company data can't be shown.</p>`;
+    if (b.stack) return chips(p.stack);
+    return "";
+  }
+
   // ── Tabs ────────────────────────────────────────────
   function tabsFor(p) {
+    if (Array.isArray(p.sections) && p.sections.length) {
+      return p.sections.map((s) => ({ id: s.id, label: s.label, html: () => `<h2>${esc(s.title || s.label)}</h2>${(s.blocks || []).map((b) => block(b, p)).join("")}` }));
+    }
     return [
       { id: "overview", label: "Overview", html: () => `
         <div class="p-grid">
