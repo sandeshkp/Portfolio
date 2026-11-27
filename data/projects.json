@@ -56,6 +56,13 @@
             "—",
             "—"
           ]
+        ],
+        "menu": [
+          "Schedule",
+          "Backlog",
+          "Mould matrix",
+          "Capacity",
+          "Export"
         ]
       },
       "note": "Runs on a company server; the code is not on this laptop, so this page is written from my design notes.",
@@ -371,6 +378,14 @@
             "120",
             "68"
           ]
+        ],
+        "menu": [
+          "New launch",
+          "Depot stock",
+          "Leftover",
+          "Plan accuracy",
+          "Dealer-wise sale",
+          "Admin"
         ]
       },
       "sections": [
@@ -786,6 +801,14 @@
             "999",
             "⚑"
           ]
+        ],
+        "menu": [
+          "Dashboard",
+          "Category sale",
+          "State view",
+          "PO mapper",
+          "Demand planner",
+          "Uploads"
         ]
       },
       "sections": [
@@ -1079,7 +1102,14 @@
             "Within ±100 cases",
             "78.7%"
           ]
-        ]
+        ],
+        "menu": [
+          "Data",
+          "Features",
+          "Models",
+          "Evaluation"
+        ],
+        "hide": false
       },
       "sections": [
         {
@@ -1315,6 +1345,13 @@
             "bot",
             "Matched 182 of 190 rows. 8 missing images listed."
           ]
+        ],
+        "menu": [
+          "Search",
+          "Upload list",
+          "History",
+          "Admin",
+          "ETL"
         ]
       },
       "sections": [
@@ -1654,6 +1691,12 @@
             "F04 · Red",
             "₹449"
           ]
+        ],
+        "menu": [
+          "Stock view",
+          "Missing images",
+          "Users",
+          "Activity"
         ]
       },
       "sections": [
@@ -1883,7 +1926,7 @@
       "kind": "app",
       "status": "production",
       "title": "Power BI Embedded Portal",
-      "tagline": "Per-user Power BI page access with an admin console, DAX-driven schema discovery and parallel metadata fetch.",
+      "tagline": "View-only Power BI portal for managers: per-user pages and regions, no Power BI licences or workspace access for viewers.",
       "stack": [
         "Python",
         "Flask",
@@ -1895,42 +1938,93 @@
         "JavaScript"
       ],
       "preview": {
-        "type": "kpis",
-        "title": "Sales report (embedded)",
+        "type": "table",
+        "title": "Sales · State report",
+        "menu": [
+          "Sales",
+          "Supply chain",
+          "Production",
+          "PMT",
+          "Admin panel"
+        ],
         "kpis": [
           [
-            "Net sales",
-            "₹3.4 Cr"
+            "Today sale",
+            "14,624"
           ],
           [
-            "Growth",
-            "+11%"
+            "MTD target",
+            "276,792"
           ],
           [
-            "Active dealers",
-            "612"
+            "MTD sale",
+            "298,508"
           ],
           [
-            "Top category",
-            "Sliders"
+            "MTD ach. %",
+            "107.8"
           ]
         ],
-        "bars": [
+        "columns": [
+          "State",
+          "Today",
+          "MTD target",
+          "MTD sale",
+          "MTD ach. %",
+          "YTD target",
+          "YTD sale",
+          "Growth %"
+        ],
+        "rows": [
           [
-            "Week 1",
-            70
+            "State 01",
+            "2,140",
+            "41,200",
+            "44,930",
+            "109.1",
+            "312,000",
+            "301,450",
+            "8.2"
           ],
           [
-            "Week 2",
-            82
+            "State 02",
+            "1,870",
+            "36,500",
+            "33,210",
+            "91.0",
+            "280,000",
+            "266,800",
+            "4.9"
           ],
           [
-            "Week 3",
-            76
+            "State 03",
+            "1,320",
+            "28,900",
+            "30,040",
+            "103.9",
+            "214,000",
+            "220,310",
+            "11.6"
           ],
           [
-            "Week 4",
-            90
+            "State 04",
+            "980",
+            "21,400",
+            "19,770",
+            "92.4",
+            "160,000",
+            "151,200",
+            "-2.1"
+          ],
+          [
+            "Total",
+            "14,624",
+            "276,792",
+            "298,508",
+            "107.8",
+            "2,120,000",
+            "2,043,760",
+            "6.4"
           ]
         ]
       },
@@ -1979,38 +2073,62 @@
           "label": "Problem",
           "blocks": [
             {
-              "p": "Different users needed different pages and slices of the same reports. Workspace-level access was too broad and per-user licensing too expensive."
+              "p": "Sales managers, regional heads and leadership only needed to look at dashboards — daily sale, MTD/YTD achievement, growth and trends. They never build or edit reports. Giving each of them a full Power BI authoring licence and workspace access would mean paying for and exposing capabilities nobody uses, while still not solving the real need: each person should see only their own regions, categories and pages."
+            },
+            {
+              "h": "Why not just share the Power BI workspace?"
             },
             {
               "table": {
                 "columns": [
-                  "Area",
-                  "Before",
-                  "After"
+                  "Concern",
+                  "Workspace sharing",
+                  "Embedded portal"
                 ],
                 "rows": [
                   [
-                    "Access",
-                    "All-or-nothing workspace",
-                    "Per-user pages, regions and categories"
+                    "User need",
+                    "Full authoring tools for people who only read",
+                    "View-only dashboard, nothing to learn"
+                  ],
+                  [
+                    "Licensing",
+                    "Each viewer needs a Power BI Pro licence (unless the workspace runs on Premium capacity)",
+                    "Users sign in to the portal, not to Power BI; the app authenticates once with a service principal"
+                  ],
+                  [
+                    "Data scope",
+                    "Everyone in the workspace sees every page",
+                    "Pages, regions and categories assigned per user"
                   ],
                   [
                     "Admin effort",
-                    "Changes inside Power BI",
-                    "Admin console in the portal"
+                    "Changes made inside Power BI per report",
+                    "Admin console: add report, pick pages, map filters, grant users in bulk"
                   ],
                   [
-                    "Filters",
-                    "Hand-typed",
-                    "Column values discovered by DAX"
+                    "Experience",
+                    "Power BI chrome, panes and navigation",
+                    "Clean full-screen report, filter and navigation panes hidden, sidebar menu by department"
                   ],
                   [
-                    "Load time",
-                    "Sequential metadata calls",
-                    "Parallel, cached for 10 minutes"
+                    "Audit",
+                    "Limited visibility of who viewed what",
+                    "Login activity with time and IP"
                   ]
                 ]
               }
+            },
+            {
+              "h": "Design goals"
+            },
+            {
+              "ol": [
+                "Read-only consumption: users open a report and see trends, nothing else.",
+                "One technical identity (service principal) talks to Power BI; users never need Power BI accounts.",
+                "Access defined in the portal's own database, editable by admins without touching the reports.",
+                "Fast: no full re-embed when switching pages of the same report."
+              ]
             }
           ]
         },
@@ -2173,6 +2291,12 @@
             "NEW",
             "✅ Ready"
           ]
+        ],
+        "menu": [
+          "Launch data",
+          "Recipients",
+          "History",
+          "Gallery"
         ]
       },
       "sections": [
@@ -2383,6 +2507,10 @@
             "BLACK",
             "0"
           ]
+        ],
+        "menu": [
+          "Allotment",
+          "Audit log"
         ]
       },
       "note": "Runs on a company server; the code is not on this laptop, so this page is written from my design notes.",

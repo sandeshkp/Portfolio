@@ -275,3 +275,62 @@ figure.code pre { margin: 0; padding: 12px 14px; overflow-x: auto; background: #
 .socials a:hover { background: rgba(255,255,255,.25); text-decoration: none; }
 .socials svg, .socials img { width: 16px; height: 16px; display: block; }
 @media (max-width: 480px) { .socials { gap: 4px; } .socials a { width: 28px; height: 28px; } .cats button { padding: 9px 12px 10px; font-size: .85rem; } }
+
+/* ── App-screen replica with hidden values ── */
+.mock.screen { box-shadow: var(--shadow); }
+.scr { display: block; }
+.scr.has-nav { display: grid; grid-template-columns: 150px 1fr; min-height: 220px; }
+.scr-nav { border-right: 1px solid var(--border); background: var(--surface); padding: 10px 8px; display: flex; flex-direction: column; gap: 4px; font-size: .72rem; }
+.scr-logo { display: flex; align-items: center; gap: 6px; padding: 2px 4px 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.scr-logo i { width: 22px; height: 22px; border-radius: 6px; background: var(--k, var(--accent)); display: block; }
+.scr-logo span { height: 8px; width: 60px; border-radius: 4px; background: var(--border); display: block; }
+.scr-nav div:not(.scr-logo) { display: flex; align-items: center; gap: 6px; padding: 6px 6px; border-radius: 6px; color: var(--muted); font-weight: 600; }
+.scr-nav div i { width: 14px; height: 14px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--border); flex: none; }
+.scr-nav div.on { background: var(--k, var(--accent)); color: #fff; }
+.scr-nav div.on i { background: rgba(255,255,255,.35); border-color: transparent; }
+.scr-main { min-width: 0; }
+.scr-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.scr-head small { display: block; font-size: .62rem; color: var(--k, var(--accent)); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.scr-head b { font-size: .85rem; }
+.scr-user { font-size: .65rem; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border); padding: 3px 8px; border-radius: 6px; }
+.scr-tbl { overflow-x: auto; }
+.scr-tbl table td, .scr-tbl table th { white-space: nowrap; }
+.hid { filter: blur(4.5px); user-select: none; pointer-events: none; }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+  .topbar { height: 50px; }
+  .brand { font-size: .95rem; }
+  .hero h1 { font-size: 1.7rem; }
+  .hero p.lead { font-size: .92rem; }
+  .p-head { padding: 6px 0 18px; }
+  .p-head h1 { font-size: 1.35rem; }
+  .p-head .lead { font-size: .9rem; }
+  .ptabs button { padding: 12px 12px; font-size: .86rem; }
+  .ptabs { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .cats { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .p-main { padding-top: 14px; }
+  #pPanel { padding: 16px 14px; border-radius: 10px; }
+  #pPanel h2 { font-size: 1.1rem; }
+  .plist { padding-left: 18px; }
+  figure.code pre { font-size: .72rem; padding: 10px; }
+  .flow span { font-size: .7rem; }
+  .p-pager button { font-size: .82rem; padding: 8px 10px; }
+  footer .wrap { flex-direction: column; }
+
+  /* Tables become stacked cards: first cell is the title, the rest are label: value */
+  .tbl-wrap { border: 0; overflow: visible; }
+  .tbl thead { display: none; }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl caption { display: block; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+  .tbl tr { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--surface); overflow: hidden; }
+  .tbl td { border: 0; padding: 6px 12px; }
+  .tbl td.k { background: var(--surface-2); border-bottom: 1px solid var(--border); white-space: normal; }
+  .tbl.multi td:not(.k)::before { content: attr(data-label); display: block; font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+  /* Screen replica: drop the sidebar, keep the screen */
+  .scr.has-nav { grid-template-columns: 1fr; }
+  .scr-nav { display: none; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+}

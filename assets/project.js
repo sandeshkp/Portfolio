@@ -28,25 +28,33 @@
       <div class="legend">${pv.series.map((s, k) => `<span><i style="background:${COLORS[k % 3]}"></i>${esc(s[0])}</span>`).join("")}</div>`;
   }
   const shoe = `<svg viewBox="0 0 60 30" aria-hidden="true"><path d="M8 20 Q10 10 22 12 L34 14 Q44 15 50 20 L52 23 L8 23 Z" fill="var(--k)" opacity=".75"/></svg>`;
-  function preview(pv) {
+  // Values are hidden (blurred) on work projects, like a redacted screenshot.
+  const NUM = /[0-9₹%]/;
+  function preview(pv, hide) {
     if (!pv) return "";
+    const v = (s) => `<span class="${hide && NUM.test(String(s)) ? "hid" : ""}">${esc(s)}</span>`;
+    const kpis = pv.kpis ? `<div class="kpis">${pv.kpis.map((k) => `<div><b>${v(k[1])}</b><span>${esc(k[0])}</span></div>`).join("")}</div>` : "";
     let body = "";
-    if (pv.type === "table") body = `<table><tr>${pv.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr>${pv.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>`;
+    if (pv.type === "table") body = kpis + `<div class="scr-tbl"><table><tr>${pv.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr>${pv.rows.map((r) => `<tr>${r.map((c) => `<td>${v(c)}</td>`).join("")}</tr>`).join("")}</table></div>`;
     else if (pv.type === "kpis") {
       const mx = Math.max(...pv.bars.map((b) => b[1]));
-      body = `<div class="kpis">${pv.kpis.map((k) => `<div><b>${esc(k[1])}</b><span>${esc(k[0])}</span></div>`).join("")}</div>` +
-        pv.bars.map((b) => `<div class="hbar"><span>${esc(b[0])}</span><div><i style="width:${(b[1] / mx) * 100}%"></i></div><span>${esc(b[1])}</span></div>`).join("");
+      body = kpis + pv.bars.map((b) => `<div class="hbar"><span>${esc(b[0])}</span><div><i style="width:${(b[1] / mx) * 100}%"></i></div><span>${v(b[1])}</span></div>`).join("");
     } else if (pv.type === "line") body = lineChart(pv);
     else if (pv.type === "chat") body = `<div class="chat">${pv.messages.map((m) => `<div class="${m[0] === "user" ? "u" : "b"}">${esc(m[1])}</div>`).join("")}</div>`;
-    else if (pv.type === "grid") body = `<div class="tiles">${pv.items.map((t) => `<div>${shoe}${esc(t[0])}<b>${esc(t[1])}</b></div>`).join("")}</div>`;
-    return `<div class="mock"><div class="mock-bar"><i></i><i></i><i></i><b>${esc(pv.title)}</b><em>dummy data</em></div><div class="mock-body">${body}</div></div>`;
+    else if (pv.type === "grid") body = `<div class="tiles">${pv.items.map((t) => `<div>${shoe}${esc(t[0])}<b>${v(t[1])}</b></div>`).join("")}</div>`;
+    const menu = pv.menu ? `<aside class="scr-nav"><div class="scr-logo"><i></i><span></span></div>${pv.menu.map((m, i) => `<div class="${i === 0 ? "on" : ""}"><i></i>${esc(m)}</div>`).join("")}</aside>` : "";
+    return `<div class="mock screen"><div class="mock-bar"><i></i><i></i><i></i><b>${esc(pv.title)}</b><em>${hide ? "values hidden" : "dummy data"}</em></div>
+      <div class="scr ${menu ? "has-nav" : ""}">${menu}<div class="scr-main">
+        ${menu ? `<div class="scr-head"><div><small>${esc(pv.menu[0])}</small><b>${esc(pv.title)}</b></div><span class="scr-user">ADMIN</span></div>` : ""}
+        <div class="mock-body">${body}</div></div></div></div>`;
   }
 
   // ── Doc blocks (used when a project has "sections") ──
   function table(t) {
-    return `<div class="tbl-wrap"><table class="tbl">${t.caption ? `<caption>${esc(t.caption)}</caption>` : ""}
+    // data-label lets phones show each row as a stacked card (see CSS)
+    return `<div class="tbl-wrap"><table class="tbl${t.columns.length > 2 ? " multi" : ""}">${t.caption ? `<caption>${esc(t.caption)}</caption>` : ""}
       <thead><tr>${t.columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead>
-      <tbody>${t.rows.map((r) => `<tr>${r.map((c, i) => `<td${i === 0 ? ' class="k"' : ""}>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+      <tbody>${t.rows.map((r) => `<tr>${r.map((c, i) => `<td data-label="${esc(t.columns[i] || "")}"${i === 0 ? ' class="k"' : ""}>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
   function block(b, p) {
     if (b.h) return `<h3>${esc(b.h)}</h3>`;
@@ -58,7 +66,12 @@
     if (b.code) return `<figure class="code">${b.title ? `<figcaption>${esc(b.title)}</figcaption>` : ""}<pre><code>${esc(b.code)}</code></pre></figure>`;
     if (b.flow) return `<div class="flow">${b.flow.map((s) => `<span>${esc(s)}</span>`).join("<em>→</em>")}</div>`;
     if (b.callout) return `<div class="callout">${esc(b.callout)}</div>`;
-    if (b.preview) return `${preview(p.preview)}<p class="note" style="margin-top:6px">Recreated example with dummy data. Real company data can't be shown.</p>`;
+    if (b.preview) {
+      const work = (p.group || "work") === "work" && p.preview.hide !== false;
+      return `${preview(p.preview, work)}<p class="note" style="margin-top:6px">${work
+        ? "Replica of the app screen. Layout matches the real tool; all values are hidden and labels are generic."
+        : "Illustration with dummy data."}</p>`;
+    }
     if (b.stack) return chips(p.stack);
     return "";
   }
