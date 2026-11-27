@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=6">
+  <link rel="stylesheet" href="assets/style.css?v=7">
 </head>
 <body>
 
@@ -17,9 +17,17 @@
     <div class="topbar">
       <span class="brand">sandesh<span>.kp</span></span>
       <div class="top-links">
-        <a href="#projects">Projects</a>
         <a href="#skills" class="hide-sm">Skills</a>
-        <a href="#contact">Contact</a>
+        <a href="#contact" class="hide-sm">Contact</a>
+        <span class="socials">
+          <a href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.6 8.65 21 11.2 21 14.5V21h-4v-5.8c0-1.4-.03-3.2-1.95-3.2-1.95 0-2.25 1.52-2.25 3.1V21H9z"/></svg></a>
+          <a href="https://github.com/sandeshkp" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><img src="https://cdn.simpleicons.org/github/white" alt=""></a>
+          <a href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener" aria-label="Kaggle" title="Kaggle"><img src="https://cdn.simpleicons.org/kaggle/white" alt=""></a>
+          <a href="https://leetcode.com/u/sandesh_kp/" target="_blank" rel="noopener" aria-label="LeetCode" title="LeetCode"><img src="https://cdn.simpleicons.org/leetcode/white" alt=""></a>
+          <a href="mailto:sandesh007369@gmail.com" aria-label="Email" title="Email">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7.2L4 7.3V17h16V7.3zM5.3 7l6.7 4.1L18.7 7z"/></svg></a>
+        </span>
         <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
       </div>
     </div>
@@ -28,12 +36,6 @@
         <div class="role">Data Analyst · Python Developer</div>
         <h1>Sandesh K P</h1>
         <p class="lead">I build data pipelines, forecasting models and internal web apps that sales and planning teams use every day.</p>
-        <div class="btns">
-          <a class="btn solid" href="#projects">See projects</a>
-          <a class="btn" href="https://www.linkedin.com/in/sandesh-kp-b0b216283" target="_blank" rel="noopener">LinkedIn</a>
-          <a class="btn" href="https://github.com/sandeshkp" target="_blank" rel="noopener">GitHub</a>
-          <a class="btn" href="https://www.kaggle.com/code/sandeshkp/" target="_blank" rel="noopener">Kaggle</a>
-        </div>
       </div>
       <div class="stats">
         <div class="stat"><b id="statWork">–</b><span>work projects</span></div>
@@ -42,6 +44,13 @@
         <div class="stat"><b id="statTech">–</b><span>tools used</span></div>
       </div>
     </div>
+    <nav class="cats" id="cats" role="tablist" aria-label="Project category">
+      <button role="tab" data-cat="all" aria-selected="true">All projects <small></small></button>
+      <button role="tab" data-cat="analytics" aria-selected="false">Data Analytics <small></small></button>
+      <button role="tab" data-cat="engineering" aria-selected="false">Data Engineering <small></small></button>
+      <button role="tab" data-cat="webapp" aria-selected="false">Web Applications <small></small></button>
+      <button role="tab" data-cat="ml" aria-selected="false">Machine Learning <small></small></button>
+    </nav>
   </div>
 </header>
 
@@ -81,6 +90,6 @@
   </div>
 </footer>
 
-<script src="assets/app.js?v=6"></script>
+<script src="assets/app.js?v=7"></script>
 </body>
 </html>

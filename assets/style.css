@@ -246,3 +246,32 @@ figure.code { margin: 8px 0 14px; border: 1px solid var(--border); border-radius
 figure.code figcaption { font-size: .78rem; color: var(--muted); padding: 6px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-family: var(--mono); }
 figure.code pre { margin: 0; padding: 12px 14px; overflow-x: auto; background: #0f172a; color: #e2e8f0; font: .8rem/1.6 var(--mono); }
 .callout { border-left: 4px solid var(--k, var(--accent)); background: var(--ks, var(--accent-soft)); padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: .92rem; }
+
+/* ── Banner category tabs (folder-tab style: active tab joins the page) ── */
+.hero .hero-body { padding-bottom: 18px; }
+.cats { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-top: 4px; }
+.cats::-webkit-scrollbar { display: none; }
+.cats button {
+  position: relative; border: 0; cursor: pointer; white-space: nowrap;
+  font: 600 .93rem var(--sans); color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.10); padding: 11px 18px 12px; border-radius: 10px 10px 0 0;
+  transition: background .15s, color .15s;
+}
+.cats button:hover { background: rgba(255,255,255,.2); color: #fff; }
+.cats button small { font-weight: 500; opacity: .7; margin-left: 2px; }
+.cats button[aria-selected="true"] { background: var(--bg); color: var(--text); }
+.cats button[aria-selected="true"]::before {
+  content: ""; position: absolute; left: 14px; right: 14px; top: 0; height: 3px;
+  border-radius: 0 0 3px 3px; background: #3730a3;
+}
+.projects { padding-top: 18px; }
+
+/* ── Social icons in top bar ── */
+.socials { display: inline-flex; gap: 6px; align-items: center; }
+.socials a {
+  width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: #fff;
+}
+.socials a:hover { background: rgba(255,255,255,.25); text-decoration: none; }
+.socials svg, .socials img { width: 16px; height: 16px; display: block; }
+@media (max-width: 480px) { .socials { gap: 4px; } .socials a { width: 28px; height: 28px; } .cats button { padding: 9px 12px 10px; font-size: .85rem; } }

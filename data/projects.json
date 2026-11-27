@@ -8,62 +8,310 @@
       "status": "production",
       "title": "Production Planning Software",
       "tagline": "Constraint-based scheduler that turns daily dealer requirements into machine and mould plans.",
-      "stack": ["Python", "Flask", "pandas", "NumPy", "SQL", "Jinja2", "Docker"],
+      "stack": [
+        "Python",
+        "Flask",
+        "pandas",
+        "NumPy",
+        "SQL",
+        "Jinja2",
+        "Docker"
+      ],
       "preview": {
-        "type": "table", "title": "Today's schedule",
-        "columns": ["Machine", "Mould", "Article", "Pairs", "Priority"],
-        "rows": [["M-01", "MLD-114", "Slider A12", "1,200", "0.91"], ["M-02", "MLD-087", "Flip B07", "950", "0.74"],
-                 ["M-03", "MLD-131", "Sandal C33", "700", "0.88"], ["—", "—", "Backlog: 3 lines", "—", "—"]]
+        "type": "table",
+        "title": "Today's schedule",
+        "columns": [
+          "Machine",
+          "Mould",
+          "Article",
+          "Pairs",
+          "Priority"
+        ],
+        "rows": [
+          [
+            "M-01",
+            "MLD-114",
+            "Slider A12",
+            "1,200",
+            "0.91"
+          ],
+          [
+            "M-02",
+            "MLD-087",
+            "Flip B07",
+            "950",
+            "0.74"
+          ],
+          [
+            "M-03",
+            "MLD-131",
+            "Sandal C33",
+            "700",
+            "0.88"
+          ],
+          [
+            "—",
+            "—",
+            "Backlog: 3 lines",
+            "—",
+            "—"
+          ]
+        ]
       },
       "note": "Runs on a company server; the code is not on this laptop, so this page is written from my design notes.",
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Daily production scheduling framed as a constraint-satisfaction problem: N dealer requirements, M moulds, K machines, with compatibility, shift capacity and priority rules." },
-          { "kv": [["Type", "Internal web application"], ["Users", "Production planners, floor supervisors"], ["Input", "Daily dealer requirements, mould master, machine availability, 12-month sales"], ["Output", "Machine-wise and mould-wise schedule, backlog, Excel export"], ["Deployment", "Docker (app + database containers)"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true },
-          { "h": "Stack" }, { "stack": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Every morning planners converted the day's dealer orders into a factory schedule by hand. They had to know which moulds were available, which machines each mould fits, which articles mattered most and what was left from the previous day." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Consolidation", "Order sheets merged in Excel", "Pulled and validated automatically"],
-            ["Compatibility", "Checked against a paper/Excel register", "Compatibility matrix enforced by the engine"],
-            ["Prioritisation", "All orders treated equally", "Composite priority score using sales history"],
-            ["Unfilled demand", "Tracked informally", "Carried forward to a visible backlog"],
-            ["Conflicts", "Found on the factory floor", "Flagged before the schedule is issued"],
-            ["Traceability", "None", "Each allocation decision stored with its reason"]] } }
-        ]},
-        { "id": "architecture", "label": "Architecture", "blocks": [
-          { "flow": ["ERP extract", "ETL + validation", "Staging tables", "Priority scoring", "Scheduling engine", "Output tables", "Flask views / Excel"] },
-          { "p": "Three layers are kept separate so heavy computation never blocks the web interface." },
-          { "table": { "columns": ["Layer", "Responsibility"], "rows": [
-            ["1. Ingestion", "Extract dealer orders, mould master and machine status; parse into DataFrames; write raw extracts to staging tables"],
-            ["2. Scheduling engine", "Score requirements, run the allocation, carry backlog forward, write output tables"],
-            ["3. Delivery", "Flask + Jinja2 views (machine-wise, mould-wise), Excel export, role-based views for planners vs. supervisors"]] } },
-          { "h": "Data model (generic)" },
-          { "table": { "columns": ["Entity", "Key fields"], "rows": [
-            ["requirement", "dealer, article, quantity, date, backlog_days"],
-            ["mould", "mould_id, compatible article types"],
-            ["machine", "machine_id, shift capacity, availability"],
-            ["compatibility", "mould_id × machine_id (allowed)"],
-            ["schedule", "machine, mould, article, quantity, priority score, reason"]] } }
-        ]},
-        { "id": "logic", "label": "Scheduling logic", "blocks": [
-          { "h": "Step 1 — Validation" },
-          { "ul": ["Null checks on dealer code, article code, quantity and mould id", "Duplicate order lines removed", "Quantities above 3σ flagged for planner review", "Invalid mould–article combinations rejected with a logged reason"] },
-          { "h": "Step 2 — Priority score (per dealer × article)" },
-          { "table": { "columns": ["Factor", "Weight", "Meaning"], "rows": [
-            ["Dealer tier", "40%", "A / B / C classification"],
-            ["Sales velocity", "30%", "12-month average sales of the article in the region"],
-            ["Backlog age", "20%", "Days the requirement has been unmet"],
-            ["Stock urgency", "10%", "Days of stock left at current sell rate"]] } },
-          { "h": "Step 3 — Allocation" },
-          { "p": "A weighted priority queue walks requirements in descending score. Each one is assigned a compatible mould and a machine with remaining shift capacity; when capacity runs out the remainder goes to the backlog for the next day." },
-          { "code": "queue = sort(requirements, key=score, desc=True)\nfor req in queue:\n    for mould in compatible_moulds(req.article):\n        machine = first(m for m in machines_for(mould) if m.capacity_left >= 1)\n        if machine:\n            qty = min(req.qty, machine.capacity_left)\n            schedule.add(machine, mould, req, qty)\n            machine.capacity_left -= qty; req.qty -= qty\n        if req.qty == 0: break\n    if req.qty > 0:\n        backlog.add(req, reason=\"capacity / no compatible mould\")", "title": "Allocation (simplified pseudocode)" }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["The morning schedule is generated by the app instead of being built in spreadsheets.", "The same rules are applied every day; backlog is explicit instead of informal.", "Every allocation can be explained from the stored reason."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Daily production scheduling framed as a constraint-satisfaction problem: N dealer requirements, M moulds, K machines, with compatibility, shift capacity and priority rules."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Internal web application"
+                ],
+                [
+                  "Users",
+                  "Production planners, floor supervisors"
+                ],
+                [
+                  "Input",
+                  "Daily dealer requirements, mould master, machine availability, 12-month sales"
+                ],
+                [
+                  "Output",
+                  "Machine-wise and mould-wise schedule, backlog, Excel export"
+                ],
+                [
+                  "Deployment",
+                  "Docker (app + database containers)"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            },
+            {
+              "h": "Stack"
+            },
+            {
+              "stack": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Every morning planners converted the day's dealer orders into a factory schedule by hand. They had to know which moulds were available, which machines each mould fits, which articles mattered most and what was left from the previous day."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Consolidation",
+                    "Order sheets merged in Excel",
+                    "Pulled and validated automatically"
+                  ],
+                  [
+                    "Compatibility",
+                    "Checked against a paper/Excel register",
+                    "Compatibility matrix enforced by the engine"
+                  ],
+                  [
+                    "Prioritisation",
+                    "All orders treated equally",
+                    "Composite priority score using sales history"
+                  ],
+                  [
+                    "Unfilled demand",
+                    "Tracked informally",
+                    "Carried forward to a visible backlog"
+                  ],
+                  [
+                    "Conflicts",
+                    "Found on the factory floor",
+                    "Flagged before the schedule is issued"
+                  ],
+                  [
+                    "Traceability",
+                    "None",
+                    "Each allocation decision stored with its reason"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "architecture",
+          "label": "Architecture",
+          "blocks": [
+            {
+              "flow": [
+                "ERP extract",
+                "ETL + validation",
+                "Staging tables",
+                "Priority scoring",
+                "Scheduling engine",
+                "Output tables",
+                "Flask views / Excel"
+              ]
+            },
+            {
+              "p": "Three layers are kept separate so heavy computation never blocks the web interface."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Layer",
+                  "Responsibility"
+                ],
+                "rows": [
+                  [
+                    "1. Ingestion",
+                    "Extract dealer orders, mould master and machine status; parse into DataFrames; write raw extracts to staging tables"
+                  ],
+                  [
+                    "2. Scheduling engine",
+                    "Score requirements, run the allocation, carry backlog forward, write output tables"
+                  ],
+                  [
+                    "3. Delivery",
+                    "Flask + Jinja2 views (machine-wise, mould-wise), Excel export, role-based views for planners vs. supervisors"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Data model (generic)"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Entity",
+                  "Key fields"
+                ],
+                "rows": [
+                  [
+                    "requirement",
+                    "dealer, article, quantity, date, backlog_days"
+                  ],
+                  [
+                    "mould",
+                    "mould_id, compatible article types"
+                  ],
+                  [
+                    "machine",
+                    "machine_id, shift capacity, availability"
+                  ],
+                  [
+                    "compatibility",
+                    "mould_id × machine_id (allowed)"
+                  ],
+                  [
+                    "schedule",
+                    "machine, mould, article, quantity, priority score, reason"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Scheduling logic",
+          "blocks": [
+            {
+              "h": "Step 1 — Validation"
+            },
+            {
+              "ul": [
+                "Null checks on dealer code, article code, quantity and mould id",
+                "Duplicate order lines removed",
+                "Quantities above 3σ flagged for planner review",
+                "Invalid mould–article combinations rejected with a logged reason"
+              ]
+            },
+            {
+              "h": "Step 2 — Priority score (per dealer × article)"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Factor",
+                  "Weight",
+                  "Meaning"
+                ],
+                "rows": [
+                  [
+                    "Dealer tier",
+                    "40%",
+                    "A / B / C classification"
+                  ],
+                  [
+                    "Sales velocity",
+                    "30%",
+                    "12-month average sales of the article in the region"
+                  ],
+                  [
+                    "Backlog age",
+                    "20%",
+                    "Days the requirement has been unmet"
+                  ],
+                  [
+                    "Stock urgency",
+                    "10%",
+                    "Days of stock left at current sell rate"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Step 3 — Allocation"
+            },
+            {
+              "p": "A weighted priority queue walks requirements in descending score. Each one is assigned a compatible mould and a machine with remaining shift capacity; when capacity runs out the remainder goes to the backlog for the next day."
+            },
+            {
+              "code": "queue = sort(requirements, key=score, desc=True)\nfor req in queue:\n    for mould in compatible_moulds(req.article):\n        machine = first(m for m in machines_for(mould) if m.capacity_left >= 1)\n        if machine:\n            qty = min(req.qty, machine.capacity_left)\n            schedule.add(machine, mould, req, qty)\n            machine.capacity_left -= qty; req.qty -= qty\n        if req.qty == 0: break\n    if req.qty > 0:\n        backlog.add(req, reason=\"capacity / no compatible mould\")",
+              "title": "Allocation (simplified pseudocode)"
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "The morning schedule is generated by the app instead of being built in spreadsheets.",
+                "The same rules are applied every day; backlog is explicit instead of informal.",
+                "Every allocation can be explained from the stored reason."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "webapp",
+        "engineering"
       ]
     },
     {
@@ -73,78 +321,409 @@
       "status": "production",
       "title": "Sales & Inventory Reporting System",
       "tagline": "Seven ETL pipelines feeding a role-based Flask portal for sales, stock and plan-accuracy reporting.",
-      "stack": ["Python", "pandas", "NumPy", "Flask", "SQLite", "openpyxl", "gspread", "FTP", "SMTP"],
+      "stack": [
+        "Python",
+        "pandas",
+        "NumPy",
+        "Flask",
+        "SQLite",
+        "openpyxl",
+        "gspread",
+        "FTP",
+        "SMTP"
+      ],
       "preview": {
-        "type": "table", "title": "Sales plan accuracy by inventory class",
-        "columns": ["Class", "MTD plan", "Sale", "Stock", "ACC %"],
-        "rows": [["Fast", "4,200", "3,950", "610", "94"], ["Regular", "2,800", "2,310", "240", "86"], ["Slow", "900", "520", "980", "71"], ["New launch", "650", "410", "120", "68"]]
+        "type": "table",
+        "title": "Sales plan accuracy by inventory class",
+        "columns": [
+          "Class",
+          "MTD plan",
+          "Sale",
+          "Stock",
+          "ACC %"
+        ],
+        "rows": [
+          [
+            "Fast",
+            "4,200",
+            "3,950",
+            "610",
+            "94"
+          ],
+          [
+            "Regular",
+            "2,800",
+            "2,310",
+            "240",
+            "86"
+          ],
+          [
+            "Slow",
+            "900",
+            "520",
+            "980",
+            "71"
+          ],
+          [
+            "New launch",
+            "650",
+            "410",
+            "120",
+            "68"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "A batch of seven Python ETL jobs turns ERP extracts, masters and history into report tables; a Flask portal serves them with region-level access control and Excel export." },
-          { "kv": [["Type", "Data pipeline + internal web portal"], ["Pipelines", "7 (dealer-wise sale, new-launch share, cut case, plan accuracy, new launch, depot stock, leftover)"], ["Sources", "ERP extracts on a network share, FTP (current month), cloud spreadsheet (working days)"], ["Portal", "Single Flask app, admin and user views per report"], ["Access", "Users mapped to one or more regions; all queries filtered server-side"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true },
-          { "h": "Stack" }, { "stack": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Sales and stock reports were rebuilt by hand from ERP extracts and spreadsheets and emailed as files. Every region needed its own cut, numbers were inconsistent between people, and there was no measure of how well sales tracked the plan." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Report creation", "Manual, per region", "Scheduled ETL jobs in a fixed order"],
-            ["Distribution", "Files over email", "Portal with per-user region filtering"],
-            ["Plan tracking", "Simple sale vs. target", "Supply-adjusted plan-accuracy metric"],
-            ["New launches", "Not tracked by age", "Ageing buckets per plant"],
-            ["Failures", "Noticed late", "HTML error email on any ETL failure"]] } }
-        ]},
-        { "id": "pipeline", "label": "Data pipeline", "blocks": [
-          { "flow": ["Network share + FTP + cloud sheet", "Extract", "Clean & normalise", "Join masters", "Aggregate / pivot", "CSV report tables", "Flask portal"] },
-          { "table": { "columns": ["Stage", "What happens"], "rows": [
-            ["Extract", "Product master, customer master, free stock, goods receipts, two financial years of sales, targets; current month from FTP; working-day counts from a cloud spreadsheet"],
-            ["Clean", "Numbers stripped of thousands separators and non-breaking spaces then coerced; dates tried against several formats; UTF-8 with Windows-encoding fallback"],
-            ["Scale", "Large CSVs read in 100k-row chunks with garbage collection between files"],
-            ["Normalise", "Legacy region codes mapped to parent region; customer type stripped/upper-cased; product keys rebuilt from SKU strings (article-colour-category-size)"],
-            ["Join", "Left joins to masters with merge indicators to label unmatched rows"],
-            ["Aggregate", "Group-bys by material × plant and region × category; unstack for share calculations"],
-            ["Load", "CSV report tables read by the portal"],
-            ["Monitor", "Each job wrapped in try/except; failure sends an HTML error report over SMTP/TLS"]] } }
-        ]},
-        { "id": "logic", "label": "Business logic", "blocks": [
-          { "h": "Sales plan accuracy" },
-          { "p": "A plain sale-vs-plan ratio penalises regions for shortfalls caused by lack of stock. The metric below removes the part of the gap that supply could not have covered." },
-          { "table": { "columns": ["Term", "Formula"], "rows": [
-            ["MTD plan", "plan ÷ total working days × working days elapsed"],
-            ["Absolute gap", "|MTD plan − sale|"],
-            ["Supply", "sale + stock"],
-            ["Total shortage", "|orders − supply|"],
-            ["Relevant shortage", "min(max(MTD plan − sale, 0), total shortage)"],
-            ["ACC %", "clip(1 − |gap − relevant shortage| ÷ max(MTD plan, sale), 0) × 100"]] } },
-          { "p": "Percentages are recomputed from summed quantities at every roll-up level (article → class → region), never averaged." },
-          { "code": "def plan_accuracy(plan, sale, orders, stock, days_total, days_elapsed):\n    mtd = plan / days_total * days_elapsed\n    supply = sale + stock\n    gap = abs(mtd - sale)\n    total_short = abs(orders - supply)\n    rel_short = min(max(mtd - sale, 0), total_short)\n    denom = max(mtd, sale)\n    return round(max(0, 1 - abs(gap - rel_short) / denom) * 100) if denom else 0", "title": "Plan accuracy" },
-          { "h": "Other reports" },
-          { "table": { "columns": ["Report", "Logic"], "rows": [
-            ["Leftover", "Requirement vs. sale per plant × product; INSTOCK/OUTSTOCK; four classes (met/partial × with/without stock); fulfilment % = clip(1 − leftover ÷ requirement, 0, 1)"],
-            ["Cut case", "Order lines joined to a gender × size × category reference; STD / STD-CUT / CUT counts unstacked into % of orders and of sales"],
-            ["New launch", "Goods receipt at a material × plant with no sale there in two years + current month; pending days from first receipt; ageing buckets 5–15 / 15–30 / 30+ days"],
-            ["New-launch share", "(new + unclassified article sales) ÷ total sales, compared with a target, with depot stock alongside"],
-            ["Dealer-wise sale", "MTD budget = monthly target ÷ working days × elapsed; YTD = completed months + MTD; achievement %, growth vs. last year, region subtotals"]] } },
-          { "h": "Access control" },
-          { "code": "allowed = {r.strip().upper() for r in session[\"regions\"]}\npick = request.args.get(\"region\")\nactive = [pick] if pick in allowed else allowed\nview = df[df.region.isin(active)]", "title": "Server-side region filter applied on every user route" }
-        ]},
-        { "id": "engineering", "label": "Engineering", "blocks": [
-          { "table": { "columns": ["Concern", "Implementation"], "rows": [
-            ["Auth", "Hashed passwords (Werkzeug), separate admin and user decorators, 30-minute sessions"],
-            ["Authorisation", "User → regions mapping in SQLite; filter enforced on the server, optional sub-filter only within allowed set"],
-            ["Excel export", "openpyxl with styled headers and product images embedded from an in-memory image index (exact key + prefix key)"],
-            ["Caching", "Memo cache keyed on input-file modification times for the heaviest report"],
-            ["Alerting", "HTML failure emails per ETL job"],
-            ["Experiment", "Chat endpoint that sends KPI summaries to a hosted open-weights LLM for plain-English questions"]] } },
-          { "h": "Libraries" },
-          { "table": { "columns": ["Library", "Purpose"], "rows": [["pandas / NumPy", "ETL, joins, aggregation"], ["Flask / Werkzeug", "Web portal, password hashing"], ["sqlite3", "Users and region mapping"], ["openpyxl", "Styled Excel with images"], ["gspread", "Cloud spreadsheet read/write"], ["ftplib / smtplib", "Current-month extract, alerts"]] } }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["Seven daily reports produced by scripts instead of by hand.", "Each user sees only their regions, with Excel export on demand.", "A plan-accuracy metric that separates demand shortfall from supply shortfall.", "Failures are reported by email the same morning."] },
-          { "h": "Next steps" },
-          { "ul": ["Move report tables from CSV into a database and add caching on the portal side.", "Replace print logging with structured logs."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "A batch of seven Python ETL jobs turns ERP extracts, masters and history into report tables; a Flask portal serves them with region-level access control and Excel export."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Data pipeline + internal web portal"
+                ],
+                [
+                  "Pipelines",
+                  "7 (dealer-wise sale, new-launch share, cut case, plan accuracy, new launch, depot stock, leftover)"
+                ],
+                [
+                  "Sources",
+                  "ERP extracts on a network share, FTP (current month), cloud spreadsheet (working days)"
+                ],
+                [
+                  "Portal",
+                  "Single Flask app, admin and user views per report"
+                ],
+                [
+                  "Access",
+                  "Users mapped to one or more regions; all queries filtered server-side"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            },
+            {
+              "h": "Stack"
+            },
+            {
+              "stack": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Sales and stock reports were rebuilt by hand from ERP extracts and spreadsheets and emailed as files. Every region needed its own cut, numbers were inconsistent between people, and there was no measure of how well sales tracked the plan."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Report creation",
+                    "Manual, per region",
+                    "Scheduled ETL jobs in a fixed order"
+                  ],
+                  [
+                    "Distribution",
+                    "Files over email",
+                    "Portal with per-user region filtering"
+                  ],
+                  [
+                    "Plan tracking",
+                    "Simple sale vs. target",
+                    "Supply-adjusted plan-accuracy metric"
+                  ],
+                  [
+                    "New launches",
+                    "Not tracked by age",
+                    "Ageing buckets per plant"
+                  ],
+                  [
+                    "Failures",
+                    "Noticed late",
+                    "HTML error email on any ETL failure"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "pipeline",
+          "label": "Data pipeline",
+          "blocks": [
+            {
+              "flow": [
+                "Network share + FTP + cloud sheet",
+                "Extract",
+                "Clean & normalise",
+                "Join masters",
+                "Aggregate / pivot",
+                "CSV report tables",
+                "Flask portal"
+              ]
+            },
+            {
+              "table": {
+                "columns": [
+                  "Stage",
+                  "What happens"
+                ],
+                "rows": [
+                  [
+                    "Extract",
+                    "Product master, customer master, free stock, goods receipts, two financial years of sales, targets; current month from FTP; working-day counts from a cloud spreadsheet"
+                  ],
+                  [
+                    "Clean",
+                    "Numbers stripped of thousands separators and non-breaking spaces then coerced; dates tried against several formats; UTF-8 with Windows-encoding fallback"
+                  ],
+                  [
+                    "Scale",
+                    "Large CSVs read in 100k-row chunks with garbage collection between files"
+                  ],
+                  [
+                    "Normalise",
+                    "Legacy region codes mapped to parent region; customer type stripped/upper-cased; product keys rebuilt from SKU strings (article-colour-category-size)"
+                  ],
+                  [
+                    "Join",
+                    "Left joins to masters with merge indicators to label unmatched rows"
+                  ],
+                  [
+                    "Aggregate",
+                    "Group-bys by material × plant and region × category; unstack for share calculations"
+                  ],
+                  [
+                    "Load",
+                    "CSV report tables read by the portal"
+                  ],
+                  [
+                    "Monitor",
+                    "Each job wrapped in try/except; failure sends an HTML error report over SMTP/TLS"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Business logic",
+          "blocks": [
+            {
+              "h": "Sales plan accuracy"
+            },
+            {
+              "p": "A plain sale-vs-plan ratio penalises regions for shortfalls caused by lack of stock. The metric below removes the part of the gap that supply could not have covered."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Term",
+                  "Formula"
+                ],
+                "rows": [
+                  [
+                    "MTD plan",
+                    "plan ÷ total working days × working days elapsed"
+                  ],
+                  [
+                    "Absolute gap",
+                    "|MTD plan − sale|"
+                  ],
+                  [
+                    "Supply",
+                    "sale + stock"
+                  ],
+                  [
+                    "Total shortage",
+                    "|orders − supply|"
+                  ],
+                  [
+                    "Relevant shortage",
+                    "min(max(MTD plan − sale, 0), total shortage)"
+                  ],
+                  [
+                    "ACC %",
+                    "clip(1 − |gap − relevant shortage| ÷ max(MTD plan, sale), 0) × 100"
+                  ]
+                ]
+              }
+            },
+            {
+              "p": "Percentages are recomputed from summed quantities at every roll-up level (article → class → region), never averaged."
+            },
+            {
+              "code": "def plan_accuracy(plan, sale, orders, stock, days_total, days_elapsed):\n    mtd = plan / days_total * days_elapsed\n    supply = sale + stock\n    gap = abs(mtd - sale)\n    total_short = abs(orders - supply)\n    rel_short = min(max(mtd - sale, 0), total_short)\n    denom = max(mtd, sale)\n    return round(max(0, 1 - abs(gap - rel_short) / denom) * 100) if denom else 0",
+              "title": "Plan accuracy"
+            },
+            {
+              "h": "Other reports"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Report",
+                  "Logic"
+                ],
+                "rows": [
+                  [
+                    "Leftover",
+                    "Requirement vs. sale per plant × product; INSTOCK/OUTSTOCK; four classes (met/partial × with/without stock); fulfilment % = clip(1 − leftover ÷ requirement, 0, 1)"
+                  ],
+                  [
+                    "Cut case",
+                    "Order lines joined to a gender × size × category reference; STD / STD-CUT / CUT counts unstacked into % of orders and of sales"
+                  ],
+                  [
+                    "New launch",
+                    "Goods receipt at a material × plant with no sale there in two years + current month; pending days from first receipt; ageing buckets 5–15 / 15–30 / 30+ days"
+                  ],
+                  [
+                    "New-launch share",
+                    "(new + unclassified article sales) ÷ total sales, compared with a target, with depot stock alongside"
+                  ],
+                  [
+                    "Dealer-wise sale",
+                    "MTD budget = monthly target ÷ working days × elapsed; YTD = completed months + MTD; achievement %, growth vs. last year, region subtotals"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Access control"
+            },
+            {
+              "code": "allowed = {r.strip().upper() for r in session[\"regions\"]}\npick = request.args.get(\"region\")\nactive = [pick] if pick in allowed else allowed\nview = df[df.region.isin(active)]",
+              "title": "Server-side region filter applied on every user route"
+            }
+          ]
+        },
+        {
+          "id": "engineering",
+          "label": "Engineering",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Concern",
+                  "Implementation"
+                ],
+                "rows": [
+                  [
+                    "Auth",
+                    "Hashed passwords (Werkzeug), separate admin and user decorators, 30-minute sessions"
+                  ],
+                  [
+                    "Authorisation",
+                    "User → regions mapping in SQLite; filter enforced on the server, optional sub-filter only within allowed set"
+                  ],
+                  [
+                    "Excel export",
+                    "openpyxl with styled headers and product images embedded from an in-memory image index (exact key + prefix key)"
+                  ],
+                  [
+                    "Caching",
+                    "Memo cache keyed on input-file modification times for the heaviest report"
+                  ],
+                  [
+                    "Alerting",
+                    "HTML failure emails per ETL job"
+                  ],
+                  [
+                    "Experiment",
+                    "Chat endpoint that sends KPI summaries to a hosted open-weights LLM for plain-English questions"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Libraries"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Library",
+                  "Purpose"
+                ],
+                "rows": [
+                  [
+                    "pandas / NumPy",
+                    "ETL, joins, aggregation"
+                  ],
+                  [
+                    "Flask / Werkzeug",
+                    "Web portal, password hashing"
+                  ],
+                  [
+                    "sqlite3",
+                    "Users and region mapping"
+                  ],
+                  [
+                    "openpyxl",
+                    "Styled Excel with images"
+                  ],
+                  [
+                    "gspread",
+                    "Cloud spreadsheet read/write"
+                  ],
+                  [
+                    "ftplib / smtplib",
+                    "Current-month extract, alerts"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "Seven daily reports produced by scripts instead of by hand.",
+                "Each user sees only their regions, with Excel export on demand.",
+                "A plan-accuracy metric that separates demand shortfall from supply shortfall.",
+                "Failures are reported by email the same morning."
+              ]
+            },
+            {
+              "h": "Next steps"
+            },
+            {
+              "ul": [
+                "Move report tables from CSV into a database and add caching on the portal side.",
+                "Replace print logging with structured logs."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "engineering",
+        "analytics"
       ]
     },
     {
@@ -154,60 +733,303 @@
       "status": "production",
       "title": "Retail Chain Sales & Demand Planner",
       "tagline": "Multi-partner ETL into MySQL plus a demand planner using weighted averages, trend, ABC and stock cover.",
-      "stack": ["Python", "Flask", "Blueprints", "pandas", "MySQL", "SQLAlchemy", "openpyxl"],
+      "stack": [
+        "Python",
+        "Flask",
+        "Blueprints",
+        "pandas",
+        "MySQL",
+        "SQLAlchemy",
+        "openpyxl"
+      ],
       "preview": {
-        "type": "table", "title": "Demand planner",
-        "columns": ["Article", "W-avg (cases)", "Trend", "ABC", "Cover (days)", "Review"],
-        "rows": [["Slider A12", "64", "GROWING", "A", "18", ""], ["Flip B07", "41", "STABLE", "A", "34", ""], ["Sandal C33", "12", "DECLINING", "B", "71", "⚑"], ["Clog D02", "0", "DEAD", "C", "999", "⚑"]]
+        "type": "table",
+        "title": "Demand planner",
+        "columns": [
+          "Article",
+          "W-avg (cases)",
+          "Trend",
+          "ABC",
+          "Cover (days)",
+          "Review"
+        ],
+        "rows": [
+          [
+            "Slider A12",
+            "64",
+            "GROWING",
+            "A",
+            "18",
+            ""
+          ],
+          [
+            "Flip B07",
+            "41",
+            "STABLE",
+            "A",
+            "34",
+            ""
+          ],
+          [
+            "Sandal C33",
+            "12",
+            "DECLINING",
+            "B",
+            "71",
+            "⚑"
+          ],
+          [
+            "Clog D02",
+            "0",
+            "DEAD",
+            "C",
+            "999",
+            "⚑"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Consolidates sales and purchase-order files from retail-chain partners into MySQL and plans replenishment per article with explainable rules." },
-          { "kv": [["Type", "Data platform + Flask application (blueprints)"], ["Sources", "Partner sales files and PO trackers over FTP; stock, transit and production files"], ["Storage", "MySQL (consolidated tables, planning table, ETL log)"], ["Modules", "Dashboards, PO mapper, master data, demand planner, order-sheet builder"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true },
-          { "h": "Stack" }, { "stack": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Each partner sends sales and PO files in its own layout. Comparing sales with targets and deciding replenishment meant merging these by hand, with no consistent rule for how much stock each article needs." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Data", "Separate files per partner", "One MySQL schema, loaded incrementally"],
-            ["Schema drift", "Broke manual sheets", "Missing columns added automatically"],
-            ["Planning", "Simple averages", "Weighted average + trend + ABC + cover"],
-            ["Overrides", "Lost on refresh", "User edits re-applied after every ETL run"],
-            ["Reporting", "Spreadsheets", "Dashboards and heat-mapped Excel"]] } }
-        ]},
-        { "id": "pipeline", "label": "Data pipeline", "blocks": [
-          { "flow": ["FTP tree (partner → year → CSV)", "Route by filename", "Normalise columns", "Auto-evolve schema", "Chunked load", "MySQL", "Planner ETL"] },
-          { "table": { "columns": ["Loader", "Technique"], "rows": [
-            ["Consolidated sales", "Walks the FTP tree; picks target table from filename keywords; normalises column names; ALTER TABLE for new columns then aligns the frame; parses store code; skips already-loaded files via a source column; to_sql in 1,000-row chunks"],
-            ["PO tracker", "Column-alias mapping; dates staged as text, cleaned (multiple formats, regex fallback, year 1900–2100) then converted, invalid → NULL; status column indexed; verification queries after load"],
-            ["Planning ETL", "Stock + transit + pending production + PO tracker + 3 months of sales; de-duplicate on material × store × month; truncate-and-insert; re-apply stored user edits and deletions; each run logged; lock prevents overlapping runs"]] } }
-        ]},
-        { "id": "logic", "label": "Planning logic", "blocks": [
-          { "table": { "columns": ["Rule", "Definition"], "rows": [
-            ["Weighted average", "Last 3 complete months, oldest → newest weights 0.2 / 0.3 / 0.5 (re-normalised if fewer months)"],
-            ["Trend", "DEAD if all zero; GROWING if strictly increasing; DECLINING if strictly decreasing; STABLE if coefficient of variation ≤ 0.15; else VOLATILE"],
-            ["ABC class", "Cumulative share of 3-month sales: A ≤ 70%, B ≤ 90%, C rest"],
-            ["Display stock", "weighted average × per-article multiplier (editable in the UI)"],
-            ["Pipeline", "free stock (all plants) + goods in transit + pending production"],
-            ["Stock cover", "pipeline ÷ (weighted average ÷ 26 working days); 999 if no sales"],
-            ["Review flag", "Suggested quantity > 0 while trend is DECLINING or DEAD"]] } },
-          { "code": "for m in materials:\n    months = last_3_monthly_sales(m)                 # oldest -> newest\n    w = normalize([0.2, 0.3, 0.5][-len(months):])\n    wavg = dot(w, months)\n    trend = classify(months, stable_cv=0.15)\n    display = wavg * multiplier.get(m, default)\n    pipeline = free_stock(m) + transit(m) + production(m)\n    cover = pipeline / (wavg / 26) if wavg else 999\n    flag = suggested(m) > 0 and trend in {\"DECLINING\", \"DEAD\"}\nabc = classify_by_cumulative_share(cutoffs=(0.70, 0.90))", "title": "Planner (simplified)" },
-          { "h": "Store reach" },
-          { "p": "Distinct selling stores per month, month-on-month change, reach % = selling stores ÷ total stores, with rolling averages." }
-        ]},
-        { "id": "engineering", "label": "Engineering", "blocks": [
-          { "table": { "columns": ["Concern", "Implementation"], "rows": [
-            ["Structure", "Flask blueprints per module (PO mapper, master data) on a shared app"],
-            ["Caching", "In-memory DataFrame cache with TTL, thread lock and background rebuild; readers wait on an is_building flag"],
-            ["DB", "SQLAlchemy engine with pool_pre_ping; chunked inserts"],
-            ["Uploads", "Extension allow-list and required-column validation"],
-            ["Accounts", "Registration restricted to company email, hashed passwords, reset tokens from secrets.token_urlsafe with expiry"],
-            ["Exports", "Heat-map styled Excel via openpyxl"]] } }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["One consolidated database for all partners, loaded incrementally.", "Replenishment suggestions with a visible reason (trend, ABC, cover).", "Planner overrides survive data refreshes.", "Order sheets generated instead of typed."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Consolidates sales and purchase-order files from retail-chain partners into MySQL and plans replenishment per article with explainable rules."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Data platform + Flask application (blueprints)"
+                ],
+                [
+                  "Sources",
+                  "Partner sales files and PO trackers over FTP; stock, transit and production files"
+                ],
+                [
+                  "Storage",
+                  "MySQL (consolidated tables, planning table, ETL log)"
+                ],
+                [
+                  "Modules",
+                  "Dashboards, PO mapper, master data, demand planner, order-sheet builder"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            },
+            {
+              "h": "Stack"
+            },
+            {
+              "stack": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Each partner sends sales and PO files in its own layout. Comparing sales with targets and deciding replenishment meant merging these by hand, with no consistent rule for how much stock each article needs."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Data",
+                    "Separate files per partner",
+                    "One MySQL schema, loaded incrementally"
+                  ],
+                  [
+                    "Schema drift",
+                    "Broke manual sheets",
+                    "Missing columns added automatically"
+                  ],
+                  [
+                    "Planning",
+                    "Simple averages",
+                    "Weighted average + trend + ABC + cover"
+                  ],
+                  [
+                    "Overrides",
+                    "Lost on refresh",
+                    "User edits re-applied after every ETL run"
+                  ],
+                  [
+                    "Reporting",
+                    "Spreadsheets",
+                    "Dashboards and heat-mapped Excel"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "pipeline",
+          "label": "Data pipeline",
+          "blocks": [
+            {
+              "flow": [
+                "FTP tree (partner → year → CSV)",
+                "Route by filename",
+                "Normalise columns",
+                "Auto-evolve schema",
+                "Chunked load",
+                "MySQL",
+                "Planner ETL"
+              ]
+            },
+            {
+              "table": {
+                "columns": [
+                  "Loader",
+                  "Technique"
+                ],
+                "rows": [
+                  [
+                    "Consolidated sales",
+                    "Walks the FTP tree; picks target table from filename keywords; normalises column names; ALTER TABLE for new columns then aligns the frame; parses store code; skips already-loaded files via a source column; to_sql in 1,000-row chunks"
+                  ],
+                  [
+                    "PO tracker",
+                    "Column-alias mapping; dates staged as text, cleaned (multiple formats, regex fallback, year 1900–2100) then converted, invalid → NULL; status column indexed; verification queries after load"
+                  ],
+                  [
+                    "Planning ETL",
+                    "Stock + transit + pending production + PO tracker + 3 months of sales; de-duplicate on material × store × month; truncate-and-insert; re-apply stored user edits and deletions; each run logged; lock prevents overlapping runs"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Planning logic",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Rule",
+                  "Definition"
+                ],
+                "rows": [
+                  [
+                    "Weighted average",
+                    "Last 3 complete months, oldest → newest weights 0.2 / 0.3 / 0.5 (re-normalised if fewer months)"
+                  ],
+                  [
+                    "Trend",
+                    "DEAD if all zero; GROWING if strictly increasing; DECLINING if strictly decreasing; STABLE if coefficient of variation ≤ 0.15; else VOLATILE"
+                  ],
+                  [
+                    "ABC class",
+                    "Cumulative share of 3-month sales: A ≤ 70%, B ≤ 90%, C rest"
+                  ],
+                  [
+                    "Display stock",
+                    "weighted average × per-article multiplier (editable in the UI)"
+                  ],
+                  [
+                    "Pipeline",
+                    "free stock (all plants) + goods in transit + pending production"
+                  ],
+                  [
+                    "Stock cover",
+                    "pipeline ÷ (weighted average ÷ 26 working days); 999 if no sales"
+                  ],
+                  [
+                    "Review flag",
+                    "Suggested quantity > 0 while trend is DECLINING or DEAD"
+                  ]
+                ]
+              }
+            },
+            {
+              "code": "for m in materials:\n    months = last_3_monthly_sales(m)                 # oldest -> newest\n    w = normalize([0.2, 0.3, 0.5][-len(months):])\n    wavg = dot(w, months)\n    trend = classify(months, stable_cv=0.15)\n    display = wavg * multiplier.get(m, default)\n    pipeline = free_stock(m) + transit(m) + production(m)\n    cover = pipeline / (wavg / 26) if wavg else 999\n    flag = suggested(m) > 0 and trend in {\"DECLINING\", \"DEAD\"}\nabc = classify_by_cumulative_share(cutoffs=(0.70, 0.90))",
+              "title": "Planner (simplified)"
+            },
+            {
+              "h": "Store reach"
+            },
+            {
+              "p": "Distinct selling stores per month, month-on-month change, reach % = selling stores ÷ total stores, with rolling averages."
+            }
+          ]
+        },
+        {
+          "id": "engineering",
+          "label": "Engineering",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Concern",
+                  "Implementation"
+                ],
+                "rows": [
+                  [
+                    "Structure",
+                    "Flask blueprints per module (PO mapper, master data) on a shared app"
+                  ],
+                  [
+                    "Caching",
+                    "In-memory DataFrame cache with TTL, thread lock and background rebuild; readers wait on an is_building flag"
+                  ],
+                  [
+                    "DB",
+                    "SQLAlchemy engine with pool_pre_ping; chunked inserts"
+                  ],
+                  [
+                    "Uploads",
+                    "Extension allow-list and required-column validation"
+                  ],
+                  [
+                    "Accounts",
+                    "Registration restricted to company email, hashed passwords, reset tokens from secrets.token_urlsafe with expiry"
+                  ],
+                  [
+                    "Exports",
+                    "Heat-map styled Excel via openpyxl"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "One consolidated database for all partners, loaded incrementally.",
+                "Replenishment suggestions with a visible reason (trend, ABC, cover).",
+                "Planner overrides survive data refreshes.",
+                "Order sheets generated instead of typed."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "engineering",
+        "analytics"
       ]
     },
     {
@@ -217,49 +1039,237 @@
       "status": "prototype",
       "title": "Purchase-Order Forecasting (ML experiment)",
       "tagline": "Gradient-boosting ensemble for next-month PO quantity — and an honest look at why it isn't ready yet.",
-      "stack": ["Python", "pandas", "XGBoost", "LightGBM", "scikit-learn", "Jupyter"],
+      "stack": [
+        "Python",
+        "pandas",
+        "XGBoost",
+        "LightGBM",
+        "scikit-learn",
+        "Jupyter"
+      ],
       "preview": {
-        "type": "table", "title": "Hold-out evaluation (ensemble)",
-        "columns": ["Metric", "Value"],
-        "rows": [["MAE (cases)", "87.2"], ["RMSE (cases)", "203.5"], ["R²", "−1.08"], ["Within ±10 cases", "66.0%"], ["Within ±50 cases", "74.5%"], ["Within ±100 cases", "78.7%"]]
+        "type": "table",
+        "title": "Hold-out evaluation (ensemble)",
+        "columns": [
+          "Metric",
+          "Value"
+        ],
+        "rows": [
+          [
+            "MAE (cases)",
+            "87.2"
+          ],
+          [
+            "RMSE (cases)",
+            "203.5"
+          ],
+          [
+            "R²",
+            "−1.08"
+          ],
+          [
+            "Within ±10 cases",
+            "66.0%"
+          ],
+          [
+            "Within ±50 cases",
+            "74.5%"
+          ],
+          [
+            "Within ±100 cases",
+            "78.7%"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Can ML beat the rule-based planner at predicting next month's purchase-order quantity per article? Built the full pipeline, evaluated it on a held-out month, and found that it does not yet beat a naive baseline." },
-          { "kv": [["Task", "Regression — next month's PO quantity per article (target = shift(−1))"], ["Data", "Small panel: < 100 articles × 5 months, reshaped wide → long"], ["Features", "~88 engineered features"], ["Models", "XGBoost, LightGBM, Gradient Boosting (ensemble)"], ["Status", "Experiment, not deployed"]] },
-          { "h": "Hold-out results" }, { "preview": true }
-        ]},
-        { "id": "features", "label": "Features", "blocks": [
-          { "table": { "columns": ["Group", "Features"], "rows": [
-            ["Lags", "Lags 1–3 of PO, secondary sale, DC stock, primary sale, own stock"],
-            ["Rolling", "Windows 2/3/4: mean and std of sale and PO; min and max of sale; EMA span 2 and 3"],
-            ["DC stock", "Cover, 1- and 2-month depletion, depletion rate, stock/sales ratio, velocity, ideal stock = 1.5 × 3-month mean, gap, reorder flag (cover < 1), critical flag (cover < 0.5)"],
-            ["Sales trend", "1- and 2-month growth, acceleration, momentum, volatility, range"],
-            ["PO pattern", "Growth, consistency, PO/sales ratio, current zero-PO run, had-PO flags"],
-            ["Fulfilment", "Rate at lags 1 and 2 and mean; under-delivery (< 0.8) and perfect-delivery (≥ 1) flags"],
-            ["Calendar / other", "Month sin/cos, festive-season flag, label-encoded category, article-level means/stds, values relative to article average"]] } }
-        ]},
-        { "id": "models", "label": "Models", "blocks": [
-          { "table": { "columns": ["Model", "Key hyperparameters", "Ensemble weight"], "rows": [
-            ["XGBoost", "300 trees, depth 6, lr 0.03, min_child_weight 2, subsample/colsample 0.8, gamma 0.1, L1 0.1, L2 1.0", "0.5"],
-            ["LightGBM", "300 trees, depth 6, lr 0.03, 31 leaves, min_child_samples 20, subsample/colsample 0.8", "0.3"],
-            ["Gradient Boosting", "200 trees, depth 5, lr 0.05, subsample 0.8, min split 20, min leaf 10", "0.2"]] } },
-          { "p": "Predictions are clipped at 0 and rounded. Each forecast gets a confidence label: HIGH if DC stock ÷ sale < 1, LOW if > 2 or no PO last month, otherwise MEDIUM." },
-          { "code": "pred = 0.5 * xgb.predict(X) + 0.3 * lgbm.predict(X) + 0.2 * gbr.predict(X)\npred = np.clip(pred, 0, None).round()\nconf = np.where(dc_cover < 1, \"HIGH\", np.where((dc_cover > 2) | (po_lag1 == 0), \"LOW\", \"MEDIUM\"))", "title": "Ensemble + confidence" }
-        ]},
-        { "id": "validation", "label": "Validation", "blocks": [
-          { "table": { "columns": ["Check", "Setup", "Result"], "rows": [
-            ["Cross-validation", "5-fold on training months (MAE, cases)", "XGB 55.8 ± 50.7 · LGBM 67.4 ± 45.0 · GB 57.3 ± 42.0"],
-            ["Hold-out month", "Train Aug–Oct → test Nov (predicting Dec)", "MAE 87.2 · RMSE 203.5 · R² −1.08"],
-            ["Tolerance bands", "Share of articles within ±10 / ±50 / ±100 cases", "66.0% / 74.5% / 78.7%"]] } },
-          { "h": "What the numbers say" },
-          { "ul": ["Negative R² on the hold-out month means the ensemble did worse than predicting the mean — it has not beaten a naive baseline.", "Article-level aggregate features were computed over all months including the test month, which leaks information and makes even this score optimistic.", "With fewer than 100 articles and 5 months, the panel is too small for 88 features.", "Plain K-fold CV is not time-aware; a forward-chaining split would be the correct choice."] },
-          { "h": "Follow-up: rule-based screen" },
-          { "p": "Later notebook work tested which articles are predictable at all (≥ 2 PO months, min PO ≥ 10, CV < 0.4, no jump > 70%, PO last month, back-test error ≤ 20%) with a simple rule 0.6 × last + 0.3 × previous + 0.1 × trend. Only about 2% of articles passed." }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["A complete feature-engineering and ensemble pipeline, documented and reproducible.", "Clear evidence that, with current data volume, ML does not yet beat the rule-based planner — so it was not deployed.", "Next: fix the leakage, use time-series CV, wait for 12+ months of history, compare against a seasonal-naive baseline."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Can ML beat the rule-based planner at predicting next month's purchase-order quantity per article? Built the full pipeline, evaluated it on a held-out month, and found that it does not yet beat a naive baseline."
+            },
+            {
+              "kv": [
+                [
+                  "Task",
+                  "Regression — next month's PO quantity per article (target = shift(−1))"
+                ],
+                [
+                  "Data",
+                  "Small panel: < 100 articles × 5 months, reshaped wide → long"
+                ],
+                [
+                  "Features",
+                  "~88 engineered features"
+                ],
+                [
+                  "Models",
+                  "XGBoost, LightGBM, Gradient Boosting (ensemble)"
+                ],
+                [
+                  "Status",
+                  "Experiment, not deployed"
+                ]
+              ]
+            },
+            {
+              "h": "Hold-out results"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "features",
+          "label": "Features",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Group",
+                  "Features"
+                ],
+                "rows": [
+                  [
+                    "Lags",
+                    "Lags 1–3 of PO, secondary sale, DC stock, primary sale, own stock"
+                  ],
+                  [
+                    "Rolling",
+                    "Windows 2/3/4: mean and std of sale and PO; min and max of sale; EMA span 2 and 3"
+                  ],
+                  [
+                    "DC stock",
+                    "Cover, 1- and 2-month depletion, depletion rate, stock/sales ratio, velocity, ideal stock = 1.5 × 3-month mean, gap, reorder flag (cover < 1), critical flag (cover < 0.5)"
+                  ],
+                  [
+                    "Sales trend",
+                    "1- and 2-month growth, acceleration, momentum, volatility, range"
+                  ],
+                  [
+                    "PO pattern",
+                    "Growth, consistency, PO/sales ratio, current zero-PO run, had-PO flags"
+                  ],
+                  [
+                    "Fulfilment",
+                    "Rate at lags 1 and 2 and mean; under-delivery (< 0.8) and perfect-delivery (≥ 1) flags"
+                  ],
+                  [
+                    "Calendar / other",
+                    "Month sin/cos, festive-season flag, label-encoded category, article-level means/stds, values relative to article average"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "models",
+          "label": "Models",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Model",
+                  "Key hyperparameters",
+                  "Ensemble weight"
+                ],
+                "rows": [
+                  [
+                    "XGBoost",
+                    "300 trees, depth 6, lr 0.03, min_child_weight 2, subsample/colsample 0.8, gamma 0.1, L1 0.1, L2 1.0",
+                    "0.5"
+                  ],
+                  [
+                    "LightGBM",
+                    "300 trees, depth 6, lr 0.03, 31 leaves, min_child_samples 20, subsample/colsample 0.8",
+                    "0.3"
+                  ],
+                  [
+                    "Gradient Boosting",
+                    "200 trees, depth 5, lr 0.05, subsample 0.8, min split 20, min leaf 10",
+                    "0.2"
+                  ]
+                ]
+              }
+            },
+            {
+              "p": "Predictions are clipped at 0 and rounded. Each forecast gets a confidence label: HIGH if DC stock ÷ sale < 1, LOW if > 2 or no PO last month, otherwise MEDIUM."
+            },
+            {
+              "code": "pred = 0.5 * xgb.predict(X) + 0.3 * lgbm.predict(X) + 0.2 * gbr.predict(X)\npred = np.clip(pred, 0, None).round()\nconf = np.where(dc_cover < 1, \"HIGH\", np.where((dc_cover > 2) | (po_lag1 == 0), \"LOW\", \"MEDIUM\"))",
+              "title": "Ensemble + confidence"
+            }
+          ]
+        },
+        {
+          "id": "validation",
+          "label": "Validation",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Check",
+                  "Setup",
+                  "Result"
+                ],
+                "rows": [
+                  [
+                    "Cross-validation",
+                    "5-fold on training months (MAE, cases)",
+                    "XGB 55.8 ± 50.7 · LGBM 67.4 ± 45.0 · GB 57.3 ± 42.0"
+                  ],
+                  [
+                    "Hold-out month",
+                    "Train Aug–Oct → test Nov (predicting Dec)",
+                    "MAE 87.2 · RMSE 203.5 · R² −1.08"
+                  ],
+                  [
+                    "Tolerance bands",
+                    "Share of articles within ±10 / ±50 / ±100 cases",
+                    "66.0% / 74.5% / 78.7%"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "What the numbers say"
+            },
+            {
+              "ul": [
+                "Negative R² on the hold-out month means the ensemble did worse than predicting the mean — it has not beaten a naive baseline.",
+                "Article-level aggregate features were computed over all months including the test month, which leaks information and makes even this score optimistic.",
+                "With fewer than 100 articles and 5 months, the panel is too small for 88 features.",
+                "Plain K-fold CV is not time-aware; a forward-chaining split would be the correct choice."
+              ]
+            },
+            {
+              "h": "Follow-up: rule-based screen"
+            },
+            {
+              "p": "Later notebook work tested which articles are predictable at all (≥ 2 PO months, min PO ≥ 10, CV < 0.4, no jump > 70%, PO last month, back-test error ≤ 20%) with a simple rule 0.6 × last + 0.3 × previous + 0.1 × trend. Only about 2% of articles passed."
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "A complete feature-engineering and ensemble pipeline, documented and reproducible.",
+                "Clear evidence that, with current data volume, ML does not yet beat the rule-based planner — so it was not deployed.",
+                "Next: fix the leakage, use time-series CV, wait for 12+ months of history, compare against a seasonal-naive baseline."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "ml",
+        "analytics"
       ]
     },
     {
@@ -269,77 +1279,333 @@
       "status": "production",
       "title": "Product Image Search Bot",
       "tagline": "Chat-style image search with an ETag-diff sync ETL, secure SSO and concurrency-limited exports.",
-      "stack": ["Python", "Flask", "boto3", "APScheduler", "SQLite (WAL)", "pandas", "Pillow", "xlsxwriter", "cryptography", "cheroot"],
+      "stack": [
+        "Python",
+        "Flask",
+        "boto3",
+        "APScheduler",
+        "SQLite (WAL)",
+        "pandas",
+        "Pillow",
+        "xlsxwriter",
+        "cryptography",
+        "cheroot"
+      ],
       "preview": {
-        "type": "chat", "title": "Image bot",
-        "messages": [["user", "A12 black"], ["bot", "Found 6 images for Slider A12 · Black"], ["bot", "[img] [img] [img] [img]  ⬇ ZIP  ⬇ Excel  ⇪ Share"],
-                     ["user", "upload stock_list.xlsx"], ["bot", "Matched 182 of 190 rows. 8 missing images listed."]]
+        "type": "chat",
+        "title": "Image bot",
+        "messages": [
+          [
+            "user",
+            "A12 black"
+          ],
+          [
+            "bot",
+            "Found 6 images for Slider A12 · Black"
+          ],
+          [
+            "bot",
+            "[img] [img] [img] [img]  ⬇ ZIP  ⬇ Excel  ⇪ Share"
+          ],
+          [
+            "user",
+            "upload stock_list.xlsx"
+          ],
+          [
+            "bot",
+            "Matched 182 of 190 rows. 8 missing images listed."
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Self-service product image lookup for the sales channel, kept in sync with cloud storage by an incremental ETL that downloads only new or replaced images." },
-          { "kv": [["Type", "Flask web app + scheduled ETL package"], ["Size", "~55 routes; ETL split into scanner, state DB, matcher, core and scheduler modules"], ["Storage", "SQLite in WAL mode (users, activity, search history, OTP, registrations, SSO tokens, ETL state)"], ["Server", "Threaded production WSGI server with TLS"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true },
-          { "h": "Stack" }, { "stack": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Sales teams needed current images for specific article-colour-category combinations. The library lives in cloud object storage, changes often, uses inconsistent file names and had no search." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Finding images", "Browse folders or ask", "Search with type-ahead or upload a list (≤ 100 rows)"],
-            ["Library sync", "Full re-download or none", "ETag diff → only new/replaced objects"],
-            ["Naming", "Inconsistent spellings", "Canonical ARTICLE_CATEGORY_COLOUR key"],
-            ["Gaps", "Unknown", "Exception report + never-found analytics"],
-            ["Access", "Shared folders", "OTP login, approval workflow, single-use SSO tokens"]] } }
-        ]},
-        { "id": "etl", "label": "Sync ETL", "blocks": [
-          { "flow": ["List bucket (metadata)", "Compare ETag with state", "NEW / REPLACED / UNCHANGED", "Newest object per stem", "Match master rows", "Download changes only", "Upsert state + reports"] },
-          { "ol": [
-            "Page through the bucket listing and keep image extensions.",
-            "Compare each key's ETag with the stored state: no record → NEW, different ETag → REPLACED, else UNCHANGED.",
-            "Build normalised-stem → newest object (de-duplicate by last-modified).",
-            "For each master row, look up its stem; record the match even if a later download fails.",
-            "Download only if NEW, REPLACED or missing locally; access errors go to an error column and state is not recorded, so the next run retries.",
-            "Index the local folder once; a row is an exception only if absent from both bucket and folder.",
-            "Upsert state for all objects (including unmatched) so a later master upload matches without a rescan; write exception and replaced-image workbooks."] },
-          { "code": "known = load_state()                         # key -> etag\nfor key, obj in list_bucket(prefix):\n    status[key] = \"NEW\" if key not in known else (\"REPLACED\" if obj.etag != known[key] else \"UNCHANGED\")\nlatest = newest_by(stem, objs)\nfor row in master:\n    obj = latest.get(stem(row.image_name))\n    if not obj: row.absent = True; continue\n    row.matched = obj\n    if status[obj.key] != \"UNCHANGED\" or not exists_local(obj):\n        try: download(obj)\n        except AccessError as e: row.error = e; continue   # retried next run\n    stage_state(obj)\nupsert_state(objs); write_reports()", "title": "ETag-diff sync (simplified)" },
-          { "p": "An in-process flag prevents overlapping runs; the job never raises and always returns a fixed-shape summary (new, replaced, matched, missing, error) that is logged to a run table." }
-        ]},
-        { "id": "matching", "label": "Matching logic", "blocks": [
-          { "table": { "columns": ["Component", "How it works"], "rows": [
-            ["Upload cleaning", "Placeholder tokens → empty; trailing '.0' from spreadsheets removed"],
-            ["Ambiguity-safe lookup", "(article, category, colour-as-typed) → canonical colour; keys mapping to two values are marked ambiguous and never guessed"],
-            ["Resolution order", "Colour as typed → resolved colour → constructed fallback"],
-            ["Exact serving", "A code is served only if it is a canonical master name and a file with exactly that name exists (case/extension-insensitive)"],
-            ["Canonical normaliser", "Split on _ or -; the first part is the article; longest run of known-category tokens = category; remainder = colour (full names → codes); misspelt categories repaired by sorted-word match"],
-            ["Never-found report", "Merges all spellings of a search, drops items now available in master, bucket or folder"]] } }
-        ]},
-        { "id": "engineering", "label": "Performance & security", "blocks": [
-          { "h": "Performance" },
-          { "table": { "columns": ["Technique", "Detail"], "rows": [
-            ["File-index cache", "10-min TTL, stale-while-revalidate: a non-blocking lock lets one thread rebuild while others use the old index"],
-            ["Master cache", "10-min TTL + file mtime check, single-flight reload"],
-            ["LRU cache", "150 share-images keyed on (path, mtime)"],
-            ["Thread pools", "Up to 32 workers for lookup/thumbnails, 48 for Excel images, 16 for ZIP"],
-            ["Back-pressure", "Bounded semaphores: 4 heavy-job and 8 search slots; wait up to 240 s then HTTP 503"],
-            ["Pagination", "Server-side admin tables (5–100 rows/page)"],
-            ["Exports", "In-memory xlsxwriter with 300 px thumbnails; DEFLATE ZIP with caption overlay; Web Share API with ZIP fallback"],
-            ["Server", "Threaded WSGI (96 threads, queue 256)"]] } },
-          { "h": "Security" },
-          { "table": { "columns": ["Control", "Detail"], "rows": [
-            ["Passwords", "Werkzeug hashes"],
-            ["PII", "Email encrypted with Fernet; peppered HMAC-SHA256 for equality/uniqueness lookups"],
-            ["2FA", "Optional 6-digit email OTP, 5-minute expiry, single use"],
-            ["Registration", "Admin approval; one pending request per email (unique partial index)"],
-            ["SSO", "Server-to-server request with constant-time key check; 32-byte token, only its SHA-256 stored, 60 s expiry; single atomic UPDATE makes it single-use and race-free; rate-limited"],
-            ["Queries", "Whitelisted column names, bound parameters, regex-validated dates"],
-            ["Exports", "Values written as strings (no formula injection); ZIP entry names sanitised"],
-            ["Ops", "Secrets from environment (fails fast if missing); rotating logs; crash capture"]] } }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["Any product image found from one search box or a bulk upload.", "Nightly sync transfers only changes instead of the whole library.", "Missing images identified from real search demand.", "Sibling apps hand users over through single-use SSO tokens."] },
-          { "h": "Next steps" },
-          { "ul": ["Automated tests for the matcher and ETL.", "CSRF protection on forms."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Self-service product image lookup for the sales channel, kept in sync with cloud storage by an incremental ETL that downloads only new or replaced images."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Flask web app + scheduled ETL package"
+                ],
+                [
+                  "Size",
+                  "~55 routes; ETL split into scanner, state DB, matcher, core and scheduler modules"
+                ],
+                [
+                  "Storage",
+                  "SQLite in WAL mode (users, activity, search history, OTP, registrations, SSO tokens, ETL state)"
+                ],
+                [
+                  "Server",
+                  "Threaded production WSGI server with TLS"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            },
+            {
+              "h": "Stack"
+            },
+            {
+              "stack": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Sales teams needed current images for specific article-colour-category combinations. The library lives in cloud object storage, changes often, uses inconsistent file names and had no search."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Finding images",
+                    "Browse folders or ask",
+                    "Search with type-ahead or upload a list (≤ 100 rows)"
+                  ],
+                  [
+                    "Library sync",
+                    "Full re-download or none",
+                    "ETag diff → only new/replaced objects"
+                  ],
+                  [
+                    "Naming",
+                    "Inconsistent spellings",
+                    "Canonical ARTICLE_CATEGORY_COLOUR key"
+                  ],
+                  [
+                    "Gaps",
+                    "Unknown",
+                    "Exception report + never-found analytics"
+                  ],
+                  [
+                    "Access",
+                    "Shared folders",
+                    "OTP login, approval workflow, single-use SSO tokens"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "etl",
+          "label": "Sync ETL",
+          "blocks": [
+            {
+              "flow": [
+                "List bucket (metadata)",
+                "Compare ETag with state",
+                "NEW / REPLACED / UNCHANGED",
+                "Newest object per stem",
+                "Match master rows",
+                "Download changes only",
+                "Upsert state + reports"
+              ]
+            },
+            {
+              "ol": [
+                "Page through the bucket listing and keep image extensions.",
+                "Compare each key's ETag with the stored state: no record → NEW, different ETag → REPLACED, else UNCHANGED.",
+                "Build normalised-stem → newest object (de-duplicate by last-modified).",
+                "For each master row, look up its stem; record the match even if a later download fails.",
+                "Download only if NEW, REPLACED or missing locally; access errors go to an error column and state is not recorded, so the next run retries.",
+                "Index the local folder once; a row is an exception only if absent from both bucket and folder.",
+                "Upsert state for all objects (including unmatched) so a later master upload matches without a rescan; write exception and replaced-image workbooks."
+              ]
+            },
+            {
+              "code": "known = load_state()                         # key -> etag\nfor key, obj in list_bucket(prefix):\n    status[key] = \"NEW\" if key not in known else (\"REPLACED\" if obj.etag != known[key] else \"UNCHANGED\")\nlatest = newest_by(stem, objs)\nfor row in master:\n    obj = latest.get(stem(row.image_name))\n    if not obj: row.absent = True; continue\n    row.matched = obj\n    if status[obj.key] != \"UNCHANGED\" or not exists_local(obj):\n        try: download(obj)\n        except AccessError as e: row.error = e; continue   # retried next run\n    stage_state(obj)\nupsert_state(objs); write_reports()",
+              "title": "ETag-diff sync (simplified)"
+            },
+            {
+              "p": "An in-process flag prevents overlapping runs; the job never raises and always returns a fixed-shape summary (new, replaced, matched, missing, error) that is logged to a run table."
+            }
+          ]
+        },
+        {
+          "id": "matching",
+          "label": "Matching logic",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Component",
+                  "How it works"
+                ],
+                "rows": [
+                  [
+                    "Upload cleaning",
+                    "Placeholder tokens → empty; trailing '.0' from spreadsheets removed"
+                  ],
+                  [
+                    "Ambiguity-safe lookup",
+                    "(article, category, colour-as-typed) → canonical colour; keys mapping to two values are marked ambiguous and never guessed"
+                  ],
+                  [
+                    "Resolution order",
+                    "Colour as typed → resolved colour → constructed fallback"
+                  ],
+                  [
+                    "Exact serving",
+                    "A code is served only if it is a canonical master name and a file with exactly that name exists (case/extension-insensitive)"
+                  ],
+                  [
+                    "Canonical normaliser",
+                    "Split on _ or -; the first part is the article; longest run of known-category tokens = category; remainder = colour (full names → codes); misspelt categories repaired by sorted-word match"
+                  ],
+                  [
+                    "Never-found report",
+                    "Merges all spellings of a search, drops items now available in master, bucket or folder"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "engineering",
+          "label": "Performance & security",
+          "blocks": [
+            {
+              "h": "Performance"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Technique",
+                  "Detail"
+                ],
+                "rows": [
+                  [
+                    "File-index cache",
+                    "10-min TTL, stale-while-revalidate: a non-blocking lock lets one thread rebuild while others use the old index"
+                  ],
+                  [
+                    "Master cache",
+                    "10-min TTL + file mtime check, single-flight reload"
+                  ],
+                  [
+                    "LRU cache",
+                    "150 share-images keyed on (path, mtime)"
+                  ],
+                  [
+                    "Thread pools",
+                    "Up to 32 workers for lookup/thumbnails, 48 for Excel images, 16 for ZIP"
+                  ],
+                  [
+                    "Back-pressure",
+                    "Bounded semaphores: 4 heavy-job and 8 search slots; wait up to 240 s then HTTP 503"
+                  ],
+                  [
+                    "Pagination",
+                    "Server-side admin tables (5–100 rows/page)"
+                  ],
+                  [
+                    "Exports",
+                    "In-memory xlsxwriter with 300 px thumbnails; DEFLATE ZIP with caption overlay; Web Share API with ZIP fallback"
+                  ],
+                  [
+                    "Server",
+                    "Threaded WSGI (96 threads, queue 256)"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Security"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Control",
+                  "Detail"
+                ],
+                "rows": [
+                  [
+                    "Passwords",
+                    "Werkzeug hashes"
+                  ],
+                  [
+                    "PII",
+                    "Email encrypted with Fernet; peppered HMAC-SHA256 for equality/uniqueness lookups"
+                  ],
+                  [
+                    "2FA",
+                    "Optional 6-digit email OTP, 5-minute expiry, single use"
+                  ],
+                  [
+                    "Registration",
+                    "Admin approval; one pending request per email (unique partial index)"
+                  ],
+                  [
+                    "SSO",
+                    "Server-to-server request with constant-time key check; 32-byte token, only its SHA-256 stored, 60 s expiry; single atomic UPDATE makes it single-use and race-free; rate-limited"
+                  ],
+                  [
+                    "Queries",
+                    "Whitelisted column names, bound parameters, regex-validated dates"
+                  ],
+                  [
+                    "Exports",
+                    "Values written as strings (no formula injection); ZIP entry names sanitised"
+                  ],
+                  [
+                    "Ops",
+                    "Secrets from environment (fails fast if missing); rotating logs; crash capture"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "Any product image found from one search box or a bulk upload.",
+                "Nightly sync transfers only changes instead of the whole library.",
+                "Missing images identified from real search demand.",
+                "Sibling apps hand users over through single-use SSO tokens."
+              ]
+            },
+            {
+              "h": "Next steps"
+            },
+            {
+              "ul": [
+                "Automated tests for the matcher and ETL.",
+                "CSRF protection on forms."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "webapp",
+        "engineering"
       ]
     },
     {
@@ -349,54 +1615,266 @@
       "status": "production",
       "title": "Stock Catalogue Generator",
       "tagline": "Enriches a stock upload with master, price and images, then renders PDF, Excel and ZIP catalogues in parallel.",
-      "stack": ["Python", "Flask", "pandas", "ReportLab", "Pillow", "xlsxwriter", "sqlite3", "schedule", "boto3"],
+      "stack": [
+        "Python",
+        "Flask",
+        "pandas",
+        "ReportLab",
+        "Pillow",
+        "xlsxwriter",
+        "sqlite3",
+        "schedule",
+        "boto3"
+      ],
       "preview": {
-        "type": "grid", "title": "Catalogue (dummy)",
-        "items": [["A12 · Black", "₹499"], ["B07 · Navy", "₹349"], ["C33 · Tan", "₹699"], ["D02 · Olive", "₹549"], ["E19 · Grey", "₹399"], ["F04 · Red", "₹449"]]
+        "type": "grid",
+        "title": "Catalogue (dummy)",
+        "items": [
+          [
+            "A12 · Black",
+            "₹499"
+          ],
+          [
+            "B07 · Navy",
+            "₹349"
+          ],
+          [
+            "C33 · Tan",
+            "₹699"
+          ],
+          [
+            "D02 · Olive",
+            "₹549"
+          ],
+          [
+            "E19 · Grey",
+            "₹399"
+          ],
+          [
+            "F04 · Red",
+            "₹449"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Upload a stock report; the app aggregates it, joins product master, colour map and price, finds images, and produces an illustrated PDF, an Excel with merged image cells, or a captioned ZIP." },
-          { "kv": [["Type", "Flask web app (~28 routes)"], ["Inputs", "Stock report upload; product master; colour map; price table (file feed)"], ["Outputs", "PDF (ReportLab), Excel with images (xlsxwriter), ZIP"], ["Jobs", "Morning price refresh, afternoon missing-images email"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Sharing available stock with dealers meant looking up every article's image and MRP manually and pasting them into a document." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Lookup", "One article at a time", "Vectorised joins on the whole upload"],
-            ["Catalogue", "Assembled by hand", "PDF / Excel / ZIP in one click"],
-            ["Data access", "Anyone saw everything", "Depot-level authorisation on upload"],
-            ["Image gaps", "Found by chance", "Tracked with seen-count, emailed daily"]] } }
-        ]},
-        { "id": "pipeline", "label": "Pipeline", "blocks": [
-          { "flow": ["Upload", "Validate", "Aggregate", "Split material code", "Join master + colour + price", "Build image code", "Render output"] },
-          { "table": { "columns": ["Step", "Detail"], "rows": [
-            ["Validate", "Required columns; every depot in the file must be in the user's allowed set; every row must carry today's date — file rejected otherwise"],
-            ["Aggregate", "Group by (material, source category, depot), sum quantities"],
-            ["Decompose", "Material code split into article-generic, colour and size"],
-            ["Enrich", "Left-join product master on article-generic; colour map code → name; price on (material, stock category)"],
-            ["Image code", "Built from article + colour + category; matched with the same multi-variant strategy as the image bot"],
-            ["Freshness", "Master invalidated when the newest dated source file changes (mtime); price refreshed on first use each day and again after a morning cut-off"]] } }
-        ]},
-        { "id": "rendering", "label": "Rendering", "blocks": [
-          { "table": { "columns": ["Output", "Technique"], "rows": [
-            ["PDF", "Landscape A4; Paragraph cells with HTML escaping; images resized in parallel and cached as flowables; consecutive rows with the same image code share one SPAN-merged image cell; header repeats on each page"],
-            ["Excel", "Rows converted to tuples before writing; merge_range per image-code run with one embedded thumbnail; missing codes logged in a daemon thread after the response"],
-            ["ZIP", "Parallel reads; each image stamped with an Article-Colour caption; DEFLATE"]] } },
-          { "code": "thumbs = parallel_map(make_thumb, unique(rows.image_code), workers=32)\nr = start = 1; prev = None\nfor row in rows:\n    write_text_cells(r, row)\n    if row.code != prev:\n        if prev and r - 1 > start: merge(start, r - 1, IMG_COL)\n        insert_image(r, IMG_COL, thumbs.get(row.code)) or write(r, IMG_COL, \"No image\")\n        prev, start = row.code, r\n    r += 1\nclose_last_group(); spawn(record_missing, rows, thumbs)", "title": "One image per group, merged across rows" }
-        ]},
-        { "id": "engineering", "label": "Engineering", "blocks": [
-          { "table": { "columns": ["Concern", "Implementation"], "rows": [
-            ["Concurrency", "Thread pools up to 32 workers for PDF/Excel/ZIP image work; lock-guarded global image caches"],
-            ["Session data", "Per-user processed frame pickled to disk, 30-min TTL, cleaned on logout/expiry"],
-            ["UI", "50-row pagination; cascading filters computed after upstream filters"],
-            ["Data quality", "missing_images table upserted with ON CONFLICT … seen_count + 1; resolved rows auto-deleted when the image appears"],
-            ["Reporting", "Scheduled HTML email with KPI cards, top 50 rows colour-coded by frequency, Excel attachment"],
-            ["Bulk download", "Separate resumable downloader from cloud storage: 16 workers, adaptive retries, files < 1 KB treated as invalid"]] } }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["A full illustrated catalogue from one upload.", "Users only ever process stock for depots they are allowed to see.", "Image gaps reported daily and closed automatically when fixed."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Upload a stock report; the app aggregates it, joins product master, colour map and price, finds images, and produces an illustrated PDF, an Excel with merged image cells, or a captioned ZIP."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Flask web app (~28 routes)"
+                ],
+                [
+                  "Inputs",
+                  "Stock report upload; product master; colour map; price table (file feed)"
+                ],
+                [
+                  "Outputs",
+                  "PDF (ReportLab), Excel with images (xlsxwriter), ZIP"
+                ],
+                [
+                  "Jobs",
+                  "Morning price refresh, afternoon missing-images email"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Sharing available stock with dealers meant looking up every article's image and MRP manually and pasting them into a document."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Lookup",
+                    "One article at a time",
+                    "Vectorised joins on the whole upload"
+                  ],
+                  [
+                    "Catalogue",
+                    "Assembled by hand",
+                    "PDF / Excel / ZIP in one click"
+                  ],
+                  [
+                    "Data access",
+                    "Anyone saw everything",
+                    "Depot-level authorisation on upload"
+                  ],
+                  [
+                    "Image gaps",
+                    "Found by chance",
+                    "Tracked with seen-count, emailed daily"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "pipeline",
+          "label": "Pipeline",
+          "blocks": [
+            {
+              "flow": [
+                "Upload",
+                "Validate",
+                "Aggregate",
+                "Split material code",
+                "Join master + colour + price",
+                "Build image code",
+                "Render output"
+              ]
+            },
+            {
+              "table": {
+                "columns": [
+                  "Step",
+                  "Detail"
+                ],
+                "rows": [
+                  [
+                    "Validate",
+                    "Required columns; every depot in the file must be in the user's allowed set; every row must carry today's date — file rejected otherwise"
+                  ],
+                  [
+                    "Aggregate",
+                    "Group by (material, source category, depot), sum quantities"
+                  ],
+                  [
+                    "Decompose",
+                    "Material code split into article-generic, colour and size"
+                  ],
+                  [
+                    "Enrich",
+                    "Left-join product master on article-generic; colour map code → name; price on (material, stock category)"
+                  ],
+                  [
+                    "Image code",
+                    "Built from article + colour + category; matched with the same multi-variant strategy as the image bot"
+                  ],
+                  [
+                    "Freshness",
+                    "Master invalidated when the newest dated source file changes (mtime); price refreshed on first use each day and again after a morning cut-off"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "rendering",
+          "label": "Rendering",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Output",
+                  "Technique"
+                ],
+                "rows": [
+                  [
+                    "PDF",
+                    "Landscape A4; Paragraph cells with HTML escaping; images resized in parallel and cached as flowables; consecutive rows with the same image code share one SPAN-merged image cell; header repeats on each page"
+                  ],
+                  [
+                    "Excel",
+                    "Rows converted to tuples before writing; merge_range per image-code run with one embedded thumbnail; missing codes logged in a daemon thread after the response"
+                  ],
+                  [
+                    "ZIP",
+                    "Parallel reads; each image stamped with an Article-Colour caption; DEFLATE"
+                  ]
+                ]
+              }
+            },
+            {
+              "code": "thumbs = parallel_map(make_thumb, unique(rows.image_code), workers=32)\nr = start = 1; prev = None\nfor row in rows:\n    write_text_cells(r, row)\n    if row.code != prev:\n        if prev and r - 1 > start: merge(start, r - 1, IMG_COL)\n        insert_image(r, IMG_COL, thumbs.get(row.code)) or write(r, IMG_COL, \"No image\")\n        prev, start = row.code, r\n    r += 1\nclose_last_group(); spawn(record_missing, rows, thumbs)",
+              "title": "One image per group, merged across rows"
+            }
+          ]
+        },
+        {
+          "id": "engineering",
+          "label": "Engineering",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Concern",
+                  "Implementation"
+                ],
+                "rows": [
+                  [
+                    "Concurrency",
+                    "Thread pools up to 32 workers for PDF/Excel/ZIP image work; lock-guarded global image caches"
+                  ],
+                  [
+                    "Session data",
+                    "Per-user processed frame pickled to disk, 30-min TTL, cleaned on logout/expiry"
+                  ],
+                  [
+                    "UI",
+                    "50-row pagination; cascading filters computed after upstream filters"
+                  ],
+                  [
+                    "Data quality",
+                    "missing_images table upserted with ON CONFLICT … seen_count + 1; resolved rows auto-deleted when the image appears"
+                  ],
+                  [
+                    "Reporting",
+                    "Scheduled HTML email with KPI cards, top 50 rows colour-coded by frequency, Excel attachment"
+                  ],
+                  [
+                    "Bulk download",
+                    "Separate resumable downloader from cloud storage: 16 workers, adaptive retries, files < 1 KB treated as invalid"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "A full illustrated catalogue from one upload.",
+                "Users only ever process stock for depots they are allowed to see.",
+                "Image gaps reported daily and closed automatically when fixed."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "webapp"
       ]
     },
     {
@@ -406,53 +1884,245 @@
       "status": "production",
       "title": "Power BI Embedded Portal",
       "tagline": "Per-user Power BI page access with an admin console, DAX-driven schema discovery and parallel metadata fetch.",
-      "stack": ["Python", "Flask", "MSAL", "Power BI REST API", "DAX", "SQLite", "xlsxwriter", "JavaScript"],
+      "stack": [
+        "Python",
+        "Flask",
+        "MSAL",
+        "Power BI REST API",
+        "DAX",
+        "SQLite",
+        "xlsxwriter",
+        "JavaScript"
+      ],
       "preview": {
-        "type": "kpis", "title": "Sales report (embedded)",
-        "kpis": [["Net sales", "₹3.4 Cr"], ["Growth", "+11%"], ["Active dealers", "612"], ["Top category", "Sliders"]],
-        "bars": [["Week 1", 70], ["Week 2", 82], ["Week 3", 76], ["Week 4", 90]]
+        "type": "kpis",
+        "title": "Sales report (embedded)",
+        "kpis": [
+          [
+            "Net sales",
+            "₹3.4 Cr"
+          ],
+          [
+            "Growth",
+            "+11%"
+          ],
+          [
+            "Active dealers",
+            "612"
+          ],
+          [
+            "Top category",
+            "Sliders"
+          ]
+        ],
+        "bars": [
+          [
+            "Week 1",
+            70
+          ],
+          [
+            "Week 2",
+            82
+          ],
+          [
+            "Week 3",
+            76
+          ],
+          [
+            "Week 4",
+            90
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "One portal that embeds Power BI reports and decides, per user, which reports, pages and filter values they get — configured by admins without touching Power BI." },
-          { "kv": [["Type", "Flask app (~26 routes) + JS front end"], ["Auth to Power BI", "Service principal via MSAL, cached token"], ["Config store", "SQLite with foreign keys and cascading deletes"], ["Admin", "Report builder, filter builder, bulk access grants, activity log"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Different users needed different pages and slices of the same reports. Workspace-level access was too broad and per-user licensing too expensive." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Access", "All-or-nothing workspace", "Per-user pages, regions and categories"],
-            ["Admin effort", "Changes inside Power BI", "Admin console in the portal"],
-            ["Filters", "Hand-typed", "Column values discovered by DAX"],
-            ["Load time", "Sequential metadata calls", "Parallel, cached for 10 minutes"]] } }
-        ]},
-        { "id": "architecture", "label": "Architecture", "blocks": [
-          { "flow": ["Login", "MSAL token (cached)", "Parallel report + page metadata", "Page selection", "Filter resolution", "Embed config", "powerbi-client JS"] },
-          { "h": "Data model" },
-          { "table": { "columns": ["Table", "Purpose"], "rows": [
-            ["users", "Account, admin flag, last login"],
-            ["user_regions / user_categories / user_allowed_pages", "Many-to-many access lists"],
-            ["report_sources", "Department, report id, mode (explicit pages or all)"],
-            ["report_pages", "Ordered pages per source"],
-            ["report_filters", "Table, column, and either user-bound values (regions/categories) or fixed JSON values"],
-            ["login_activity", "User, time, IP"]] } }
-        ]},
-        { "id": "logic", "label": "Embed logic", "blocks": [
-          { "ol": [
-            "Get an Azure AD token via MSAL; reuse until 120 s before expiry, guarded by a lock.",
-            "Fetch each report source's metadata and pages in parallel (one worker per source), cached 600 s.",
-            "Choose pages: explicit mode keeps configured order; then apply the user's allowed pages, or drop default-hidden pages.",
-            "Resolve filters by replacing user-bound placeholders with the user's regions/categories; drop a filter if the user has no values.",
-            "Client applies basic 'In' filters, hides filter/navigation panes and switches pages with setPage(), falling back to a full re-embed."] },
-          { "code": "aad_tok = cached_aad_token(refresh_within=120)\ninfo = parallel({s.id: cached(600, fetch_report_and_pages, s) for s in sources})\nfor s in sources:\n    pages = info[s.id].pages if s.mode == \"all\" else ordered_subset(info[s.id].pages, s.pages)\n    pages = keep(pages, user.allowed) if user.allowed else drop(pages, default_hidden)\n    filters = [f.with_values(user[f.bind] or f.fixed) for f in s.filters if (user[f.bind] or f.fixed)]\n    emit(pages, filters)", "title": "Per-user embed payload" },
-          { "h": "Schema discovery for admins (DAX via executeQueries)" },
-          { "ul": ["COLUMNSTATISTICS(), falling back to INFO.VIEW.COLUMNS(); auto-generated date tables skipped.", "Column values via TOPN(1001, VALUES(Table[Col])) — 1001 detects truncation at 1000.", "Identifiers escaped (quotes and ']' doubled); report ids validated as GUIDs."] }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["Users see only the pages and slices assigned to them, inside one portal.", "Access changes for many users at once with additive grants.", "Faster loads from parallel, cached metadata and in-report page switching."] },
-          { "h": "Next steps" },
-          { "ul": ["Move row-level scoping to Power BI RLS with per-user embed tokens.", "Automated tests for page/filter resolution."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "One portal that embeds Power BI reports and decides, per user, which reports, pages and filter values they get — configured by admins without touching Power BI."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Flask app (~26 routes) + JS front end"
+                ],
+                [
+                  "Auth to Power BI",
+                  "Service principal via MSAL, cached token"
+                ],
+                [
+                  "Config store",
+                  "SQLite with foreign keys and cascading deletes"
+                ],
+                [
+                  "Admin",
+                  "Report builder, filter builder, bulk access grants, activity log"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Different users needed different pages and slices of the same reports. Workspace-level access was too broad and per-user licensing too expensive."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Access",
+                    "All-or-nothing workspace",
+                    "Per-user pages, regions and categories"
+                  ],
+                  [
+                    "Admin effort",
+                    "Changes inside Power BI",
+                    "Admin console in the portal"
+                  ],
+                  [
+                    "Filters",
+                    "Hand-typed",
+                    "Column values discovered by DAX"
+                  ],
+                  [
+                    "Load time",
+                    "Sequential metadata calls",
+                    "Parallel, cached for 10 minutes"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "architecture",
+          "label": "Architecture",
+          "blocks": [
+            {
+              "flow": [
+                "Login",
+                "MSAL token (cached)",
+                "Parallel report + page metadata",
+                "Page selection",
+                "Filter resolution",
+                "Embed config",
+                "powerbi-client JS"
+              ]
+            },
+            {
+              "h": "Data model"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Table",
+                  "Purpose"
+                ],
+                "rows": [
+                  [
+                    "users",
+                    "Account, admin flag, last login"
+                  ],
+                  [
+                    "user_regions / user_categories / user_allowed_pages",
+                    "Many-to-many access lists"
+                  ],
+                  [
+                    "report_sources",
+                    "Department, report id, mode (explicit pages or all)"
+                  ],
+                  [
+                    "report_pages",
+                    "Ordered pages per source"
+                  ],
+                  [
+                    "report_filters",
+                    "Table, column, and either user-bound values (regions/categories) or fixed JSON values"
+                  ],
+                  [
+                    "login_activity",
+                    "User, time, IP"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Embed logic",
+          "blocks": [
+            {
+              "ol": [
+                "Get an Azure AD token via MSAL; reuse until 120 s before expiry, guarded by a lock.",
+                "Fetch each report source's metadata and pages in parallel (one worker per source), cached 600 s.",
+                "Choose pages: explicit mode keeps configured order; then apply the user's allowed pages, or drop default-hidden pages.",
+                "Resolve filters by replacing user-bound placeholders with the user's regions/categories; drop a filter if the user has no values.",
+                "Client applies basic 'In' filters, hides filter/navigation panes and switches pages with setPage(), falling back to a full re-embed."
+              ]
+            },
+            {
+              "code": "aad_tok = cached_aad_token(refresh_within=120)\ninfo = parallel({s.id: cached(600, fetch_report_and_pages, s) for s in sources})\nfor s in sources:\n    pages = info[s.id].pages if s.mode == \"all\" else ordered_subset(info[s.id].pages, s.pages)\n    pages = keep(pages, user.allowed) if user.allowed else drop(pages, default_hidden)\n    filters = [f.with_values(user[f.bind] or f.fixed) for f in s.filters if (user[f.bind] or f.fixed)]\n    emit(pages, filters)",
+              "title": "Per-user embed payload"
+            },
+            {
+              "h": "Schema discovery for admins (DAX via executeQueries)"
+            },
+            {
+              "ul": [
+                "COLUMNSTATISTICS(), falling back to INFO.VIEW.COLUMNS(); auto-generated date tables skipped.",
+                "Column values via TOPN(1001, VALUES(Table[Col])) — 1001 detects truncation at 1000.",
+                "Identifiers escaped (quotes and ']' doubled); report ids validated as GUIDs."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "Users see only the pages and slices assigned to them, inside one portal.",
+                "Access changes for many users at once with additive grants.",
+                "Faster loads from parallel, cached metadata and in-report page switching."
+              ]
+            },
+            {
+              "h": "Next steps"
+            },
+            {
+              "ul": [
+                "Move row-level scoping to Power BI RLS with per-user embed tokens.",
+                "Automated tests for page/filter resolution."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "webapp",
+        "analytics"
       ]
     },
     {
@@ -462,48 +2132,205 @@
       "status": "production",
       "title": "Product Launch Mailer",
       "tagline": "Region-wise launch emails with stock tables, image galleries and launch-history badges.",
-      "stack": ["Python", "Flask", "pandas", "premailer", "SMTP", "SQLite", "JSZip"],
+      "stack": [
+        "Python",
+        "Flask",
+        "pandas",
+        "premailer",
+        "SMTP",
+        "SQLite",
+        "JSZip"
+      ],
       "preview": {
-        "type": "table", "title": "Launch check",
-        "columns": ["Region", "Products", "Images", "History", "Status"],
-        "rows": [["Region A", "12", "12/12", "NEW", "✅ Ready"], ["Region B", "12", "11/12", "2× since Mar", "⚠ 1 missing"], ["Region C", "9", "9/9", "NEW", "✅ Ready"]]
+        "type": "table",
+        "title": "Launch check",
+        "columns": [
+          "Region",
+          "Products",
+          "Images",
+          "History",
+          "Status"
+        ],
+        "rows": [
+          [
+            "Region A",
+            "12",
+            "12/12",
+            "NEW",
+            "✅ Ready"
+          ],
+          [
+            "Region B",
+            "12",
+            "11/12",
+            "2× since Mar",
+            "⚠ 1 missing"
+          ],
+          [
+            "Region C",
+            "9",
+            "9/9",
+            "NEW",
+            "✅ Ready"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Turns a launch workbook into one HTML email per region: summary and detail tables, a pre-filtered image gallery link, missing-image warnings and a NEW / repeat-launch badge." },
-          { "kv": [["Type", "Flask app (~26 routes)"], ["Storage", "SQLite: region recipients (to/cc/bcc), launch history"], ["Email", "HTML with inlined CSS (premailer), one SMTP session per run"], ["Gallery", "Paginated, lazy-loaded, client-side ZIP"], ["Status", "In use"]] },
-          { "h": "Preview" }, { "preview": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "p": "Launch announcements were assembled region by region; missing images and repeat launches were only noticed after sending." },
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Building mails", "Manual per region", "Generated from one workbook"],
-            ["Images", "Attached by hand", "Gallery link pre-filtered to the region's products"],
-            ["Missing images", "Found after sending", "Detected before sending, same logic as the export"],
-            ["Repeat launches", "Not visible", "NEW / N× since <date> badge"]] } }
-        ]},
-        { "id": "logic", "label": "Mail build", "blocks": [
-          { "ol": [
-            "Filter the workbook by region, group and budget category.",
-            "Detect missing images by normalising folder file names (lower case, separators removed) and comparing with each row's code; unmapped codes also count as missing.",
-            "Update launch history in one transaction: one SELECT … IN, then UPDATE or INSERT per product.",
-            "Build summary (distinct products and stock per category + totals) and detail tables with column sums.",
-            "Add a deep link to the gallery pre-filtered to the region's codes, and a missing-images block.",
-            "Inline all CSS with premailer and send over one STARTTLS session reused for all regions."] },
-          { "code": "gens = clean_unique(rows.generic)\nexisting = select(generic, count, first_date).where(region=r, generic in gens)\nfor g in gens:\n    if g in existing:\n        n = existing[g].count + 1; update(g, n, today)\n    else:\n        n = 1; insert(g, first=today, last=today)\n    badge[g] = \"NEW\" if n == 1 else f\"{n}x since {existing[g].first}\"\ncommit()", "title": "Launch-history badge (one transaction)" }
-        ]},
-        { "id": "engineering", "label": "Engineering", "blocks": [
-          { "table": { "columns": ["Concern", "Implementation"], "rows": [
-            ["Load", "Dataset loaded once at start and after each upload"],
-            ["UI", "Server-side pagination (30 rows); select2 for recipient mapping"],
-            ["DB", "Batched SQL for history; parameterised queries"],
-            ["Gallery", "20 items/page, multi-term search, IntersectionObserver lazy loading, JSZip + FileSaver bulk download"],
-            ["Consistency", "Missing-article Excel export uses the same detection function as the mail"],
-            ["Config", "Secrets from environment"]] } }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["Every region's launch mail generated from one workbook.", "Missing images caught before sending.", "Repeat launches clearly marked."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Turns a launch workbook into one HTML email per region: summary and detail tables, a pre-filtered image gallery link, missing-image warnings and a NEW / repeat-launch badge."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Flask app (~26 routes)"
+                ],
+                [
+                  "Storage",
+                  "SQLite: region recipients (to/cc/bcc), launch history"
+                ],
+                [
+                  "Email",
+                  "HTML with inlined CSS (premailer), one SMTP session per run"
+                ],
+                [
+                  "Gallery",
+                  "Paginated, lazy-loaded, client-side ZIP"
+                ],
+                [
+                  "Status",
+                  "In use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "p": "Launch announcements were assembled region by region; missing images and repeat launches were only noticed after sending."
+            },
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Building mails",
+                    "Manual per region",
+                    "Generated from one workbook"
+                  ],
+                  [
+                    "Images",
+                    "Attached by hand",
+                    "Gallery link pre-filtered to the region's products"
+                  ],
+                  [
+                    "Missing images",
+                    "Found after sending",
+                    "Detected before sending, same logic as the export"
+                  ],
+                  [
+                    "Repeat launches",
+                    "Not visible",
+                    "NEW / N× since <date> badge"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Mail build",
+          "blocks": [
+            {
+              "ol": [
+                "Filter the workbook by region, group and budget category.",
+                "Detect missing images by normalising folder file names (lower case, separators removed) and comparing with each row's code; unmapped codes also count as missing.",
+                "Update launch history in one transaction: one SELECT … IN, then UPDATE or INSERT per product.",
+                "Build summary (distinct products and stock per category + totals) and detail tables with column sums.",
+                "Add a deep link to the gallery pre-filtered to the region's codes, and a missing-images block.",
+                "Inline all CSS with premailer and send over one STARTTLS session reused for all regions."
+              ]
+            },
+            {
+              "code": "gens = clean_unique(rows.generic)\nexisting = select(generic, count, first_date).where(region=r, generic in gens)\nfor g in gens:\n    if g in existing:\n        n = existing[g].count + 1; update(g, n, today)\n    else:\n        n = 1; insert(g, first=today, last=today)\n    badge[g] = \"NEW\" if n == 1 else f\"{n}x since {existing[g].first}\"\ncommit()",
+              "title": "Launch-history badge (one transaction)"
+            }
+          ]
+        },
+        {
+          "id": "engineering",
+          "label": "Engineering",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Concern",
+                  "Implementation"
+                ],
+                "rows": [
+                  [
+                    "Load",
+                    "Dataset loaded once at start and after each upload"
+                  ],
+                  [
+                    "UI",
+                    "Server-side pagination (30 rows); select2 for recipient mapping"
+                  ],
+                  [
+                    "DB",
+                    "Batched SQL for history; parameterised queries"
+                  ],
+                  [
+                    "Gallery",
+                    "20 items/page, multi-term search, IntersectionObserver lazy loading, JSZip + FileSaver bulk download"
+                  ],
+                  [
+                    "Consistency",
+                    "Missing-article Excel export uses the same detection function as the mail"
+                  ],
+                  [
+                    "Config",
+                    "Secrets from environment"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "Every region's launch mail generated from one workbook.",
+                "Missing images caught before sending.",
+                "Repeat launches clearly marked."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "webapp"
       ]
     },
     {
@@ -513,34 +2340,191 @@
       "status": "production",
       "title": "Dealer Stock Allotment Engine",
       "tagline": "Weighted multi-criteria scoring and greedy allocation of scarce stock, with a Green / Red / Black audit trail.",
-      "stack": ["Python", "pandas", "NumPy", "SQLAlchemy", "openpyxl"],
+      "stack": [
+        "Python",
+        "pandas",
+        "NumPy",
+        "SQLAlchemy",
+        "openpyxl"
+      ],
       "preview": {
-        "type": "table", "title": "Allotment",
-        "columns": ["Dealer", "Article", "Requested", "Score", "Status", "Allotted"],
-        "rows": [["Dealer 101", "A12", "300", "0.86", "GREEN", "300"], ["Dealer 214", "A12", "250", "0.61", "RED", "140"], ["Dealer 087", "A12", "180", "0.32", "BLACK", "0"]]
+        "type": "table",
+        "title": "Allotment",
+        "columns": [
+          "Dealer",
+          "Article",
+          "Requested",
+          "Score",
+          "Status",
+          "Allotted"
+        ],
+        "rows": [
+          [
+            "Dealer 101",
+            "A12",
+            "300",
+            "0.86",
+            "GREEN",
+            "300"
+          ],
+          [
+            "Dealer 214",
+            "A12",
+            "250",
+            "0.61",
+            "RED",
+            "140"
+          ],
+          [
+            "Dealer 087",
+            "A12",
+            "180",
+            "0.32",
+            "BLACK",
+            "0"
+          ]
+        ]
       },
       "note": "Runs on a company server; the code is not on this laptop, so this page is written from my design notes.",
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "When demand exceeds stock, every dealer × article requirement is scored, sorted and allotted greedily, then labelled GREEN (full), RED (partial/deferred) or BLACK (blocked)." },
-          { "kv": [["Type", "Daily Python batch (pandas/NumPy)"], ["Inputs", "Dealer requirement export, live warehouse stock, dealer master"], ["Output", "Colour-coded allotment workbook + audit table"], ["Status", "In daily use"]] },
-          { "h": "Preview" }, { "preview": true }
-        ]},
-        { "id": "problem", "label": "Problem", "blocks": [
-          { "table": { "columns": ["Area", "Before", "After"], "rows": [
-            ["Decision", "Individual judgement in Excel", "Same weighted rules every day"],
-            ["Transparency", "No record of why", "Audit row per decision with reason code"],
-            ["Prioritisation", "Not weighted by performance", "Priority, stock ratio, offtake, dues, trend"],
-            ["Errors", "Copy mismatches between sheets", "Schema validation on input"]] } }
-        ]},
-        { "id": "logic", "label": "Scoring & allocation", "blocks": [
-          { "table": { "columns": ["Criterion", "Weight"], "rows": [["Dealer priority class", "30%"], ["Stock availability ratio", "25%"], ["Recent offtake velocity", "20%"], ["Dues / blocking flag", "15%"], ["Market trend", "10%"]] } },
-          { "ol": ["Ingest requirements; validate SKUs, quantities and dealer codes.", "Merge live stock (after safety buffer) on SKU.", "Join dealer master (priority, credit utilisation, dues, activity).", "Composite score = criteria matrix · weights (NumPy); sort descending.", "Greedy allocation with stock decrement per SKU.", "Classify, export colour-coded workbook, append audit rows."] },
-          { "code": "weights = np.array([0.30, 0.25, 0.20, 0.15, 0.10])\ndf[\"score\"] = df[criteria_cols].to_numpy() @ weights\ndf = df.sort_values(\"score\", ascending=False)\npool = stock.set_index(\"sku\")[\"available\"].to_dict()\nfor i, row in df.iterrows():\n    avail = pool.get(row.sku, 0)\n    if row.blocked:          qty, status = 0, \"BLACK\"\n    elif avail >= row.req:   qty, status = row.req, \"GREEN\"\n    elif avail > 0:          qty, status = avail, \"RED\"\n    else:                    qty, status = 0, \"RED\"\n    pool[row.sku] = avail - qty\n    df.loc[i, [\"allotted\", \"status\"]] = qty, status", "title": "Score and allot" }
-        ]},
-        { "id": "outcome", "label": "Outcome", "blocks": [
-          { "ul": ["Consistent, explainable allotment every day.", "Any dealer query answered from the audit table."] }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "When demand exceeds stock, every dealer × article requirement is scored, sorted and allotted greedily, then labelled GREEN (full), RED (partial/deferred) or BLACK (blocked)."
+            },
+            {
+              "kv": [
+                [
+                  "Type",
+                  "Daily Python batch (pandas/NumPy)"
+                ],
+                [
+                  "Inputs",
+                  "Dealer requirement export, live warehouse stock, dealer master"
+                ],
+                [
+                  "Output",
+                  "Colour-coded allotment workbook + audit table"
+                ],
+                [
+                  "Status",
+                  "In daily use"
+                ]
+              ]
+            },
+            {
+              "h": "Preview"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Area",
+                  "Before",
+                  "After"
+                ],
+                "rows": [
+                  [
+                    "Decision",
+                    "Individual judgement in Excel",
+                    "Same weighted rules every day"
+                  ],
+                  [
+                    "Transparency",
+                    "No record of why",
+                    "Audit row per decision with reason code"
+                  ],
+                  [
+                    "Prioritisation",
+                    "Not weighted by performance",
+                    "Priority, stock ratio, offtake, dues, trend"
+                  ],
+                  [
+                    "Errors",
+                    "Copy mismatches between sheets",
+                    "Schema validation on input"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "Scoring & allocation",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Criterion",
+                  "Weight"
+                ],
+                "rows": [
+                  [
+                    "Dealer priority class",
+                    "30%"
+                  ],
+                  [
+                    "Stock availability ratio",
+                    "25%"
+                  ],
+                  [
+                    "Recent offtake velocity",
+                    "20%"
+                  ],
+                  [
+                    "Dues / blocking flag",
+                    "15%"
+                  ],
+                  [
+                    "Market trend",
+                    "10%"
+                  ]
+                ]
+              }
+            },
+            {
+              "ol": [
+                "Ingest requirements; validate SKUs, quantities and dealer codes.",
+                "Merge live stock (after safety buffer) on SKU.",
+                "Join dealer master (priority, credit utilisation, dues, activity).",
+                "Composite score = criteria matrix · weights (NumPy); sort descending.",
+                "Greedy allocation with stock decrement per SKU.",
+                "Classify, export colour-coded workbook, append audit rows."
+              ]
+            },
+            {
+              "code": "weights = np.array([0.30, 0.25, 0.20, 0.15, 0.10])\ndf[\"score\"] = df[criteria_cols].to_numpy() @ weights\ndf = df.sort_values(\"score\", ascending=False)\npool = stock.set_index(\"sku\")[\"available\"].to_dict()\nfor i, row in df.iterrows():\n    avail = pool.get(row.sku, 0)\n    if row.blocked:          qty, status = 0, \"BLACK\"\n    elif avail >= row.req:   qty, status = row.req, \"GREEN\"\n    elif avail > 0:          qty, status = avail, \"RED\"\n    else:                    qty, status = 0, \"RED\"\n    pool[row.sku] = avail - qty\n    df.loc[i, [\"allotted\", \"status\"]] = qty, status",
+              "title": "Score and allot"
+            }
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "blocks": [
+            {
+              "ul": [
+                "Consistent, explainable allotment every day.",
+                "Any dealer query answered from the audit table."
+              ]
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "analytics",
+        "engineering"
       ]
     },
     {
@@ -550,71 +2534,380 @@
       "status": "research",
       "title": "BTC Short-Horizon Forecasting Research",
       "tagline": "Volatility ranges and gated direction models on 1-second data, with leakage tests and fee-aware walk-forward backtests.",
-      "stack": ["Python", "NumPy", "pandas", "Ridge", "Logistic regression", "MLP (NumPy)", "1D-CNN (NumPy)", "Walk-forward"],
+      "stack": [
+        "Python",
+        "NumPy",
+        "pandas",
+        "Ridge",
+        "Logistic regression",
+        "MLP (NumPy)",
+        "1D-CNN (NumPy)",
+        "Walk-forward"
+      ],
       "preview": {
-        "type": "table", "title": "Headline out-of-sample results (121 days, 173k forecasts)",
-        "columns": ["Metric", "Model", "Baseline"],
-        "rows": [["90% range coverage", "89.9%", "target 90%"], ["50% range coverage", "49.8%", "target 50%"], ["Pinball loss (bps)", "4.484", "4.737 (+5.3%)"], ["Volatility R²", "0.705", "0.649"], ["Direction AUC", "0.534", "0.500"], ["Paper P&L after fees", "20,000 → 2", "—"]]
+        "type": "table",
+        "title": "Headline out-of-sample results (121 days, 173k forecasts)",
+        "columns": [
+          "Metric",
+          "Model",
+          "Baseline"
+        ],
+        "rows": [
+          [
+            "90% range coverage",
+            "89.9%",
+            "target 90%"
+          ],
+          [
+            "50% range coverage",
+            "49.8%",
+            "target 50%"
+          ],
+          [
+            "Pinball loss (bps)",
+            "4.484",
+            "4.737 (+5.3%)"
+          ],
+          [
+            "Volatility R²",
+            "0.705",
+            "0.649"
+          ],
+          [
+            "Direction AUC",
+            "0.534",
+            "0.500"
+          ],
+          [
+            "Paper P&L after fees",
+            "20,000 → 2",
+            "—"
+          ]
+        ]
       },
       "sections": [
-        { "id": "overview", "label": "Overview", "blocks": [
-          { "callout": "Question: can short-horizon BTC moves be forecast well enough to trade after fees? Answer, after a leakage-safe study: ranges yes (well calibrated), direction barely, profit no." },
-          { "kv": [["Data", "Public exchange archive: spot BTC/USDT 1-second bars + perpetual futures 1-minute bars, ~184 days; live recorder"], ["Horizon", "Main model 20 minutes, decision every minute; short-horizon study 10 s – 20 min"], ["Models", "All written by hand in NumPy: ridge, Newton logistic, MLP, 1D-CNN, AdamW"], ["Evaluation", "18-fold walk-forward, 121 out-of-sample days"], ["Tests", "8 pipeline self-checks"]] },
-          { "h": "Headline results" }, { "preview": true }
-        ]},
-        { "id": "data", "label": "Data & features", "blocks": [
-          { "table": { "columns": ["Stage", "Detail"], "rows": [
-            ["Download", "Archive files verified by SHA-256, up to 4 retries with backoff"],
-            ["Bars", "Price, volume, buyer-initiated volume, trade count"],
-            ["Outages", "After a gap > 30 s, the next 24 h are masked as unreliable"],
-            ["Live", "Recorder back-fills 30 h at start, optional order-book snapshots"]] } },
-          { "h": "Features" },
-          { "table": { "columns": ["Model", "Inputs"], "rows": [
-            ["Volatility", "Log realised variance over 5 min, 20 min, 1 h, 4 h, 24 h (from 10-s returns); volume and trade count 5 min vs 24 h; jump share from bipower variation; |order-flow imbalance| 5 min; half-hour × weekend seasonality"],
-            ["Direction", "Order-flow imbalance 1/5/15 min and 1 h; vol-scaled returns 1/5/20 min, 1 h, 4 h; gap to 1-h VWAP; perp–spot basis deviation; perp lead 5 min; perp flow 5/15 min"],
-            ["Network", "Last 30 one-minute returns and flow imbalances"]] } }
-        ]},
-        { "id": "models", "label": "Models", "blocks": [
-          { "table": { "columns": ["Component", "Method", "Settings"], "rows": [
-            ["Volatility", "Ridge regression on log forward 20-min realised variance", "λ = 1e-3"],
-            ["Range", "Filtered historical simulation: quantiles of returns ÷ predicted vol on a 14-day calibration slice", "q = 5/25/50/75/95"],
-            ["Direction", "Ridge logistic regression (Newton steps) + Platt calibration", "λ = 0.25, p clipped to [0.40, 0.60]"],
-            ["Coherence", "Range shifted so P(return > 0) equals the stated probability", "—"],
-            ["Correction net", "Wide-and-deep MLP 128-64-32, ReLU, dropout 10%, AdamW; last layer zero-initialised so it starts at the linear model; 3-seed average", "lr 1e-3, wd 1e-4, ≤ 20 epochs, batch 1024, patience 4"],
-            ["Gate", "Direction used only if log-loss gain vs base rate has one-sided t p < 0.0228 (daily means, Newey-West) and Platt slope > 0", "else base rate"]] } },
-          { "code": "for fold in walk_forward(train=60d, cal=14d, test=7d, purge=21min):\n    vol = ridge(Xv[fit], log_fwd_var[fit], lam=1e-3)\n    dir_ = ridge_logistic(Xd[fit], up[fit], lam=0.25)\n    z = ret[cal] / exp(0.5 * vol(Xv[cal]))\n    zq = quantiles(z, grid)\n    t, days = newey_west_t(logloss(base) - logloss(dir_(cal)))\n    gate = pvalue(t, days) < 0.0228 and platt_slope > 0\n    p = clip(platt(dir_(test)) if gate else base, 0.40, 0.60)\n    q = sigma(test) * (interp(TAUS, grid, zq) - interp(1 - p, grid, zq))", "title": "Walk-forward fold" }
-        ]},
-        { "id": "validation", "label": "Validation", "blocks": [
-          { "h": "Backtest design" },
-          { "ul": ["Walk-forward: 60-day window (incl. 14-day calibration), 7-day test step, 21-minute purge between fit, calibration and test.", "All settings fixed before testing; significance on daily means.", "Baselines: unconditional, last-1h volatility, last-1h volatility with clock adjustment.", "Placebo: labels rolled by ≥ 2 days.", "Automatic red flags: AUC > 0.56, accuracy > 0.54, vol R² > 0.8, probability spread > 0.05, 90% coverage off by > 3 pts, < 120 days.", "Paper rules: trade at p ≥ 0.55 / ≤ 0.45, target 1.5σ, trailing stop 1.0σ, 20-min time exit, 0.1% fee per side, 50 coin-flip baselines."] },
-          { "h": "Pipeline tests (8)" },
-          { "table": { "columns": ["#", "Test", "Catches"], "rows": [
-            ["1", "Truncate the future, features must be identical", "Look-ahead bias"],
-            ["2", "Timestamp units, torn lines", "Parsing bugs"],
-            ["3", "Fold purity", "Label overlap between slices"],
-            ["4", "Implied P(up) matches, quantiles don't cross, save/load round-trip", "Incoherent forecasts"],
-            ["5", "Same checks on the network", "NN regressions"],
-            ["6", "Target/stop fills, trailing stop, time exit, fees", "Backtest accounting errors"],
-            ["7", "Planted leak must be detected (AUC > 0.9)", "Silent leakage"],
-            ["8", "Outage masking", "Bad data after gaps"]] } },
-          { "h": "Synthetic sanity check" },
-          { "p": "AR(1) volatility process with a clock pattern. No planted signal: AUC 0.5013, gate on in 0 of 5 folds. Planted edge: AUC 0.5518, beating 20 of 20 placebo runs — the pipeline finds signal only when it exists." }
-        ]},
-        { "id": "results", "label": "Results", "blocks": [
-          { "h": "Main model (121 out-of-sample days, 18 folds)" },
-          { "table": { "columns": ["Metric", "Result", "Comment"], "rows": [
-            ["Range coverage 90% / 50%", "89.9% / 49.8%", "Quantile hit rates 0.051 / 0.253 / 0.501 / 0.750 / 0.950"],
-            ["Pinball loss", "4.484 bps vs 4.737", "+5.3% vs unconditional (t = 11.1); +1.0% vs 1-h vol (t = 8.2)"],
-            ["Volatility R²", "0.705 vs 0.649", "Beats baseline"],
-            ["Direction AUC / accuracy", "0.534 / 52.2%", "Gate on in 6 of 18 folds; final gain p = 0.358 (not significant)"],
-            ["Placebo", "0.538 vs 0.502", "Real beats placebo 10 of 10"],
-            ["Linear-only direction", "AUC 0.534, gain p = 0.006", "Gate on in 10 of 18 folds"],
-            ["Paper replay", "20,000 → 2 with fees (4,779 trades)", "24,733 without fees; beats 49 of 50 coin-flips"]] } },
-          { "h": "Short-horizon study (NN accuracy, moves > 0.5 bp)" },
-          { "table": { "columns": ["Horizon", "10 s", "30 s", "1 min", "2 min", "5 min", "20 min"], "rows": [["Accuracy", "58.9%", "55.7%", "54.1%", "52.8%", "52.5%", "52.0%"]] } },
-          { "ul": ["Most confident 1% at 10 s: 81.1%; acting 2 s late drops 10-s accuracy to 55.4%; placebo ≈ 50% at every horizon.", "Range trading (1D-CNN on 15-min candles): 71.2% vs 71.7% random-walk baseline — no skill; −12.8% after fees.", "Live engine matched tested forecasts in 720 of 720 replays."] },
-          { "callout": "Conclusion: volatility ranges are forecastable and well calibrated; direction carries a small, real but untradable signal — fees are larger than the typical move. Reported as a negative result rather than tuned into a false positive." }
-        ]}
+        {
+          "id": "overview",
+          "label": "Overview",
+          "blocks": [
+            {
+              "callout": "Question: can short-horizon BTC moves be forecast well enough to trade after fees? Answer, after a leakage-safe study: ranges yes (well calibrated), direction barely, profit no."
+            },
+            {
+              "kv": [
+                [
+                  "Data",
+                  "Public exchange archive: spot BTC/USDT 1-second bars + perpetual futures 1-minute bars, ~184 days; live recorder"
+                ],
+                [
+                  "Horizon",
+                  "Main model 20 minutes, decision every minute; short-horizon study 10 s – 20 min"
+                ],
+                [
+                  "Models",
+                  "All written by hand in NumPy: ridge, Newton logistic, MLP, 1D-CNN, AdamW"
+                ],
+                [
+                  "Evaluation",
+                  "18-fold walk-forward, 121 out-of-sample days"
+                ],
+                [
+                  "Tests",
+                  "8 pipeline self-checks"
+                ]
+              ]
+            },
+            {
+              "h": "Headline results"
+            },
+            {
+              "preview": true
+            }
+          ]
+        },
+        {
+          "id": "data",
+          "label": "Data & features",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Stage",
+                  "Detail"
+                ],
+                "rows": [
+                  [
+                    "Download",
+                    "Archive files verified by SHA-256, up to 4 retries with backoff"
+                  ],
+                  [
+                    "Bars",
+                    "Price, volume, buyer-initiated volume, trade count"
+                  ],
+                  [
+                    "Outages",
+                    "After a gap > 30 s, the next 24 h are masked as unreliable"
+                  ],
+                  [
+                    "Live",
+                    "Recorder back-fills 30 h at start, optional order-book snapshots"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Features"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Model",
+                  "Inputs"
+                ],
+                "rows": [
+                  [
+                    "Volatility",
+                    "Log realised variance over 5 min, 20 min, 1 h, 4 h, 24 h (from 10-s returns); volume and trade count 5 min vs 24 h; jump share from bipower variation; |order-flow imbalance| 5 min; half-hour × weekend seasonality"
+                  ],
+                  [
+                    "Direction",
+                    "Order-flow imbalance 1/5/15 min and 1 h; vol-scaled returns 1/5/20 min, 1 h, 4 h; gap to 1-h VWAP; perp–spot basis deviation; perp lead 5 min; perp flow 5/15 min"
+                  ],
+                  [
+                    "Network",
+                    "Last 30 one-minute returns and flow imbalances"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "models",
+          "label": "Models",
+          "blocks": [
+            {
+              "table": {
+                "columns": [
+                  "Component",
+                  "Method",
+                  "Settings"
+                ],
+                "rows": [
+                  [
+                    "Volatility",
+                    "Ridge regression on log forward 20-min realised variance",
+                    "λ = 1e-3"
+                  ],
+                  [
+                    "Range",
+                    "Filtered historical simulation: quantiles of returns ÷ predicted vol on a 14-day calibration slice",
+                    "q = 5/25/50/75/95"
+                  ],
+                  [
+                    "Direction",
+                    "Ridge logistic regression (Newton steps) + Platt calibration",
+                    "λ = 0.25, p clipped to [0.40, 0.60]"
+                  ],
+                  [
+                    "Coherence",
+                    "Range shifted so P(return > 0) equals the stated probability",
+                    "—"
+                  ],
+                  [
+                    "Correction net",
+                    "Wide-and-deep MLP 128-64-32, ReLU, dropout 10%, AdamW; last layer zero-initialised so it starts at the linear model; 3-seed average",
+                    "lr 1e-3, wd 1e-4, ≤ 20 epochs, batch 1024, patience 4"
+                  ],
+                  [
+                    "Gate",
+                    "Direction used only if log-loss gain vs base rate has one-sided t p < 0.0228 (daily means, Newey-West) and Platt slope > 0",
+                    "else base rate"
+                  ]
+                ]
+              }
+            },
+            {
+              "code": "for fold in walk_forward(train=60d, cal=14d, test=7d, purge=21min):\n    vol = ridge(Xv[fit], log_fwd_var[fit], lam=1e-3)\n    dir_ = ridge_logistic(Xd[fit], up[fit], lam=0.25)\n    z = ret[cal] / exp(0.5 * vol(Xv[cal]))\n    zq = quantiles(z, grid)\n    t, days = newey_west_t(logloss(base) - logloss(dir_(cal)))\n    gate = pvalue(t, days) < 0.0228 and platt_slope > 0\n    p = clip(platt(dir_(test)) if gate else base, 0.40, 0.60)\n    q = sigma(test) * (interp(TAUS, grid, zq) - interp(1 - p, grid, zq))",
+              "title": "Walk-forward fold"
+            }
+          ]
+        },
+        {
+          "id": "validation",
+          "label": "Validation",
+          "blocks": [
+            {
+              "h": "Backtest design"
+            },
+            {
+              "ul": [
+                "Walk-forward: 60-day window (incl. 14-day calibration), 7-day test step, 21-minute purge between fit, calibration and test.",
+                "All settings fixed before testing; significance on daily means.",
+                "Baselines: unconditional, last-1h volatility, last-1h volatility with clock adjustment.",
+                "Placebo: labels rolled by ≥ 2 days.",
+                "Automatic red flags: AUC > 0.56, accuracy > 0.54, vol R² > 0.8, probability spread > 0.05, 90% coverage off by > 3 pts, < 120 days.",
+                "Paper rules: trade at p ≥ 0.55 / ≤ 0.45, target 1.5σ, trailing stop 1.0σ, 20-min time exit, 0.1% fee per side, 50 coin-flip baselines."
+              ]
+            },
+            {
+              "h": "Pipeline tests (8)"
+            },
+            {
+              "table": {
+                "columns": [
+                  "#",
+                  "Test",
+                  "Catches"
+                ],
+                "rows": [
+                  [
+                    "1",
+                    "Truncate the future, features must be identical",
+                    "Look-ahead bias"
+                  ],
+                  [
+                    "2",
+                    "Timestamp units, torn lines",
+                    "Parsing bugs"
+                  ],
+                  [
+                    "3",
+                    "Fold purity",
+                    "Label overlap between slices"
+                  ],
+                  [
+                    "4",
+                    "Implied P(up) matches, quantiles don't cross, save/load round-trip",
+                    "Incoherent forecasts"
+                  ],
+                  [
+                    "5",
+                    "Same checks on the network",
+                    "NN regressions"
+                  ],
+                  [
+                    "6",
+                    "Target/stop fills, trailing stop, time exit, fees",
+                    "Backtest accounting errors"
+                  ],
+                  [
+                    "7",
+                    "Planted leak must be detected (AUC > 0.9)",
+                    "Silent leakage"
+                  ],
+                  [
+                    "8",
+                    "Outage masking",
+                    "Bad data after gaps"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Synthetic sanity check"
+            },
+            {
+              "p": "AR(1) volatility process with a clock pattern. No planted signal: AUC 0.5013, gate on in 0 of 5 folds. Planted edge: AUC 0.5518, beating 20 of 20 placebo runs — the pipeline finds signal only when it exists."
+            }
+          ]
+        },
+        {
+          "id": "results",
+          "label": "Results",
+          "blocks": [
+            {
+              "h": "Main model (121 out-of-sample days, 18 folds)"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Metric",
+                  "Result",
+                  "Comment"
+                ],
+                "rows": [
+                  [
+                    "Range coverage 90% / 50%",
+                    "89.9% / 49.8%",
+                    "Quantile hit rates 0.051 / 0.253 / 0.501 / 0.750 / 0.950"
+                  ],
+                  [
+                    "Pinball loss",
+                    "4.484 bps vs 4.737",
+                    "+5.3% vs unconditional (t = 11.1); +1.0% vs 1-h vol (t = 8.2)"
+                  ],
+                  [
+                    "Volatility R²",
+                    "0.705 vs 0.649",
+                    "Beats baseline"
+                  ],
+                  [
+                    "Direction AUC / accuracy",
+                    "0.534 / 52.2%",
+                    "Gate on in 6 of 18 folds; final gain p = 0.358 (not significant)"
+                  ],
+                  [
+                    "Placebo",
+                    "0.538 vs 0.502",
+                    "Real beats placebo 10 of 10"
+                  ],
+                  [
+                    "Linear-only direction",
+                    "AUC 0.534, gain p = 0.006",
+                    "Gate on in 10 of 18 folds"
+                  ],
+                  [
+                    "Paper replay",
+                    "20,000 → 2 with fees (4,779 trades)",
+                    "24,733 without fees; beats 49 of 50 coin-flips"
+                  ]
+                ]
+              }
+            },
+            {
+              "h": "Short-horizon study (NN accuracy, moves > 0.5 bp)"
+            },
+            {
+              "table": {
+                "columns": [
+                  "Horizon",
+                  "10 s",
+                  "30 s",
+                  "1 min",
+                  "2 min",
+                  "5 min",
+                  "20 min"
+                ],
+                "rows": [
+                  [
+                    "Accuracy",
+                    "58.9%",
+                    "55.7%",
+                    "54.1%",
+                    "52.8%",
+                    "52.5%",
+                    "52.0%"
+                  ]
+                ]
+              }
+            },
+            {
+              "ul": [
+                "Most confident 1% at 10 s: 81.1%; acting 2 s late drops 10-s accuracy to 55.4%; placebo ≈ 50% at every horizon.",
+                "Range trading (1D-CNN on 15-min candles): 71.2% vs 71.7% random-walk baseline — no skill; −12.8% after fees.",
+                "Live engine matched tested forecasts in 720 of 720 replays."
+              ]
+            },
+            {
+              "callout": "Conclusion: volatility ranges are forecastable and well calibrated; direction carries a small, real but untradable signal — fees are larger than the typical move. Reported as a negative result rather than tuned into a false positive."
+            }
+          ]
+        }
+      ],
+      "cats": [
+        "ml",
+        "analytics"
       ]
     }
   ]
