@@ -334,3 +334,8 @@ figure.code pre { margin: 0; padding: 12px 14px; overflow-x: auto; background: #
   .scr-nav { display: none; }
   .kpis { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── Real (redacted) screenshots ── */
+figure.shot { margin: 8px 0 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+figure.shot img { display: block; width: 100%; height: auto; }
+figure.shot figcaption { font-size: .8rem; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--border); }

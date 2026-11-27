@@ -66,6 +66,9 @@
     if (b.code) return `<figure class="code">${b.title ? `<figcaption>${esc(b.title)}</figcaption>` : ""}<pre><code>${esc(b.code)}</code></pre></figure>`;
     if (b.flow) return `<div class="flow">${b.flow.map((s) => `<span>${esc(s)}</span>`).join("<em>→</em>")}</div>`;
     if (b.callout) return `<div class="callout">${esc(b.callout)}</div>`;
+    if (b.image) return `<figure class="shot"><div class="mock-bar"><i></i><i></i><i></i><b>${esc(b.image.title || "")}</b><em>names &amp; values hidden</em></div>
+      <a href="${esc(b.image.src)}" target="_blank" rel="noopener"><img src="${esc(b.image.src)}" alt="${esc(b.image.alt || b.image.title || "App screenshot")}" loading="lazy"></a>
+      ${b.image.caption ? `<figcaption>${esc(b.image.caption)}</figcaption>` : ""}</figure>`;
     if (b.preview) {
       const work = (p.group || "work") === "work" && p.preview.hide !== false;
       return `${preview(p.preview, work)}<p class="note" style="margin-top:6px">${work

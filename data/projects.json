@@ -2061,7 +2061,18 @@
               ]
             },
             {
-              "h": "Preview"
+              "h": "Real screen"
+            },
+            {
+              "image": {
+                "src": "assets/screens/powerbi-state-report.jpg",
+                "title": "Sales · State report",
+                "alt": "Portal screen: department sidebar, report header and embedded report, with names and values blurred",
+                "caption": "Actual portal screen. Company name, logo, report names and all values are blurred; the browser address is cropped."
+              }
+            },
+            {
+              "h": "Layout replica (dummy data)"
             },
             {
               "preview": true
